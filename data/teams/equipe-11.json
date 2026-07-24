@@ -1,0 +1,21 @@
+{
+  "id": "equipe-11",
+  "name": "Équipe 11",
+  "division": "Jeunes D1",
+  "matches": [
+    {
+      "date": "03/10/2026",
+      "opponent": "Saint-Maur",
+      "status": "played",
+      "result": "V",
+      "score": "V 9-1"
+    },
+    {
+      "date": "17/10/2026",
+      "opponent": "Chevilly Larue",
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}

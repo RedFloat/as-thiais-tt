@@ -1,0 +1,21 @@
+{
+  "id": "equipe-1",
+  "name": "Équipe 1",
+  "division": "Nationale 3",
+  "matches": [
+    {
+      "date": "26/09/2026",
+      "opponent": "TT Montreuil",
+      "status": "played",
+      "result": "V",
+      "score": "V 8-4"
+    },
+    {
+      "date": "10/10/2026",
+      "opponent": "US Fontenay",
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}

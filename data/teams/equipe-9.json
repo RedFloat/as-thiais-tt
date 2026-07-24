@@ -1,0 +1,21 @@
+{
+  "id": "equipe-9",
+  "name": "Équipe 9",
+  "division": "Départementale 2",
+  "matches": [
+    {
+      "date": "25/09/2026",
+      "opponent": "Kremlin-Bicêtre",
+      "status": "played",
+      "result": "V",
+      "score": "V 12-2"
+    },
+    {
+      "date": "09/10/2026",
+      "opponent": "Thiais 8",
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}

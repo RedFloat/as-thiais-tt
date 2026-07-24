@@ -1,0 +1,21 @@
+{
+  "id": "equipe-2",
+  "name": "Équipe 2",
+  "division": "Régionale 2",
+  "matches": [
+    {
+      "date": "27/09/2026",
+      "opponent": "Versailles US",
+      "status": "played",
+      "result": "N",
+      "score": "N 7-7"
+    },
+    {
+      "date": "11/10/2026",
+      "opponent": "SQY Ping",
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}

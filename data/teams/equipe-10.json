@@ -1,0 +1,21 @@
+{
+  "id": "equipe-10",
+  "name": "Équipe 10",
+  "division": "Départementale 3",
+  "matches": [
+    {
+      "date": "25/09/2026",
+      "opponent": "Ivry US",
+      "status": "played",
+      "result": "N",
+      "score": "N 7-7"
+    },
+    {
+      "date": "09/10/2026",
+      "opponent": "Cachan",
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}
