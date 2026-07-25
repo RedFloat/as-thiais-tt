@@ -101,8 +101,8 @@
         <li><button type="button" class="nav-btn" data-view="settings">
           <i class="fa-solid fa-sliders"></i> Réglages globaux
         </button></li>
-        <li><button type="button" class="nav-btn" data-view="sponsors">
-          <i class="fa-solid fa-handshake"></i> Sponsors
+        <li><button type="button" class="nav-btn" data-view="sponsors" disabled>
+          <i class="fa-solid fa-handshake"></i> Sponsors <span class="soon-tag">Bientôt</span>
         </button></li>
         <li><button type="button" class="nav-btn" data-view="documents" disabled>
           <i class="fa-solid fa-file-lines"></i> Documents <span class="soon-tag">Bientôt</span>
@@ -206,49 +206,10 @@
 
       <!-- ---------- Vues à venir ---------- -->
       <section class="admin-view" id="view-sponsors">
-        <div class="view-header">
-          <h1>Sponsors</h1>
-          <p>Gère les sponsors affichés sur la page d'accueil (mosaïque + logo mis en avant).</p>
-        </div>
-
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-plus"></i> <span id="sponsorFormTitle">Ajouter un sponsor</span></h2>
-          <form id="sponsorForm">
-            <input type="hidden" id="sponsorId">
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="sponsorName">Nom du sponsor</label>
-                <input type="text" id="sponsorName" placeholder="Ville de Thiais" required>
-              </div>
-              <div class="form-group">
-                <label for="sponsorLogo">Lien du logo (image)</label>
-                <input type="url" id="sponsorLogo" placeholder="https://..." required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="sponsorLink">Lien du site du sponsor (facultatif)</label>
-              <input type="url" id="sponsorLink" placeholder="https://...">
-              <span class="form-hint">Si renseigné, le logo devient cliquable dans la mosaïque du site.</span>
-            </div>
-
-            <div style="display:flex; gap:0.7rem; align-items:center;">
-              <button type="submit" class="btn btn-primary" id="sponsorSaveBtn">
-                <i class="fa-solid fa-floppy-disk"></i> <span id="sponsorSaveLabel">Ajouter le sponsor</span>
-              </button>
-              <button type="button" class="btn btn-ghost hidden" id="sponsorCancelBtn">Annuler la modification</button>
-            </div>
-
-            <div class="status-msg" id="sponsorStatus"></div>
-          </form>
-        </div>
-
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-list"></i> Sponsors actuels (<span id="sponsorsCount">0</span>)</h2>
-          <div id="sponsorsList">
-            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
-          </div>
+        <div class="coming-soon">
+          <i class="fa-solid fa-handshake"></i>
+          <h2>Gestion des sponsors</h2>
+          <p>Ce module arrive dans une prochaine étape.</p>
         </div>
       </section>
 
