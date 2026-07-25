@@ -118,139 +118,16 @@
     });
   }
 
-  /* ---------- Sponsors ---------- */
-
-  function buildSponsors(data) {
-    const mosaic = document.getElementById('partnersMosaic');
-    const featured = document.getElementById('featuredPartnerLogo');
-    if (!mosaic || !data || !Array.isArray(data.sponsors)) return;
-
-    const sponsors = data.sponsors;
-
-    // Mosaïque
-    mosaic.innerHTML = '';
-    sponsors.forEach((sponsor) => {
-      const item = document.createElement('div');
-      item.className = 'mosaic-item';
-
-      const img = document.createElement('img');
-      img.src = sponsor.logo;
-      img.alt = sponsor.name || '';
-
-      if (sponsor.link) {
-        const link = document.createElement('a');
-        link.href = sponsor.link;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.style.display = 'contents';
-        link.appendChild(img);
-        item.appendChild(link);
-      } else {
-        item.appendChild(img);
-      }
-
-      mosaic.appendChild(item);
-    });
-
-    // Logo mis en avant, en rotation toutes les 3 secondes
-    if (featured && sponsors.length > 0) {
-      let index = 0;
-      const showSponsor = (i) => {
-        featured.src = sponsors[i].logo;
-        featured.alt = sponsors[i].name || '';
-        featured.style.display = '';
-      };
-      showSponsor(index);
-
-      if (sponsors.length > 1) {
-        setInterval(() => {
-          index = (index + 1) % sponsors.length;
-          featured.classList.add('is-fading');
-          setTimeout(() => {
-            showSponsor(index);
-            featured.classList.remove('is-fading');
-          }, 300);
-        }, 3000);
-      }
-    }
-  }
-
-  /* ---------- Documents ---------- */
-
-  function fileButtonLabel(filePath) {
-    return filePath && filePath.toLowerCase().endsWith('.docx')
-      ? 'Télécharger le document'
-      : 'Télécharger le PDF';
-  }
-
-  function buildDocuments(data) {
-    const container = document.getElementById('documentsContainer');
-    if (!container || !data || !Array.isArray(data.categories)) return;
-
-    container.innerHTML = '';
-
-    data.categories.forEach((category) => {
-      if (!Array.isArray(category.documents) || category.documents.length === 0) return;
-
-      const section = document.createElement('div');
-      section.className = 'doc-category-section';
-
-      const title = document.createElement('h2');
-      title.className = 'doc-category-title';
-      title.innerHTML =
-        '<i class="fa-solid ' + (category.icon || 'fa-folder') + '"></i> ' + category.label;
-      section.appendChild(title);
-
-      const grid = document.createElement('div');
-      grid.className = 'docs-grid';
-
-      category.documents.forEach((doc) => {
-        const card = document.createElement('div');
-        card.className = 'doc-card';
-
-        card.innerHTML =
-          '<div>' +
-          '<div class="doc-card-header">' +
-          '<h3 class="doc-title">' + doc.title + '</h3>' +
-          '<div class="doc-icon"><i class="fa-solid ' + (doc.icon || 'fa-file') + '"></i></div>' +
-          '</div>' +
-          '<p class="doc-description">' + (doc.description || '') + '</p>' +
-          '</div>' +
-          '<a href="' + doc.file + '" target="_blank" rel="noopener" class="doc-link-btn">' +
-          '<i class="fa-solid fa-download"></i> ' + fileButtonLabel(doc.file) +
-          '</a>';
-
-        grid.appendChild(card);
-      });
-
-      section.appendChild(grid);
-      container.appendChild(section);
-    });
-  }
-
-  /* ---------- Embed calendrier ---------- */
-
-  function applyCalendarEmbed(config) {
-    const iframe = document.getElementById('calendarEmbed');
-    if (!iframe || !config || !config.calendarEmbedUrl) return;
-    iframe.src = config.calendarEmbedUrl;
-  }
-
   /* ---------- Initialisation ---------- */
 
   async function init() {
-    const [config, nav, sponsors, documents] = await Promise.all([
+    const [config, nav] = await Promise.all([
       loadJSON('./data/site-config.json'),
-      loadJSON('./data/navigation.json'),
-      loadJSON('./data/sponsors.json'),
-      loadJSON('./data/documents.json')
+      loadJSON('./data/navigation.json')
     ]);
 
     applySeason(config);
-    applyCalendarEmbed(config);
     buildNavigation(nav);
-    buildSponsors(sponsors);
-    buildDocuments(documents);
   }
 
   if (document.readyState === 'loading') {
