@@ -49,24 +49,6 @@
     });
   }
 
-  /* ---------- Réseaux sociaux ---------- */
-
-  function applySocialLinks(config) {
-    if (!config) return;
-
-    if (config.facebookUrl) {
-      document.querySelectorAll('[data-social="facebook"]').forEach((el) => {
-        el.href = config.facebookUrl;
-      });
-    }
-
-    if (config.instagramUrl) {
-      document.querySelectorAll('[data-social="instagram"]').forEach((el) => {
-        el.href = config.instagramUrl;
-      });
-    }
-  }
-
   /* ---------- Menu de navigation ---------- */
 
   function buildNavigation(nav) {
@@ -486,7 +468,6 @@
 
     applySeason(config);
     applyCalendarEmbed(config);
-    applySocialLinks(config);
     buildNavigation(nav);
     buildSponsors(sponsors);
     buildDocuments(documents);

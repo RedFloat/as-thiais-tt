@@ -236,8 +236,6 @@
 
   const settingsForm = document.getElementById('settingsForm');
   const settingsStatus = document.getElementById('settingsStatus');
-  const socialsForm = document.getElementById('socialsForm');
-  const socialsStatus = document.getElementById('socialsStatus');
 
   async function loadSettingsView() {
     setStatus(settingsStatus, 'loading', 'Chargement…');
@@ -245,10 +243,7 @@
       const config = await readFile('data/site-config.json');
       document.getElementById('settingsSeason').value = config.season || '';
       document.getElementById('settingsCalendarUrl').value = config.calendarEmbedUrl || '';
-      document.getElementById('settingsFacebook').value = config.facebookUrl || '';
-      document.getElementById('settingsInstagram').value = config.instagramUrl || '';
       hideStatus(settingsStatus);
-      hideStatus(socialsStatus);
     } catch (err) {
       setStatus(settingsStatus, 'error', 'Erreur de chargement : ' + err.message);
     }
@@ -292,35 +287,6 @@
     el.className = 'status-msg';
     el.textContent = '';
   }
-
-  socialsForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const saveBtn = document.getElementById('socialsSaveBtn');
-    saveBtn.disabled = true;
-    setStatus(socialsStatus, 'loading', 'Enregistrement en cours…');
-
-    try {
-      const path = 'data/site-config.json';
-      const current = fileState[path] ? fileState[path].json : {};
-      const updated = Object.assign({}, current, {
-        facebookUrl: document.getElementById('settingsFacebook').value.trim(),
-        instagramUrl: document.getElementById('settingsInstagram').value.trim()
-      });
-
-      const sha = fileState[path] ? fileState[path].sha : undefined;
-      const result = await GitHubAPI.saveJSON(
-        cfg, path, updated, sha,
-        'Admin : mise à jour des liens réseaux sociaux'
-      );
-
-      fileState[path] = { json: updated, sha: result.content.sha };
-      setStatus(socialsStatus, 'success', 'Enregistré ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
-    } catch (err) {
-      setStatus(socialsStatus, 'error', 'Erreur : ' + err.message);
-    } finally {
-      saveBtn.disabled = false;
-    }
-  });
 
   /* ---------- Démarrage ---------- */
 

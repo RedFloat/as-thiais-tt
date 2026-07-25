@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendrier — AS Thiais Tennis de Table</title>
+  <title>Règlement Intérieur — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,7 +24,6 @@
       
       --radius-card: 16px;
       --shadow-subtle: 0 10px 30px rgba(4, 74, 110, 0.05);
-      --shadow-hover: 0 20px 40px rgba(4, 74, 110, 0.1);
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -66,7 +65,7 @@
 
     .badge-gold {
       background: rgba(210, 169, 91, 0.15);
-      color: var(--color-gold); /* Texte en jaune doré pour un contraste parfait */
+      color: var(--color-gold); /* Modifié ici en jaune/doré pour un contraste parfait */
       border: 1px solid var(--color-gold);
       font-weight: 700;
       font-size: 0.75rem;
@@ -78,7 +77,7 @@
     }
 
     /* ==========================================================================
-       2. HEADER SUR 2 NIVEAUX (ORDINATEUR) & RESPONSIVE MOBILE
+       2. HEADER SUR 2 NIVEAUX (STRICTEMENT D'ORIGINE)
        ========================================================================== */
     header {
       background-color: var(--color-navy);
@@ -295,7 +294,7 @@
     }
 
     /* ==========================================================================
-       3. PAGE CALENDRIER - DESIGN MODERNE & ÉPURÉ
+       3. PAGE REGLEMENT INTERIEUR
        ========================================================================== */
     .page-hero {
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
@@ -332,163 +331,63 @@
       padding: 3rem 0 4rem;
     }
 
-    /* Carte principale effet "Glassmorphism / Card Moderne" */
-    .calendar-container-card {
+    .reglement-card {
       background: var(--color-white);
       border-radius: var(--radius-card);
-      padding: 2.5rem;
+      padding: 3rem;
       box-shadow: var(--shadow-subtle);
       border: 1px solid rgba(4, 74, 110, 0.08);
+      max-width: 900px;
+      margin: 0 auto;
     }
 
-    .calendar-intro-block {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      margin-bottom: 2rem;
-      font-size: 1.05rem;
-    }
-
-    .calendar-intro-block p {
+    .reglement-content {
+      font-size: 1.1rem;
+      line-height: 1.8;
       color: var(--color-text-main);
+      margin-bottom: 2.5rem;
     }
 
-    /* Bouton de téléchargement stylisé en mode "Call To Action" */
-    .btn-download {
+    .reglement-content p {
+      margin-bottom: 1.5rem;
+    }
+
+    .reglement-actions {
+      text-align: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-download-pdf {
       display: inline-flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.8rem;
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
       color: var(--color-white) !important;
-      padding: 0.85rem 1.6rem;
+      padding: 1rem 2rem;
       border-radius: 50px;
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: 700;
+      font-size: 1.05rem;
       box-shadow: 0 4px 15px rgba(4, 74, 110, 0.2);
       transition: var(--transition);
       border: 1px solid rgba(210, 169, 91, 0.3);
       text-decoration: none !important;
     }
 
-    .btn-download:hover {
+    .btn-download-pdf:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(4, 74, 110, 0.3);
+      box-shadow: 0 8px 25px rgba(4, 74, 110, 0.3);
       color: var(--color-gold) !important;
       text-decoration: none !important;
     }
 
-    .btn-download i {
+    .btn-download-pdf i {
       color: var(--color-gold);
-      font-size: 1.1rem;
-    }
-
-    /* Encadré d'information important (Alerte design) */
-    .calendar-notice-modern {
-      background: var(--color-gold-light);
-      border-left: 4px solid var(--color-gold);
-      border-radius: 0 12px 12px 0;
-      padding: 1.2rem 1.5rem;
-      margin: 1.5rem 0 2rem;
-      color: var(--color-navy-dark);
-      font-weight: 500;
-      font-size: 0.98rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      box-shadow: 0 2px 10px rgba(210, 169, 91, 0.1);
-    }
-
-    .calendar-notice-modern i {
-      color: var(--color-gold);
-      font-size: 1.3rem;
-      margin-top: 0.1rem;
-      flex-shrink: 0;
-    }
-
-    /* Bouton toggle pour les conseils (Style épuré moderne) */
-    .calendar-toggle-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      background: transparent;
-      color: var(--color-navy);
-      padding: 0.6rem 0;
-      font-weight: 700;
-      font-size: 0.95rem;
-      border: none;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-bottom: 0.5rem;
-      border-bottom: 2px solid transparent;
-    }
-
-    .calendar-toggle-btn:hover {
-      color: var(--color-gold);
-      border-bottom-color: var(--color-gold);
-    }
-
-    .calendar-toggle-btn i {
-      color: var(--color-gold);
-      transition: transform 0.3s ease;
-    }
-
-    /* Bloc Conseils repliable redessiné */
-    #conseils {
-      display: none;
-      margin-top: 0.8rem;
-      margin-bottom: 2rem;
-      padding: 1.8rem;
-      background-color: var(--color-gold-light);
-      border: 1px solid rgba(210, 169, 91, 0.4);
-      color: var(--color-navy-dark);
-      border-radius: 12px;
-      animation: fadeIn 0.4s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    #conseils p {
-      margin: 0.8rem 0;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
-    #conseils img {
-      height: 28px;
-      width: auto;
-      vertical-align: middle;
-      border-radius: 4px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin: 0 0.3rem;
-    }
-
-    /* Conteneur de l'Iframe Google Calendar avec effet shadow moderne */
-    .calendar-iframe-wrapper {
-      position: relative;
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-      background: var(--color-white);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-      margin-top: 1rem;
-    }
-
-    .calendar-iframe-wrapper iframe {
-      width: 100%;
-      height: 650px;
-      border: none;
-      display: block;
+      font-size: 1.2rem;
     }
 
     /* ==========================================================================
-       4. FOOTER
+       4. FOOTER (STRICTEMENT D'ORIGINE)
        ========================================================================== */
     footer {
       background: var(--color-navy-dark);
@@ -621,7 +520,7 @@
      ========================================== -->
   <header>
     <div class="header-top container">
-      <a href="./index.html" class="logo">
+      <a href="index.html" class="logo">
         <div class="logo-badge">
           <img src="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg" alt="Logo Officiel AS Thiais TT">
         </div>
@@ -629,8 +528,8 @@
       </a>
 
       <div class="header-socials-desktop">
-        <a href="#" data-social="facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="#" data-social="instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
       </div>
 
       <button class="mobile-toggle-btn" id="mobileMenuBtn" aria-label="Menu principal">
@@ -650,70 +549,37 @@
   </header>
 
   <!-- ==========================================
-     HERO CALENDRIER
+     HERO REGLEMENT INTERIEUR
      ========================================== -->
   <section class="page-hero">
     <div class="container">
       <span class="badge-gold" data-season-badge>Saison 2025/2026</span>
-      <h1>Calendrier Sportif</h1>
-      <p>Suivez en temps réel toutes nos rencontres, tournois et manifestations sportives.</p>
+      <h1>Règlement Intérieur</h1>
+      <p>Cadre de vie, principes déontologiques et fonctionnement de l'association.</p>
     </div>
   </section>
 
   <!-- ==========================================
-     CONTENU PRINCIPAL : CALENDRIER
+     CONTENU PRINCIPAL : REGLEMENT INTERIEUR
      ========================================== -->
   <main class="page-content">
     <div class="container">
-      <div class="calendar-container-card">
+      <div class="reglement-card">
         
-        <div class="calendar-intro-block">
+        <div class="reglement-content">
           <p>
-            Vous souhaitez consulter ou conserver le planning complet hors-ligne ? Téléchargez dès maintenant le calendrier officiel de la saison :
+            <strong>REGLEMENT INTERIEUR 2025/2026</strong><br>
+            Ce règlement intérieur a pour objet de préciser les statuts de l’Association Sportive Thiais Tennis de Table (AS THIAIS TT), sise à Thiais. Il y est adjoint la charte régionale d’éthique et de déontologie du sport.
           </p>
-          <div>
-            <a href="/public/9075/upload/files/2025-2026%20-%20Calendrier%20des%20manifestations1.pdf" target="_blank" class="btn-download">
-              <i class="fa-solid fa-file-arrow-down"></i> Télécharger le calendrier officiel (PDF)
-            </a>
-          </div>
           <p>
-            Pour toute question relative aux rencontres ou aux convocations, rapprochez-vous de votre entraîneur ou écrivez-nous directement via la rubrique <a href="#contact">Contact</a>.
+            Ces documents sont affichés dans la salle de tennis de table du Palais Omnisports de Thiais et disponibles sur le site internet du club.
           </p>
         </div>
 
-        <div class="calendar-notice-modern">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <div>
-            <strong>Information importante :</strong> Les informations sur les compétitions (les lieux ou horaires) nous parviendront en cours de saison. Le calendrier interactif ci-dessous sera mis à jour dès réception des nouvelles informations.
-          </div>
-        </div>
-
-        <button type="button" class="calendar-toggle-btn" onclick="toggleConseils()">
-          <i class="fa-solid fa-circle-question" id="conseilsIcon"></i> Conseils pour la navigation dans le calendrier interactif
-        </button>
-
-        <div id="conseils">
-          <p>
-            <i class="fa-solid fa-filter" style="color: var(--color-navy);"></i> 
-            Pour sélectionner le type d'événement à afficher (Jeunes, Adultes, Événements du club), utilisez l'icône : 
-            <img src="/public/9075/upload/images/Outils/Calendrier.png" alt="Icône Calendrier">
-          </p>
-          <p>
-            <i class="fa-solid fa-calendar-days" style="color: var(--color-navy);"></i> 
-            Vous pouvez changer la vue (calendrier ou planning) grâce à l'icône : 
-            <img src="/public/9075/upload/images/Outils/Vue.png" alt="Icône Vue">
-          </p>
-          <p style="font-size: 0.9rem; color: var(--color-text-muted); margin-top: 0.4rem;">
-            <em>Note : La vue planning n'affiche pas forcément tous les évènements (il y a une limite d'évènements affichés). Pour voir les suivants, pensez à avancer manuellement dans les dates.</em>
-          </p>
-          <p style="margin-top: 0.4rem;">
-            <i class="fa-solid fa-circle-info" style="color: var(--color-navy);"></i> 
-            Cliquez sur un événement spécifique pour afficher tous ses détails (lieux précis, équipes engagées, etc.).
-          </p>
-        </div>
-
-        <div class="calendar-iframe-wrapper">
-          <iframe id="calendarEmbed" frameborder="0" height="600" scrolling="no" src="" style="border-width:0" width="800"></iframe>
+        <div class="reglement-actions">
+          <a href="./docs/reglement_interieur.pdf" target="_blank" class="btn-download-pdf">
+            <i class="fa-solid fa-file-pdf"></i> Consulter le règlement intérieur (PDF)
+          </a>
         </div>
 
       </div>
@@ -753,36 +619,24 @@
           </div>
 
           <div class="footer-socials">
-            <a href="#" class="social-btn" data-social="facebook" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" class="social-btn" data-social="instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
           </div>
         </div>
 
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; <span data-season>2026-2027</span> AS Thiais Tennis de Table. Tous droits réservés.</p>
+        <p>&copy; 2026-2027 AS Thiais Tennis de Table. Tous droits réservés.</p>
       </div>
     </div>
   </footer>
 
   <!-- ==========================================
-     JAVASCRIPT (MENU MOBILE & CONSEILS)
+     JAVASCRIPT (MENU MOBILE)
      ========================================== -->
   <script src="./js/site-data.js"></script>
   <script>
-    function toggleConseils() {
-      var conseilsDiv = document.getElementById('conseils');
-      var icon = document.getElementById('conseilsIcon');
-      if (conseilsDiv.style.display === 'block') {
-        conseilsDiv.style.display = 'none';
-        icon.style.transform = 'rotate(0deg)';
-      } else {
-        conseilsDiv.style.display = 'block';
-        icon.style.transform = 'rotate(90deg)';
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       const mobileBtn = document.getElementById('mobileMenuBtn');
       const navWrapper = document.getElementById('navWrapper');

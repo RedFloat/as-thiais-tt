@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Le Club — AS Thiais Tennis de Table</title>
+  <title>Entraînements — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -877,7 +877,7 @@
     }
 
     /* ==========================================================================
-       7. PAGE LE CLUB
+       7. PAGE ENTRAINEMENTS
        ========================================================================== */
     .page-hero {
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
@@ -909,154 +909,122 @@
       padding: 3.5rem 0 3.5rem;
     }
 
-    .club-history {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 1.75rem;
-      align-items: start;
+    .info-strip {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
       margin-bottom: 2.5rem;
     }
 
-    .club-history .panel-card p {
-      color: var(--color-text-muted);
-      font-size: 0.95rem;
-      line-height: 1.75;
-      margin-bottom: 1rem;
+    .info-strip-item {
+      flex: 1;
+      min-width: 240px;
+      background: var(--color-white);
+      border: 1px solid rgba(4, 74, 110, 0.08);
+      border-left: 4px solid var(--color-gold);
+      border-radius: var(--radius-card);
+      padding: 1.2rem 1.4rem;
+      box-shadow: var(--shadow-subtle);
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
     }
 
-    .club-history .panel-card p:last-child {
-      margin-bottom: 0;
-    }
-
-    .club-history .panel-card strong {
+    .info-strip-item i {
+      font-size: 1.4rem;
       color: var(--color-navy);
+      margin-top: 0.15rem;
     }
 
-    .agreements-box {
+    .info-strip-item strong {
+      display: block;
+      color: var(--color-navy);
+      margin-bottom: 0.2rem;
+      font-size: 0.98rem;
+    }
+
+    .info-strip-item span {
+      color: var(--color-text-muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .planning-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.75rem;
+      margin-bottom: 2.5rem;
+      align-items: start;
+    }
+
+    .planning-panel h2 {
+      color: var(--color-navy);
+      font-size: 1.2rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .planning-panel h2 i { color: var(--color-gold); }
+
+    .planning-list {
       display: flex;
       flex-direction: column;
       gap: 0.9rem;
     }
 
-    .agreement-item {
+    .planning-list-item {
       display: flex;
       gap: 0.9rem;
-      align-items: center;
+      align-items: flex-start;
       padding: 0.9rem 1rem;
       background: var(--color-bg-light);
       border-radius: 8px;
       border: 1px solid #e2e8f0;
     }
 
-    .agreement-item i {
-      width: 36px;
-      height: 36px;
+    .planning-list-item i {
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: var(--color-gold-light);
       color: var(--color-navy);
+      border: 1px solid var(--color-gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid var(--color-gold);
       flex-shrink: 0;
+      font-size: 0.9rem;
     }
 
-    .agreement-item strong {
+    .planning-list-item strong {
       display: block;
       color: var(--color-navy);
-      font-size: 0.85rem;
+      font-size: 0.92rem;
+      margin-bottom: 0.15rem;
     }
 
-    .agreement-item span {
+    .planning-list-item span {
       color: var(--color-text-muted);
-      font-size: 0.85rem;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.2rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .stat-card {
-      background: var(--color-white);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-subtle);
-      border: 1px solid rgba(4, 74, 110, 0.06);
-      padding: 1.5rem 1.2rem;
-      text-align: center;
-    }
-
-    .stat-card .stat-number {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--color-navy);
-      line-height: 1;
-    }
-
-    .stat-card .stat-number span.accent {
-      color: var(--color-gold);
-    }
-
-    .stat-card .stat-label {
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      line-height: 1.4;
-    }
-
-    .stat-card .stat-label strong {
-      color: var(--color-navy);
-    }
-
-    .stat-icon-circle {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
-      border: 1.5px solid var(--color-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      margin: 0 auto;
-    }
-
-    .infra-support-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.75rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .infra-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-      margin-top: 0.3rem;
-    }
-
-    .infra-list li {
-      display: flex;
-      gap: 0.8rem;
-      align-items: flex-start;
-      font-size: 0.9rem;
-      color: var(--color-text-main);
+      font-size: 0.86rem;
       line-height: 1.5;
     }
 
-    .infra-list i {
-      color: var(--color-gold);
-      margin-top: 0.2rem;
-      flex-shrink: 0;
-      width: 1.1rem;
-      text-align: center;
+    .holiday-note {
+      margin-top: 1.2rem;
+      background: var(--color-gold-light);
+      border-left: 4px solid var(--color-gold);
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      font-size: 0.86rem;
+      color: var(--color-navy);
+      line-height: 1.6;
     }
 
-    .support-panel {
+    .holiday-note i { color: var(--color-gold); margin-right: 0.3rem; }
+
+    .retraites-panel {
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
       color: var(--color-white);
       border-radius: var(--radius-card);
@@ -1066,7 +1034,15 @@
       justify-content: center;
     }
 
-    .support-panel h2 {
+    .retraites-panel .badge-gold {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.1);
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+      margin-bottom: 0.9rem;
+    }
+
+    .retraites-panel h2 {
       font-size: 1.2rem;
       margin-bottom: 0.7rem;
       display: flex;
@@ -1074,131 +1050,36 @@
       gap: 0.6rem;
     }
 
-    .support-panel h2 i { color: var(--color-gold); }
+    .retraites-panel h2 i { color: var(--color-gold); }
 
-    .support-panel p {
+    .retraites-panel p {
       color: #cbd5e1;
       font-size: 0.9rem;
       line-height: 1.7;
+      margin-bottom: 1.2rem;
     }
 
-    .support-panel .badge-gold {
-      align-self: flex-start;
-      margin-top: 1rem;
-      background: rgba(255,255,255,0.1);
-      border-color: var(--color-gold);
-      color: var(--color-gold);
-    }
-
-    .tribute-panel {
-      background: var(--color-white);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-subtle);
-      border: 1px solid rgba(4, 74, 110, 0.06);
-      padding: 2rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .tribute-founder {
-      display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
-      padding-bottom: 1.75rem;
-      margin-bottom: 1.75rem;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .tribute-founder-avatar {
-      flex-shrink: 0;
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: var(--color-navy);
-      color: var(--color-white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.3rem;
-      border: 3px solid var(--color-gold);
-    }
-
-    .tribute-founder h3 {
-      color: var(--color-navy);
-      font-size: 1.2rem;
-      margin-bottom: 0.3rem;
-    }
-
-    .tribute-founder .tribute-role {
-      display: inline-block;
-      color: var(--color-gold);
-      font-weight: 700;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.6rem;
-    }
-
-    .tribute-founder p {
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-      line-height: 1.7;
-    }
-
-    .tribute-players-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    .tribute-player-card {
+    .retraites-slots {
       display: flex;
       gap: 0.8rem;
-      align-items: center;
-      padding: 0.9rem;
-      background: var(--color-bg-light);
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      transition: var(--transition);
-    }
-
-    .tribute-player-card:hover {
-      border-color: var(--color-gold);
-      box-shadow: var(--shadow-hover);
-      transform: translateY(-2px);
-    }
-
-    .tribute-player-avatar {
-      flex-shrink: 0;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.85rem;
-      border: 1px solid var(--color-gold);
-    }
-
-    .tribute-player-card strong {
-      display: block;
-      color: var(--color-navy);
-      font-size: 0.9rem;
-    }
-
-    .tribute-player-card span {
-      color: var(--color-text-muted);
-      font-size: 0.78rem;
-      line-height: 1.4;
-    }
-
-    .practical-panel {
-      display: flex;
-      gap: 1.75rem;
       flex-wrap: wrap;
+    }
+
+    .retraites-slot {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.5rem 0.9rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .retraites-slot i { color: var(--color-gold); }
+
+    .schedule-panel {
       background: var(--color-white);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-subtle);
@@ -1206,70 +1087,82 @@
       padding: 1.75rem;
     }
 
-    .practical-item {
-      flex: 1;
-      min-width: 260px;
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-
-    .practical-item i {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
+    .schedule-panel h2 {
       color: var(--color-navy);
+      font-size: 1.25rem;
+      margin-bottom: 0.4rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      border: 1px solid var(--color-gold);
-      flex-shrink: 0;
-      font-size: 1.1rem;
+      gap: 0.6rem;
     }
 
-    .practical-item strong {
-      display: block;
-      color: var(--color-navy);
-      margin-bottom: 0.2rem;
-      font-size: 0.98rem;
-    }
+    .schedule-panel h2 i { color: var(--color-gold); }
 
-    .practical-item p {
+    .schedule-panel-intro {
       color: var(--color-text-muted);
-      font-size: 0.88rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      margin-bottom: 1.4rem;
     }
 
-    .practical-item a {
-      color: var(--color-navy);
-      font-weight: 600;
-      text-decoration: underline;
+    .schedule-preview-link {
+      display: block;
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      max-width: 640px;
+      margin: 0 auto;
+      transition: var(--transition);
+    }
+
+    .schedule-preview-link:hover {
+      box-shadow: var(--shadow-hover);
+      border-color: var(--color-gold);
+      transform: translateY(-2px);
+    }
+
+    .schedule-preview-link img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .schedule-preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(2,44,67,0.85) 0%, rgba(2,44,67,0) 45%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 1.2rem;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .schedule-preview-link:hover .schedule-preview-overlay {
+      opacity: 1;
+    }
+
+    .schedule-preview-overlay span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--color-gold);
+      color: var(--color-navy-dark);
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
     }
 
     @media (max-width: 900px) {
-      .club-history {
+      .planning-grid {
         grid-template-columns: 1fr;
-      }
-      .infra-support-grid {
-        grid-template-columns: 1fr;
-      }
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .tribute-players-grid {
-        grid-template-columns: repeat(2, 1fr);
       }
     }
 
     @media (max-width: 600px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-      .tribute-players-grid {
-        grid-template-columns: 1fr;
-      }
-      .tribute-founder {
+      .info-strip {
         flex-direction: column;
       }
     }
@@ -1288,8 +1181,8 @@
 
       <!-- Réseaux sociaux (Visible Uniquement sur Ordinateur) -->
       <div class="header-socials-desktop">
-        <a href="#" data-social="facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="#" data-social="instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
       </div>
 
       <!-- Bouton 3 points (Visible Uniquement sur Mobile) -->
@@ -1311,15 +1204,15 @@
   </header>
 
   <!-- ==========================================
-     HERO LE CLUB
+     HERO ENTRAINEMENTS
      ========================================== -->
   <section class="page-hero">
     <div class="container">
-      <span class="badge-gold">Depuis 1995</span>
-      <h1>Le Club</h1>
+      <span class="badge-gold" data-season-badge>Saison 2025-2026</span>
+      <h1>Entraînements</h1>
       <p>
-        L'Association Sportive Thiais Tennis de Table, association loi 1901, a pour activité la pratique
-        du tennis de table à Thiais depuis près de 30 ans.
+        Retrouvez toutes les informations pratiques concernant le lieu, le planning et les créneaux
+        d'entraînement du club pour la saison.
       </p>
     </div>
   </section>
@@ -1330,170 +1223,67 @@
   <section class="page-content">
     <div class="container">
 
-      <!-- Histoire + Agréments -->
-      <div class="club-history">
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-book-open"></i> Notre histoire</h2>
-          <p>
-            L'Association Sportive Thiais Tennis de Table, association loi 1901, a été créée le
-            <strong>7 novembre 1995</strong>, présidée à sa création par <strong>Jacques Berthaud</strong>.
-          </p>
-          <p>
-            M. Berthaud Jacques en a été l'emblématique président jusqu'en 2008, poste qu'il a quitté
-            pour des raisons de santé. Le club lui doit son développement et ses meilleures années.
-          </p>
-          <p>
-            Le club a pour principal soutien la Ville de Thiais, qui l'accompagne depuis de nombreuses
-            années, notamment pendant la période où il a connu son plus haut niveau, en Nationale 1.
-          </p>
-        </div>
-
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-stamp"></i> Agréments</h2>
-          <div class="agreements-box">
-            <div class="agreement-item">
-              <i class="fa-solid fa-landmark"></i>
-              <div>
-                <strong>Ministère de la Jeunesse et des Sports</strong>
-                <span>Agrément n° 94 S 487</span>
-              </div>
-            </div>
-            <div class="agreement-item">
-              <i class="fa-solid fa-trophy"></i>
-              <div>
-                <strong>Fédération Française de Tennis de Table</strong>
-                <span>Agrément n° 08940459</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chiffres clés -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number">~160</div>
-          <div class="stat-label">Adhérents, dont <span class="accent">18%</span> de féminines</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">10</div>
-          <div class="stat-label">Équipes en championnat par équipe Messieurs</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">1</div>
-          <div class="stat-label">Équipe en championnat par équipe Dames</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon-circle"><i class="fa-solid fa-child-reaching"></i></div>
-          <div class="stat-label">Équipes <strong>Jeunes</strong> & Championnat de <strong>Paris</strong></div>
-        </div>
-      </div>
-
-      <!-- Infrastructure + Soutien -->
-      <div class="infra-support-grid">
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-building-columns"></i> Nos installations</h2>
-          <ul class="infra-list">
-            <li><i class="fa-solid fa-location-dot"></i> Siège au <strong>Palais Omnisports de Thiais</strong></li>
-            <li><i class="fa-solid fa-square-parking"></i> Parking de plus de <strong>100 places</strong></li>
-            <li><i class="fa-solid fa-table-tennis-paddle-ball"></i> Salle spécifique de <strong>16 tables</strong>, extensible jusqu'à <strong>20 tables</strong></li>
-          </ul>
-        </div>
-
-        <div class="support-panel">
-          <span class="badge-gold">Partenaire historique</span>
-          <h2><i class="fa-solid fa-handshake"></i> Le soutien de la Ville de Thiais</h2>
-          <p>
-            Le club a pour principal soutien la Ville de Thiais, qui l'accompagne depuis de nombreuses
-            années, notamment durant la période où il a connu son plus haut niveau sportif, en Nationale 1.
-          </p>
-        </div>
-      </div>
-
-      <!-- Hommage -->
-      <div class="tribute-panel">
-        <h2 style="color:var(--color-navy); font-size:1.3rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem;">
-          <i class="fa-solid fa-award" style="color:var(--color-gold);"></i> Hommage
-        </h2>
-
-        <div class="tribute-founder">
-          <div class="tribute-founder-avatar">JB</div>
+      <!-- Lieu -->
+      <div class="info-strip">
+        <div class="info-strip-item">
+          <i class="fa-solid fa-location-dot"></i>
           <div>
-            <span class="tribute-role">Président fondateur (1995 - 2008)</span>
-            <h3>Jacques Berthaud</h3>
-            <p>
-              Président emblématique du club jusqu'en 2008, poste qu'il a quitté pour des raisons de santé.
-              Le club lui doit son développement et ses meilleures années.
-            </p>
+            <strong>Lieu</strong>
+            <span>Palais Omnisports de Thiais, salle spécifique</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Planning + Créneaux retraités -->
+      <div class="planning-grid">
+        <div class="panel-card planning-panel">
+          <h2><i class="fa-solid fa-calendar-days"></i> Planning de la saison</h2>
+          <div class="planning-list">
+            <div class="planning-list-item">
+              <i class="fa-solid fa-play"></i>
+              <div>
+                <strong>Rentrée des entraînements</strong>
+                <span>Lundi 8 septembre 2025</span>
+              </div>
+            </div>
+            <div class="planning-list-item">
+              <i class="fa-solid fa-calendar-check"></i>
+              <div>
+                <strong>Sauf le samedi</strong>
+                <span>Début le samedi 20 septembre 2026</span>
+              </div>
+            </div>
+          </div>
+          <div class="holiday-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Pas d'entraînement pendant les congés scolaires.
           </div>
         </div>
 
-        <p style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:1.2rem;">
-          Hommage à quelques joueurs qui ont fait du club ce qu'il est aujourd'hui :
+        <div class="retraites-panel">
+          <span class="badge-gold">Créneau dédié</span>
+          <h2><i class="fa-solid fa-user-group"></i> Créneaux retraités</h2>
+          <p>Un créneau spécialement dédié aux retraités est proposé chaque semaine.</p>
+          <div class="retraites-slots">
+            <span class="retraites-slot"><i class="fa-solid fa-clock"></i> Lundi 9h - 12h</span>
+            <span class="retraites-slot"><i class="fa-solid fa-clock"></i> Vendredi 9h - 12h</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Créneaux d'entraînement (image cliquable -> PDF) -->
+      <div class="schedule-panel">
+        <h2><i class="fa-solid fa-table-list"></i> Créneaux d'entraînement</h2>
+        <p class="schedule-panel-intro">
+          Consultez le détail de tous les créneaux d'entraînement par équipe et par catégorie. Cliquez sur
+          l'aperçu ci-dessous pour ouvrir le planning complet au format PDF.
         </p>
-
-        <div class="tribute-players-grid">
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">AD</div>
-            <div>
-              <strong>Ananou Dodji</strong>
-              <span>Joueur et entraîneur, parmi les meilleurs joueurs en France</span>
-            </div>
+        <a href="./docs/entrainements-horaires.pdf" target="_blank" rel="noopener" class="schedule-preview-link">
+          <img src="./imgs/apercu-entrainement.png" alt="Aperçu des créneaux d'entraînement — cliquer pour ouvrir le PDF complet">
+          <div class="schedule-preview-overlay">
+            <span><i class="fa-solid fa-file-pdf"></i> Ouvrir le planning complet (PDF)</span>
           </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">VF</div>
-            <div>
-              <strong>Valensi Franck</strong>
-              <span>Joueur entraîneur, de la génération J.P. Gatien</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">DG</div>
-            <div>
-              <strong>Djondo Gaetan</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">KY</div>
-            <div>
-              <strong>Kidjo Yves</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">DL</div>
-            <div>
-              <strong>Dan LY</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">AY</div>
-            <div>
-              <strong>Amaizo Yves</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Infos pratiques -->
-      <div class="practical-panel">
-        <div class="practical-item">
-          <i class="fa-solid fa-calendar-week"></i>
-          <div>
-            <strong>Ouverture du club</strong>
-            <p>Le club accueille ses adhérents du lundi au dimanche — consultez les <a href="./entrainements.html">horaires d'accès</a> sur le site.</p>
-          </div>
-        </div>
-        <div class="practical-item">
-          <i class="fa-solid fa-person-running"></i>
-          <div>
-            <strong>Entraînements</strong>
-            <p>Séances d'entraînement du lundi au jeudi — consultez la rubrique <a href="./entrainements.html">Entraînements</a>.</p>
-          </div>
-        </div>
+        </a>
       </div>
 
     </div>
@@ -1533,15 +1323,15 @@
 
           <!-- Réseaux sociaux (Facebook & Instagram) -->
           <div class="footer-socials">
-            <a href="#" class="social-btn" data-social="facebook" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" class="social-btn" data-social="instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
           </div>
         </div>
 
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; <span data-season>2026-2027</span> AS Thiais Tennis de Table. Tous droits réservés.</p>
+        <p>&copy; 2026-2027 AS Thiais Tennis de Table. Tous droits réservés.</p>
       </div>
     </div>
   </footer>

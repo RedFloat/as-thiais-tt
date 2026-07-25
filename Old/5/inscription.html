@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Le Club — AS Thiais Tennis de Table</title>
+  <title>Inscription — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -877,7 +877,7 @@
     }
 
     /* ==========================================================================
-       7. PAGE LE CLUB
+       7. PAGE INSCRIPTION
        ========================================================================== */
     .page-hero {
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
@@ -906,212 +906,206 @@
     }
 
     .page-content {
-      padding: 3.5rem 0 3.5rem;
+      padding: 2.5rem 0 3.5rem;
     }
 
-    .club-history {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 1.75rem;
-      align-items: start;
-      margin-bottom: 2.5rem;
-    }
-
-    .club-history .panel-card p {
-      color: var(--color-text-muted);
-      font-size: 0.95rem;
-      line-height: 1.75;
-      margin-bottom: 1rem;
-    }
-
-    .club-history .panel-card p:last-child {
-      margin-bottom: 0;
-    }
-
-    .club-history .panel-card strong {
-      color: var(--color-navy);
-    }
-
-    .agreements-box {
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-    }
-
-    .agreement-item {
-      display: flex;
-      gap: 0.9rem;
-      align-items: center;
-      padding: 0.9rem 1rem;
-      background: var(--color-bg-light);
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .agreement-item i {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--color-gold);
-      flex-shrink: 0;
-    }
-
-    .agreement-item strong {
-      display: block;
-      color: var(--color-navy);
-      font-size: 0.85rem;
-    }
-
-    .agreement-item span {
-      color: var(--color-text-muted);
-      font-size: 0.85rem;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.2rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .stat-card {
-      background: var(--color-white);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-subtle);
-      border: 1px solid rgba(4, 74, 110, 0.06);
-      padding: 1.5rem 1.2rem;
-      text-align: center;
-    }
-
-    .stat-card .stat-number {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--color-navy);
-      line-height: 1;
-    }
-
-    .stat-card .stat-number span.accent {
-      color: var(--color-gold);
-    }
-
-    .stat-card .stat-label {
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      line-height: 1.4;
-    }
-
-    .stat-card .stat-label strong {
-      color: var(--color-navy);
-    }
-
-    .stat-icon-circle {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
-      border: 1.5px solid var(--color-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      margin: 0 auto;
-    }
-
-    .infra-support-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.75rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .infra-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-      margin-top: 0.3rem;
-    }
-
-    .infra-list li {
-      display: flex;
-      gap: 0.8rem;
-      align-items: flex-start;
-      font-size: 0.9rem;
-      color: var(--color-text-main);
-      line-height: 1.5;
-    }
-
-    .infra-list i {
-      color: var(--color-gold);
-      margin-top: 0.2rem;
-      flex-shrink: 0;
-      width: 1.1rem;
-      text-align: center;
-    }
-
-    .support-panel {
-      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
-      color: var(--color-white);
-      border-radius: var(--radius-card);
-      padding: 1.75rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .support-panel h2 {
-      font-size: 1.2rem;
-      margin-bottom: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .support-panel h2 i { color: var(--color-gold); }
-
-    .support-panel p {
-      color: #cbd5e1;
-      font-size: 0.9rem;
-      line-height: 1.7;
-    }
-
-    .support-panel .badge-gold {
-      align-self: flex-start;
-      margin-top: 1rem;
-      background: rgba(255,255,255,0.1);
-      border-color: var(--color-gold);
-      color: var(--color-gold);
-    }
-
-    .tribute-panel {
+    .cta-panel {
       background: var(--color-white);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-subtle);
       border: 1px solid rgba(4, 74, 110, 0.06);
       padding: 2rem;
       margin-bottom: 2.5rem;
+      text-align: center;
     }
 
-    .tribute-founder {
-      display: flex;
+    .cta-panel .badge-gold {
+      margin-bottom: 0.8rem;
+    }
+
+    .cta-panel h2 {
+      color: var(--color-navy);
+      font-size: 1.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .cta-panel p {
+      color: var(--color-text-muted);
+      max-width: 600px;
+      margin: 0 auto 1.4rem;
+      line-height: 1.6;
+    }
+
+    .btn-large {
+      font-size: 1.05rem;
+      padding: 0.9rem 2.2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .cta-subnote {
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px dashed #e2e8f0;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+
+    .cta-subnote i { color: var(--color-gold); }
+
+    .content-grid-2 {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
       gap: 1.5rem;
-      align-items: flex-start;
-      padding-bottom: 1.75rem;
-      margin-bottom: 1.75rem;
-      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 2.5rem;
+      align-items: start;
     }
 
-    .tribute-founder-avatar {
+    .panel-card {
+      background: var(--color-white);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(4, 74, 110, 0.06);
+      padding: 1.75rem;
+    }
+
+    .panel-card h2 {
+      color: var(--color-navy);
+      font-size: 1.25rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .panel-card h2 i { color: var(--color-gold); }
+
+    .health-doc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .health-doc-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 1rem;
+      background: var(--color-bg-light);
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .health-doc-icon {
       flex-shrink: 0;
-      width: 64px;
-      height: 64px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--color-gold-light);
+      color: var(--color-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border: 1px solid var(--color-gold);
+    }
+
+    .health-doc-item strong {
+      display: block;
+      color: var(--color-navy);
+      margin-bottom: 0.25rem;
+      font-size: 0.95rem;
+    }
+
+    .health-doc-item p, .health-doc-item a {
+      color: var(--color-text-muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .health-doc-item a {
+      color: var(--color-navy);
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .birth-years-box {
+      margin-top: 0.6rem;
+      background: var(--color-white);
+      border: 1px dashed var(--color-gold);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+    }
+
+    .birth-years-box .years-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+
+    .year-chip {
+      background: var(--color-gold-light);
+      color: var(--color-navy);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 50px;
+      border: 1px solid var(--color-gold);
+    }
+
+    .certif-note {
+      background: var(--color-gold-light);
+      border-left: 4px solid var(--color-gold);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      font-size: 0.88rem;
+      color: var(--color-navy);
+      line-height: 1.6;
+      margin-top: 0.4rem;
+    }
+
+    .certif-note i { color: var(--color-gold); margin-right: 0.3rem; }
+
+    .tuto-link-box {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-top: 1.2rem;
+      padding: 0.9rem 1.1rem;
+      background: var(--color-navy);
+      border-radius: 8px;
+      color: var(--color-white);
+    }
+
+    .tuto-link-box i { font-size: 1.3rem; color: var(--color-gold); flex-shrink: 0; }
+
+    .tuto-link-box a {
+      color: var(--color-white);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    .tuto-link-box a:hover { color: var(--color-gold); }
+
+    .payment-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .payment-step {
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+    }
+
+    .payment-step-num {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       background: var(--color-navy);
       color: var(--color-white);
@@ -1119,86 +1113,54 @@
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 1.3rem;
-      border: 3px solid var(--color-gold);
-    }
-
-    .tribute-founder h3 {
-      color: var(--color-navy);
-      font-size: 1.2rem;
-      margin-bottom: 0.3rem;
-    }
-
-    .tribute-founder .tribute-role {
-      display: inline-block;
-      color: var(--color-gold);
-      font-weight: 700;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.6rem;
-    }
-
-    .tribute-founder p {
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-      line-height: 1.7;
-    }
-
-    .tribute-players-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    .tribute-player-card {
-      display: flex;
-      gap: 0.8rem;
-      align-items: center;
-      padding: 0.9rem;
-      background: var(--color-bg-light);
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      transition: var(--transition);
-    }
-
-    .tribute-player-card:hover {
-      border-color: var(--color-gold);
-      box-shadow: var(--shadow-hover);
-      transform: translateY(-2px);
-    }
-
-    .tribute-player-avatar {
-      flex-shrink: 0;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
       font-size: 0.85rem;
-      border: 1px solid var(--color-gold);
     }
 
-    .tribute-player-card strong {
+    .payment-step p {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      line-height: 1.55;
+    }
+
+    .payment-step strong {
       display: block;
       color: var(--color-navy);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      margin-bottom: 0.15rem;
     }
 
-    .tribute-player-card span {
-      color: var(--color-text-muted);
-      font-size: 0.78rem;
-      line-height: 1.4;
-    }
-
-    .practical-panel {
+    .help-panel {
       display: flex;
-      gap: 1.75rem;
+      align-items: center;
+      gap: 1.5rem;
       flex-wrap: wrap;
+      justify-content: space-between;
+      background: var(--color-white);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(4, 74, 110, 0.06);
+      padding: 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .help-panel-text h2 {
+      color: var(--color-navy);
+      font-size: 1.2rem;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .help-panel-text h2 i { color: var(--color-gold); }
+
+    .help-panel-text p {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      max-width: 480px;
+    }
+
+    .permanences-panel {
       background: var(--color-white);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-subtle);
@@ -1206,71 +1168,90 @@
       padding: 1.75rem;
     }
 
-    .practical-item {
-      flex: 1;
-      min-width: 260px;
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-
-    .practical-item i {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
+    .permanences-panel h2 {
       color: var(--color-navy);
+      font-size: 1.25rem;
+      margin-bottom: 0.4rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      border: 1px solid var(--color-gold);
-      flex-shrink: 0;
-      font-size: 1.1rem;
+      gap: 0.6rem;
     }
 
-    .practical-item strong {
-      display: block;
-      color: var(--color-navy);
-      margin-bottom: 0.2rem;
-      font-size: 0.98rem;
-    }
+    .permanences-panel h2 i { color: var(--color-gold); }
 
-    .practical-item p {
+    .permanences-intro {
       color: var(--color-text-muted);
-      font-size: 0.88rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      margin-bottom: 1.3rem;
     }
 
-    .practical-item a {
+    .permanences-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .permanence-day {
+      background: var(--color-bg-light);
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      padding: 1.1rem;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .permanence-day:hover {
+      border-color: var(--color-gold);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .permanence-day .day-label {
       color: var(--color-navy);
-      font-weight: 600;
-      text-decoration: underline;
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .permanence-day .day-dates {
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .permanence-day .day-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--color-gold-light);
+      color: var(--color-navy);
+      border: 1px solid var(--color-gold);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 50px;
+    }
+
+    .permanence-location {
+      margin-top: 1.2rem;
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
     }
 
     @media (max-width: 900px) {
-      .club-history {
+      .content-grid-2 {
         grid-template-columns: 1fr;
-      }
-      .infra-support-grid {
-        grid-template-columns: 1fr;
-      }
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .tribute-players-grid {
-        grid-template-columns: repeat(2, 1fr);
       }
     }
 
-    @media (max-width: 600px) {
-      .stats-grid {
+    @media (max-width: 700px) {
+      .permanences-grid {
         grid-template-columns: 1fr;
       }
-      .tribute-players-grid {
-        grid-template-columns: 1fr;
-      }
-      .tribute-founder {
+      .help-panel {
         flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -1288,8 +1269,8 @@
 
       <!-- Réseaux sociaux (Visible Uniquement sur Ordinateur) -->
       <div class="header-socials-desktop">
-        <a href="#" data-social="facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="#" data-social="instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
       </div>
 
       <!-- Bouton 3 points (Visible Uniquement sur Mobile) -->
@@ -1311,15 +1292,16 @@
   </header>
 
   <!-- ==========================================
-     HERO LE CLUB
+     HERO INSCRIPTION
      ========================================== -->
   <section class="page-hero">
     <div class="container">
-      <span class="badge-gold">Depuis 1995</span>
-      <h1>Le Club</h1>
+      <span class="badge-gold" data-season-badge>Saison 2026-2027</span>
+      <h1>Inscriptions</h1>
       <p>
-        L'Association Sportive Thiais Tennis de Table, association loi 1901, a pour activité la pratique
-        du tennis de table à Thiais depuis près de 30 ans.
+        Une nouvelle saison commence, avec les premiers matchs mi-septembre pour les équipes évoluant en National
+        et fin septembre pour toutes les autres. Pensez à vous inscrire dès que possible, surtout si vous
+        pratiquez la compétition !
       </p>
     </div>
   </section>
@@ -1330,169 +1312,144 @@
   <section class="page-content">
     <div class="container">
 
-      <!-- Histoire + Agréments -->
-      <div class="club-history">
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-book-open"></i> Notre histoire</h2>
-          <p>
-            L'Association Sportive Thiais Tennis de Table, association loi 1901, a été créée le
-            <strong>7 novembre 1995</strong>, présidée à sa création par <strong>Jacques Berthaud</strong>.
-          </p>
-          <p>
-            M. Berthaud Jacques en a été l'emblématique président jusqu'en 2008, poste qu'il a quitté
-            pour des raisons de santé. Le club lui doit son développement et ses meilleures années.
-          </p>
-          <p>
-            Le club a pour principal soutien la Ville de Thiais, qui l'accompagne depuis de nombreuses
-            années, notamment pendant la période où il a connu son plus haut niveau, en Nationale 1.
-          </p>
-        </div>
-
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-stamp"></i> Agréments</h2>
-          <div class="agreements-box">
-            <div class="agreement-item">
-              <i class="fa-solid fa-landmark"></i>
-              <div>
-                <strong>Ministère de la Jeunesse et des Sports</strong>
-                <span>Agrément n° 94 S 487</span>
-              </div>
-            </div>
-            <div class="agreement-item">
-              <i class="fa-solid fa-trophy"></i>
-              <div>
-                <strong>Fédération Française de Tennis de Table</strong>
-                <span>Agrément n° 08940459</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chiffres clés -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number">~160</div>
-          <div class="stat-label">Adhérents, dont <span class="accent">18%</span> de féminines</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">10</div>
-          <div class="stat-label">Équipes en championnat par équipe Messieurs</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">1</div>
-          <div class="stat-label">Équipe en championnat par équipe Dames</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon-circle"><i class="fa-solid fa-child-reaching"></i></div>
-          <div class="stat-label">Équipes <strong>Jeunes</strong> & Championnat de <strong>Paris</strong></div>
-        </div>
-      </div>
-
-      <!-- Infrastructure + Soutien -->
-      <div class="infra-support-grid">
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-building-columns"></i> Nos installations</h2>
-          <ul class="infra-list">
-            <li><i class="fa-solid fa-location-dot"></i> Siège au <strong>Palais Omnisports de Thiais</strong></li>
-            <li><i class="fa-solid fa-square-parking"></i> Parking de plus de <strong>100 places</strong></li>
-            <li><i class="fa-solid fa-table-tennis-paddle-ball"></i> Salle spécifique de <strong>16 tables</strong>, extensible jusqu'à <strong>20 tables</strong></li>
-          </ul>
-        </div>
-
-        <div class="support-panel">
-          <span class="badge-gold">Partenaire historique</span>
-          <h2><i class="fa-solid fa-handshake"></i> Le soutien de la Ville de Thiais</h2>
-          <p>
-            Le club a pour principal soutien la Ville de Thiais, qui l'accompagne depuis de nombreuses
-            années, notamment durant la période où il a connu son plus haut niveau sportif, en Nationale 1.
-          </p>
-        </div>
-      </div>
-
-      <!-- Hommage -->
-      <div class="tribute-panel">
-        <h2 style="color:var(--color-navy); font-size:1.3rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem;">
-          <i class="fa-solid fa-award" style="color:var(--color-gold);"></i> Hommage
-        </h2>
-
-        <div class="tribute-founder">
-          <div class="tribute-founder-avatar">JB</div>
-          <div>
-            <span class="tribute-role">Président fondateur (1995 - 2008)</span>
-            <h3>Jacques Berthaud</h3>
-            <p>
-              Président emblématique du club jusqu'en 2008, poste qu'il a quitté pour des raisons de santé.
-              Le club lui doit son développement et ses meilleures années.
-            </p>
-          </div>
-        </div>
-
-        <p style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:1.2rem;">
-          Hommage à quelques joueurs qui ont fait du club ce qu'il est aujourd'hui :
+      <!-- CTA Inscription en ligne -->
+      <div class="cta-panel">
+        <span class="badge-gold">Nouveau</span>
+        <h2>Inscrivez-vous directement en ligne</h2>
+        <p>
+          Il y a du nouveau pour vous inscrire cette saison : vous pouvez désormais le faire directement sur
+          internet, en suivant le lien ci-dessous.
         </p>
-
-        <div class="tribute-players-grid">
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">AD</div>
-            <div>
-              <strong>Ananou Dodji</strong>
-              <span>Joueur et entraîneur, parmi les meilleurs joueurs en France</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">VF</div>
-            <div>
-              <strong>Valensi Franck</strong>
-              <span>Joueur entraîneur, de la génération J.P. Gatien</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">DG</div>
-            <div>
-              <strong>Djondo Gaetan</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">KY</div>
-            <div>
-              <strong>Kidjo Yves</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">DL</div>
-            <div>
-              <strong>Dan LY</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">AY</div>
-            <div>
-              <strong>Amaizo Yves</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
+        <a href="#LIEN_INSCRIPTION_EN_LIGNE_ICI" class="btn-primary btn-large">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Accéder au site d'inscription
+        </a>
+        <div class="cta-subnote">
+          <i class="fa-solid fa-circle-info"></i>
+          Vous étiez licencié(e) à Thiais la saison dernière ? Retrouvez votre profil directement sur le site
+          en indiquant simplement votre nom, prénom et adresse mail. Merci de bien vouloir vérifier les
+          différentes informations qui y sont indiquées.
         </div>
       </div>
 
-      <!-- Infos pratiques -->
-      <div class="practical-panel">
-        <div class="practical-item">
-          <i class="fa-solid fa-calendar-week"></i>
-          <div>
-            <strong>Ouverture du club</strong>
-            <p>Le club accueille ses adhérents du lundi au dimanche — consultez les <a href="./entrainements.html">horaires d'accès</a> sur le site.</p>
+      <!-- Documents santé + Cotisation -->
+      <div class="content-grid-2">
+
+        <!-- Colonne gauche : documents santé -->
+        <div class="panel-card">
+          <h2><i class="fa-solid fa-notes-medical"></i> Document santé à joindre</h2>
+          <div class="health-doc-list">
+
+            <div class="health-doc-item">
+              <div class="health-doc-icon">-18</div>
+              <div>
+                <strong>Moins de 18 ans</strong>
+                <p>Questionnaire de santé, disponible <a href="#LIEN_QUESTIONNAIRE_SANTE_MINEURS_ICI">ici</a>.</p>
+              </div>
+            </div>
+
+            <div class="health-doc-item">
+              <div class="health-doc-icon">18+</div>
+              <div>
+                <strong>18 ans et plus</strong>
+                <p>Le Parcours Prévention Santé (PPS) est à valider.</p>
+              </div>
+            </div>
+
+            <div class="health-doc-item">
+              <div class="health-doc-icon"><i class="fa-solid fa-calendar-check"></i></div>
+              <div style="width:100%;">
+                <strong>Sauf années de naissance spécifiques</strong>
+                <p>Certificat médical obligatoire (avec la mention « en compétition » le cas échéant) à la place du PPS, pour les personnes nées en :</p>
+                <div class="birth-years-box">
+                  <div class="years-grid">
+                    <span class="year-chip">1931</span>
+                    <span class="year-chip">1936</span>
+                    <span class="year-chip">1941</span>
+                    <span class="year-chip">1946</span>
+                    <span class="year-chip">1951</span>
+                    <span class="year-chip">1956</span>
+                    <span class="year-chip">1961</span>
+                    <span class="year-chip">1966</span>
+                    <span class="year-chip">1971</span>
+                    <span class="year-chip">1976</span>
+                    <span class="year-chip">1981</span>
+                    <span class="year-chip">1986</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="certif-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Dans tous les cas, le certificat médical peut remplacer le PPS.
+          </div>
+
+          <div class="tuto-link-box">
+            <i class="fa-solid fa-circle-play"></i>
+            <span>Besoin d'aide pour remplir votre PPS ? Consultez notre <a href="https://sucy-ping.fr/tutoriel-pps" target="_blank" rel="noopener">tutoriel PPS</a>.</span>
           </div>
         </div>
-        <div class="practical-item">
-          <i class="fa-solid fa-person-running"></i>
-          <div>
-            <strong>Entraînements</strong>
-            <p>Séances d'entraînement du lundi au jeudi — consultez la rubrique <a href="./entrainements.html">Entraînements</a>.</p>
+
+        <!-- Colonne droite : cotisation + options du site -->
+        <div class="panel-card">
+          <h2><i class="fa-solid fa-euro-sign"></i> Cotisation & validation</h2>
+          <div class="payment-panel">
+            <div class="payment-step">
+              <div class="payment-step-num">1</div>
+              <p><strong>Réglez votre cotisation</strong>Votre licence ne sera validée qu'une fois le paiement de la cotisation transmis.</p>
+            </div>
+            <div class="payment-step">
+              <div class="payment-step-num">2</div>
+              <p><strong>Joignez le justificatif</strong>Merci de joindre une copie de votre adhésion / preuve de paiement lors de votre inscription.</p>
+            </div>
+            <div class="payment-step">
+              <div class="payment-step-num">3</div>
+              <p><strong>Vérifiez vos informations</strong>Prenez un moment pour contrôler les informations affichées sur votre profil.</p>
+            </div>
           </div>
+        </div>
+
+      </div>
+
+      <!-- Aide / Questions -->
+      <div class="help-panel">
+        <div class="help-panel-text">
+          <h2><i class="fa-solid fa-comments"></i> Une question ?</h2>
+          <p>N'hésitez pas à revenir vers les membres du comité directeur ou les entraîneurs, nous nous ferons un plaisir de vous répondre.</p>
+        </div>
+        <a href="#contact" class="btn-primary">
+          <i class="fa-solid fa-paper-plane"></i> Nous contacter
+        </a>
+      </div>
+
+      <!-- Permanences -->
+      <div class="permanences-panel">
+        <h2><i class="fa-solid fa-people-group"></i> Permanences d'inscription</h2>
+        <p class="permanences-intro">
+          Pour vous aider à finaliser votre inscription, nous tiendrons des permanences à la salle aux dates suivantes, de 18h à 20h30 :
+        </p>
+        <div class="permanences-grid">
+          <div class="permanence-day">
+            <div class="day-label">Lundi</div>
+            <div class="day-dates">8 et 15 septembre</div>
+            <div class="day-time"><i class="fa-solid fa-clock"></i> 18h - 20h30</div>
+          </div>
+          <div class="permanence-day">
+            <div class="day-label">Mardi</div>
+            <div class="day-dates">9 et 16 septembre</div>
+            <div class="day-time"><i class="fa-solid fa-clock"></i> 18h - 20h30</div>
+          </div>
+          <div class="permanence-day">
+            <div class="day-label">Mercredi</div>
+            <div class="day-dates">10 et 17 septembre</div>
+            <div class="day-time"><i class="fa-solid fa-clock"></i> 18h - 20h30</div>
+          </div>
+        </div>
+        <div class="permanence-location">
+          <i class="fa-solid fa-location-dot" style="color:var(--color-gold);"></i>
+          Palais omnisports de Thiais — Place Vincent Van Gogh, 94320 Thiais
         </div>
       </div>
 
@@ -1533,15 +1490,15 @@
 
           <!-- Réseaux sociaux (Facebook & Instagram) -->
           <div class="footer-socials">
-            <a href="#" class="social-btn" data-social="facebook" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" class="social-btn" data-social="instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
           </div>
         </div>
 
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; <span data-season>2026-2027</span> AS Thiais Tennis de Table. Tous droits réservés.</p>
+        <p>&copy; 2026-2027 AS Thiais Tennis de Table. Tous droits réservés.</p>
       </div>
     </div>
   </footer>

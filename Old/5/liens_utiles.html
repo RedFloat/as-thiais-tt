@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Le Club — AS Thiais Tennis de Table</title>
+  <title>Liens Utiles — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -877,7 +877,7 @@
     }
 
     /* ==========================================================================
-       7. PAGE LE CLUB
+       7. PAGE LIENS UTILES
        ========================================================================== */
     .page-hero {
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
@@ -909,368 +909,202 @@
       padding: 3.5rem 0 3.5rem;
     }
 
-    .club-history {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 1.75rem;
-      align-items: start;
-      margin-bottom: 2.5rem;
+    .links-category {
+      margin-bottom: 2.75rem;
     }
 
-    .club-history .panel-card p {
-      color: var(--color-text-muted);
-      font-size: 0.95rem;
-      line-height: 1.75;
-      margin-bottom: 1rem;
-    }
-
-    .club-history .panel-card p:last-child {
+    .links-category:last-child {
       margin-bottom: 0;
     }
 
-    .club-history .panel-card strong {
-      color: var(--color-navy);
-    }
-
-    .agreements-box {
+    .links-category-title {
       display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-    }
-
-    .agreement-item {
-      display: flex;
-      gap: 0.9rem;
       align-items: center;
-      padding: 0.9rem 1rem;
-      background: var(--color-bg-light);
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
+      gap: 0.7rem;
+      margin-bottom: 1.3rem;
     }
 
-    .agreement-item i {
-      width: 36px;
-      height: 36px;
+    .links-category-title i {
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       background: var(--color-gold-light);
       color: var(--color-navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       border: 1px solid var(--color-gold);
-      flex-shrink: 0;
-    }
-
-    .agreement-item strong {
-      display: block;
-      color: var(--color-navy);
-      font-size: 0.85rem;
-    }
-
-    .agreement-item span {
-      color: var(--color-text-muted);
-      font-size: 0.85rem;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.2rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .stat-card {
-      background: var(--color-white);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-subtle);
-      border: 1px solid rgba(4, 74, 110, 0.06);
-      padding: 1.5rem 1.2rem;
-      text-align: center;
-    }
-
-    .stat-card .stat-number {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--color-navy);
-      line-height: 1;
-    }
-
-    .stat-card .stat-number span.accent {
-      color: var(--color-gold);
-    }
-
-    .stat-card .stat-label {
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      line-height: 1.4;
-    }
-
-    .stat-card .stat-label strong {
-      color: var(--color-navy);
-    }
-
-    .stat-icon-circle {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
-      border: 1.5px solid var(--color-gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
-      margin: 0 auto;
-    }
-
-    .infra-support-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.75rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .infra-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-      margin-top: 0.3rem;
-    }
-
-    .infra-list li {
-      display: flex;
-      gap: 0.8rem;
-      align-items: flex-start;
-      font-size: 0.9rem;
-      color: var(--color-text-main);
-      line-height: 1.5;
-    }
-
-    .infra-list i {
-      color: var(--color-gold);
-      margin-top: 0.2rem;
+      font-size: 1rem;
       flex-shrink: 0;
-      width: 1.1rem;
-      text-align: center;
     }
 
-    .support-panel {
-      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
-      color: var(--color-white);
-      border-radius: var(--radius-card);
-      padding: 1.75rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .support-panel h2 {
+    .links-category-title h2 {
+      color: var(--color-navy);
       font-size: 1.2rem;
-      margin-bottom: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
     }
 
-    .support-panel h2 i { color: var(--color-gold); }
-
-    .support-panel p {
-      color: #cbd5e1;
-      font-size: 0.9rem;
-      line-height: 1.7;
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
     }
 
-    .support-panel .badge-gold {
-      align-self: flex-start;
-      margin-top: 1rem;
-      background: rgba(255,255,255,0.1);
-      border-color: var(--color-gold);
-      color: var(--color-gold);
-    }
-
-    .tribute-panel {
+    .link-card {
       background: var(--color-white);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-subtle);
       border: 1px solid rgba(4, 74, 110, 0.06);
-      padding: 2rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .tribute-founder {
+      padding: 1.5rem;
       display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
-      padding-bottom: 1.75rem;
-      margin-bottom: 1.75rem;
-      border-bottom: 1px solid #e2e8f0;
+      flex-direction: column;
+      transition: var(--transition);
     }
 
-    .tribute-founder-avatar {
-      flex-shrink: 0;
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
+    .link-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+      border-color: var(--color-gold);
+    }
+
+    .link-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
       background: var(--color-navy);
       color: var(--color-white);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
       font-size: 1.3rem;
-      border: 3px solid var(--color-gold);
+      margin-bottom: 1rem;
     }
 
-    .tribute-founder h3 {
+    .link-card h3 {
       color: var(--color-navy);
-      font-size: 1.2rem;
-      margin-bottom: 0.3rem;
+      font-size: 1.02rem;
+      margin-bottom: 0.4rem;
     }
 
-    .tribute-founder .tribute-role {
-      display: inline-block;
-      color: var(--color-gold);
-      font-weight: 700;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.6rem;
-    }
-
-    .tribute-founder p {
+    .link-card p {
       color: var(--color-text-muted);
-      font-size: 0.9rem;
-      line-height: 1.7;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      flex-grow: 1;
+      margin-bottom: 1.1rem;
     }
 
-    .tribute-players-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
+    .link-card-url {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.8rem;
+      word-break: break-all;
     }
 
-    .tribute-player-card {
-      display: flex;
-      gap: 0.8rem;
+    .link-card-btn {
+      display: inline-flex;
       align-items: center;
-      padding: 0.9rem;
-      background: var(--color-bg-light);
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--color-gold-light);
+      color: var(--color-navy);
+      border: 1px solid var(--color-gold);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.6rem 1rem;
       border-radius: 8px;
-      border: 1px solid #e2e8f0;
       transition: var(--transition);
     }
 
-    .tribute-player-card:hover {
-      border-color: var(--color-gold);
-      box-shadow: var(--shadow-hover);
-      transform: translateY(-2px);
+    .link-card-btn:hover {
+      background: var(--color-gold);
+      color: var(--color-navy-dark);
     }
 
-    .tribute-player-avatar {
-      flex-shrink: 0;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
+    .app-card {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.85rem;
-      border: 1px solid var(--color-gold);
-    }
-
-    .tribute-player-card strong {
-      display: block;
-      color: var(--color-navy);
-      font-size: 0.9rem;
-    }
-
-    .tribute-player-card span {
-      color: var(--color-text-muted);
-      font-size: 0.78rem;
-      line-height: 1.4;
-    }
-
-    .practical-panel {
-      display: flex;
-      gap: 1.75rem;
+      gap: 1.5rem;
       flex-wrap: wrap;
-      background: var(--color-white);
+      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
+      color: var(--color-white);
       border-radius: var(--radius-card);
-      box-shadow: var(--shadow-subtle);
-      border: 1px solid rgba(4, 74, 110, 0.06);
-      padding: 1.75rem;
+      padding: 1.75rem 2rem;
     }
 
-    .practical-item {
-      flex: 1;
-      min-width: 260px;
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-
-    .practical-item i {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
+    .app-card-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.1);
+      color: var(--color-gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid var(--color-gold);
+      font-size: 1.8rem;
       flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .app-card-text {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .app-card-text h3 {
       font-size: 1.1rem;
+      margin-bottom: 0.3rem;
     }
 
-    .practical-item strong {
-      display: block;
-      color: var(--color-navy);
-      margin-bottom: 0.2rem;
-      font-size: 0.98rem;
-    }
-
-    .practical-item p {
-      color: var(--color-text-muted);
+    .app-card-text p {
+      color: #cbd5e1;
       font-size: 0.88rem;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    .practical-item a {
-      color: var(--color-navy);
+    .app-card-stores {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .app-store-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--color-white);
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
       font-weight: 600;
-      text-decoration: underline;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+
+    .app-store-btn:hover {
+      background: var(--color-gold);
+      color: var(--color-navy-dark);
+      border-color: var(--color-gold);
+    }
+
+    .app-store-btn i {
+      font-size: 1.15rem;
     }
 
     @media (max-width: 900px) {
-      .club-history {
-        grid-template-columns: 1fr;
-      }
-      .infra-support-grid {
-        grid-template-columns: 1fr;
-      }
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .tribute-players-grid {
+      .links-grid {
         grid-template-columns: repeat(2, 1fr);
       }
     }
 
     @media (max-width: 600px) {
-      .stats-grid {
+      .links-grid {
         grid-template-columns: 1fr;
       }
-      .tribute-players-grid {
-        grid-template-columns: 1fr;
-      }
-      .tribute-founder {
+      .app-card {
         flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -1288,8 +1122,8 @@
 
       <!-- Réseaux sociaux (Visible Uniquement sur Ordinateur) -->
       <div class="header-socials-desktop">
-        <a href="#" data-social="facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="#" data-social="instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
       </div>
 
       <!-- Bouton 3 points (Visible Uniquement sur Mobile) -->
@@ -1311,15 +1145,15 @@
   </header>
 
   <!-- ==========================================
-     HERO LE CLUB
+     HERO LIENS UTILES
      ========================================== -->
   <section class="page-hero">
     <div class="container">
-      <span class="badge-gold">Depuis 1995</span>
-      <h1>Le Club</h1>
+      <span class="badge-gold">À consulter</span>
+      <h1>Liens Utiles</h1>
       <p>
-        L'Association Sportive Thiais Tennis de Table, association loi 1901, a pour activité la pratique
-        du tennis de table à Thiais depuis près de 30 ans.
+        Une sélection de sites pour suivre l'actualité du tennis de table, consulter vos résultats,
+        trouver un tournoi ou choisir votre matériel.
       </p>
     </div>
   </section>
@@ -1330,168 +1164,135 @@
   <section class="page-content">
     <div class="container">
 
-      <!-- Histoire + Agréments -->
-      <div class="club-history">
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-book-open"></i> Notre histoire</h2>
-          <p>
-            L'Association Sportive Thiais Tennis de Table, association loi 1901, a été créée le
-            <strong>7 novembre 1995</strong>, présidée à sa création par <strong>Jacques Berthaud</strong>.
-          </p>
-          <p>
-            M. Berthaud Jacques en a été l'emblématique président jusqu'en 2008, poste qu'il a quitté
-            pour des raisons de santé. Le club lui doit son développement et ses meilleures années.
-          </p>
-          <p>
-            Le club a pour principal soutien la Ville de Thiais, qui l'accompagne depuis de nombreuses
-            années, notamment pendant la période où il a connu son plus haut niveau, en Nationale 1.
-          </p>
+      <!-- Instances officielles -->
+      <div class="links-category">
+        <div class="links-category-title">
+          <i class="fa-solid fa-landmark"></i>
+          <h2>Instances officielles</h2>
         </div>
+        <div class="links-grid">
 
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-stamp"></i> Agréments</h2>
-          <div class="agreements-box">
-            <div class="agreement-item">
-              <i class="fa-solid fa-landmark"></i>
-              <div>
-                <strong>Ministère de la Jeunesse et des Sports</strong>
-                <span>Agrément n° 94 S 487</span>
-              </div>
-            </div>
-            <div class="agreement-item">
-              <i class="fa-solid fa-trophy"></i>
-              <div>
-                <strong>Fédération Française de Tennis de Table</strong>
-                <span>Agrément n° 08940459</span>
-              </div>
-            </div>
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-city"></i></div>
+            <h3>Ville de Thiais</h3>
+            <p>Le site officiel de la ville de Thiais, partenaire historique du club.</p>
+            <span class="link-card-url">www.ville-thiais.fr</span>
+            <a href="https://www.ville-thiais.fr" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
           </div>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-map"></i></div>
+            <h3>Comité du Val-de-Marne</h3>
+            <p>Le comité départemental de tennis de table du Val-de-Marne (CD94).</p>
+            <span class="link-card-url">www.cd94tt.com</span>
+            <a href="https://www.cd94tt.com" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-flag"></i></div>
+            <h3>Ligue Île-de-France</h3>
+            <p>Le site de la ligue régionale d'Île-de-France de tennis de table.</p>
+            <span class="link-card-url">www.fftt-idf.com</span>
+            <a href="https://www.fftt-idf.com" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-trophy"></i></div>
+            <h3>Fédération Française (FFTT)</h3>
+            <p>Le site officiel de la Fédération Française de Tennis de Table.</p>
+            <span class="link-card-url">www.fftt.com</span>
+            <a href="https://www.fftt.com" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
         </div>
       </div>
 
-      <!-- Chiffres clés -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number">~160</div>
-          <div class="stat-label">Adhérents, dont <span class="accent">18%</span> de féminines</div>
+      <!-- Compétition & résultats -->
+      <div class="links-category">
+        <div class="links-category-title">
+          <i class="fa-solid fa-chart-line"></i>
+          <h2>Compétition & résultats</h2>
         </div>
-        <div class="stat-card">
-          <div class="stat-number">10</div>
-          <div class="stat-label">Équipes en championnat par équipe Messieurs</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">1</div>
-          <div class="stat-label">Équipe en championnat par équipe Dames</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon-circle"><i class="fa-solid fa-child-reaching"></i></div>
-          <div class="stat-label">Équipes <strong>Jeunes</strong> & Championnat de <strong>Paris</strong></div>
+        <div class="links-grid">
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
+            <h3>Tournois en France</h3>
+            <p>Retrouvez tous les tournois de tennis de table organisés en France.</p>
+            <span class="link-card-url">tournois-tt.fr</span>
+            <a href="https://tournois-tt.fr/" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <h3>PingPocket</h3>
+            <p>Suivez vos résultats et statistiques de compétition en temps réel.</p>
+            <span class="link-card-url">www.pingpocket.fr</span>
+            <a href="https://www.pingpocket.fr" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
         </div>
       </div>
 
-      <!-- Infrastructure + Soutien -->
-      <div class="infra-support-grid">
-        <div class="panel-card">
-          <h2><i class="fa-solid fa-building-columns"></i> Nos installations</h2>
-          <ul class="infra-list">
-            <li><i class="fa-solid fa-location-dot"></i> Siège au <strong>Palais Omnisports de Thiais</strong></li>
-            <li><i class="fa-solid fa-square-parking"></i> Parking de plus de <strong>100 places</strong></li>
-            <li><i class="fa-solid fa-table-tennis-paddle-ball"></i> Salle spécifique de <strong>16 tables</strong>, extensible jusqu'à <strong>20 tables</strong></li>
-          </ul>
+      <!-- Matériel -->
+      <div class="links-category">
+        <div class="links-category-title">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <h2>Matériel</h2>
         </div>
+        <div class="links-grid">
 
-        <div class="support-panel">
-          <span class="badge-gold">Partenaire historique</span>
-          <h2><i class="fa-solid fa-handshake"></i> Le soutien de la Ville de Thiais</h2>
-          <p>
-            Le club a pour principal soutien la Ville de Thiais, qui l'accompagne depuis de nombreuses
-            années, notamment durant la période où il a connu son plus haut niveau sportif, en Nationale 1.
-          </p>
-        </div>
-      </div>
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <h3>Revspin (Revues Plaques & Bois)</h3>
+            <p>Une revue complète en anglais des revêtements et bois de raquette.</p>
+            <span class="link-card-url">revspin.net/rubber</span>
+            <a href="https://revspin.net/rubber/" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
 
-      <!-- Hommage -->
-      <div class="tribute-panel">
-        <h2 style="color:var(--color-navy); font-size:1.3rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem;">
-          <i class="fa-solid fa-award" style="color:var(--color-gold);"></i> Hommage
-        </h2>
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-store"></i></div>
+            <h3>Friendship</h3>
+            <p>Achat de matériel de tennis de table chez Friendship.</p>
+            <span class="link-card-url">theo384.free.fr</span>
+            <a href="http://theo384.free.fr/" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
 
-        <div class="tribute-founder">
-          <div class="tribute-founder-avatar">JB</div>
-          <div>
-            <span class="tribute-role">Président fondateur (1995 - 2008)</span>
-            <h3>Jacques Berthaud</h3>
-            <p>
-              Président emblématique du club jusqu'en 2008, poste qu'il a quitté pour des raisons de santé.
-              Le club lui doit son développement et ses meilleures années.
-            </p>
-          </div>
-        </div>
-
-        <p style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:1.2rem;">
-          Hommage à quelques joueurs qui ont fait du club ce qu'il est aujourd'hui :
-        </p>
-
-        <div class="tribute-players-grid">
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">AD</div>
-            <div>
-              <strong>Ananou Dodji</strong>
-              <span>Joueur et entraîneur, parmi les meilleurs joueurs en France</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">VF</div>
-            <div>
-              <strong>Valensi Franck</strong>
-              <span>Joueur entraîneur, de la génération J.P. Gatien</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">DG</div>
-            <div>
-              <strong>Djondo Gaetan</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">KY</div>
-            <div>
-              <strong>Kidjo Yves</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">DL</div>
-            <div>
-              <strong>Dan LY</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
-          <div class="tribute-player-card">
-            <div class="tribute-player-avatar">AY</div>
-            <div>
-              <strong>Amaizo Yves</strong>
-              <span>Joueur historique du club</span>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- Infos pratiques -->
-      <div class="practical-panel">
-        <div class="practical-item">
-          <i class="fa-solid fa-calendar-week"></i>
-          <div>
-            <strong>Ouverture du club</strong>
-            <p>Le club accueille ses adhérents du lundi au dimanche — consultez les <a href="./entrainements.html">horaires d'accès</a> sur le site.</p>
-          </div>
+      <!-- Application FFTT -->
+      <div class="links-category">
+        <div class="links-category-title">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+          <h2>Application mobile</h2>
         </div>
-        <div class="practical-item">
-          <i class="fa-solid fa-person-running"></i>
-          <div>
-            <strong>Entraînements</strong>
-            <p>Séances d'entraînement du lundi au jeudi — consultez la rubrique <a href="./entrainements.html">Entraînements</a>.</p>
+
+        <div class="app-card">
+          <div class="app-card-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
+          <div class="app-card-text">
+            <h3>Application FFTT</h3>
+            <p>Retrouvez vos licences, classements et résultats directement depuis votre téléphone.</p>
+          </div>
+          <div class="app-card-stores">
+            <a href="https://apps.apple.com/fr/app/fftt/id1148342433" target="_blank" rel="noopener" class="app-store-btn"><i class="fa-brands fa-apple"></i> App Store</a>
+            <a href="https://play.google.com/store/apps/details?id=com.fftt.fftt" target="_blank" rel="noopener" class="app-store-btn"><i class="fa-brands fa-google-play"></i> Google Play</a>
           </div>
         </div>
       </div>
@@ -1533,15 +1334,15 @@
 
           <!-- Réseaux sociaux (Facebook & Instagram) -->
           <div class="footer-socials">
-            <a href="#" class="social-btn" data-social="facebook" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" class="social-btn" data-social="instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-btn" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-btn" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
           </div>
         </div>
 
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; <span data-season>2026-2027</span> AS Thiais Tennis de Table. Tous droits réservés.</p>
+        <p>&copy; 2026-2027 AS Thiais Tennis de Table. Tous droits réservés.</p>
       </div>
     </div>
   </footer>
