@@ -236,81 +236,14 @@
     iframe.src = config.calendarEmbedUrl;
   }
 
-  /* ---------- Équipes / matchs ---------- */
-
-  function scoreBadge(match) {
-    if (match.status === 'upcoming') {
-      return { cls: 'status-upcoming', label: 'À venir' };
-    }
-    const scoreText = match.score ? ' ' + match.score : '';
-    if (match.result === 'V') return { cls: 'score-win', label: 'V' + scoreText };
-    if (match.result === 'D') return { cls: 'score-loss', label: 'D' + scoreText };
-    if (match.result === 'N') return { cls: 'score-draw', label: 'N' + scoreText };
-    return { cls: 'status-upcoming', label: scoreText.trim() || '—' };
-  }
-
-  function buildTeams(teams) {
-    const grid = document.getElementById('teamsGrid');
-    if (!grid || !Array.isArray(teams)) return;
-
-    grid.innerHTML = '';
-
-    teams.forEach((team) => {
-      if (!team) return;
-      const card = document.createElement('div');
-      card.className = 'mini-team-card';
-
-      const header = document.createElement('div');
-      header.className = 'mini-team-header';
-      header.innerHTML =
-        '<span class="mini-team-name">' + team.name + '</span>' +
-        '<span class="mini-team-div">' + team.division + '</span>';
-      card.appendChild(header);
-
-      (team.matches || []).forEach((match) => {
-        const badge = scoreBadge(match);
-        const line = document.createElement('div');
-        line.className = 'match-line';
-        line.innerHTML =
-          '<span class="match-date">' + match.date + '</span>' +
-          '<span class="match-details">' + match.opponent + '</span>' +
-          '<span class="score-badge ' + badge.cls + '">' + badge.label + '</span>';
-        card.appendChild(line);
-      });
-
-      grid.appendChild(card);
-    });
-  }
-
-  // Applique l'interrupteur "afficher/masquer le bloc résultats & matchs à venir"
-  // et charge les 12 fichiers équipes seulement si le bloc est présent sur la page.
-  async function initTeamsSection(settings) {
-    const section = document.getElementById('teamsSection');
-    if (!section) return;
-
-    if (settings && settings.showResultsAndUpcomingMatches === false) {
-      section.style.display = 'none';
-      return;
-    }
-
-    section.style.display = '';
-
-    const teamIds = Array.from({ length: 12 }, (_, i) => `equipe-${i + 1}`);
-    const teams = await Promise.all(
-      teamIds.map((id) => loadJSON(`./data/teams/${id}.json`))
-    );
-    buildTeams(teams.filter(Boolean));
-  }
-
   /* ---------- Initialisation ---------- */
 
   async function init() {
-    const [config, nav, sponsors, documents, homepageSettings] = await Promise.all([
+    const [config, nav, sponsors, documents] = await Promise.all([
       loadJSON('./data/site-config.json'),
       loadJSON('./data/navigation.json'),
       loadJSON('./data/sponsors.json'),
-      loadJSON('./data/documents.json'),
-      loadJSON('./data/homepage-settings.json')
+      loadJSON('./data/documents.json')
     ]);
 
     applySeason(config);
@@ -318,7 +251,6 @@
     buildNavigation(nav);
     buildSponsors(sponsors);
     buildDocuments(documents);
-    initTeamsSection(homepageSettings);
   }
 
   if (document.readyState === 'loading') {
