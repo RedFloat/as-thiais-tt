@@ -16,14 +16,15 @@
       --color-navy: #044A6E;          /* Bleu Marine principal */
       --color-navy-dark: #022c43;     /* Bleu Marine foncé */
       --color-gold: #D2A95B;          /* Doré d'accentuation */
-      --color-gold-light: #fdf8f0;    /* Fond doré très clair */
+      --color-gold-light: #f7f1e3;    /* Fond doré très clair */
       --color-bg-light: #f8fafc;      /* Fond gris-blanc épuré */
       --color-text-main: #1e293b;     /* Texte principal */
       --color-text-muted: #64748b;    /* Texte secondaire */
       --color-white: #ffffff;
       
-      --radius-card: 16px;
-      --shadow-subtle: 0 10px 30px rgba(4, 74, 110, 0.05);
+      --radius-card: 12px;
+      --shadow-subtle: 0 4px 15px rgba(4, 74, 110, 0.06);
+      --shadow-hover: 0 8px 25px rgba(4, 74, 110, 0.12);
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -64,16 +65,22 @@
     }
 
     .badge-gold {
-      background: rgba(210, 169, 91, 0.15);
-      color: var(--color-gold); /* Modifié ici en jaune/doré pour un contraste parfait */
+      background: var(--color-gold-light);
+      color: var(--color-navy);
       border: 1px solid var(--color-gold);
       font-weight: 700;
       font-size: 0.75rem;
-      padding: 0.3rem 1rem;
+      padding: 0.25rem 0.8rem;
       border-radius: 50px;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.5px;
       display: inline-block;
+    }
+
+    .page-hero .badge-gold {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--color-gold);
+      color: var(--color-gold);
     }
 
     /* ==========================================================================
@@ -212,16 +219,6 @@
         color: var(--color-gold) !important;
         background: rgba(255, 255, 255, 0.05);
         text-decoration: none !important;
-      }
-
-      .nav-link.is-current {
-        color: var(--color-gold) !important;
-      }
-
-      .dropdown a.is-current {
-        color: var(--color-navy) !important;
-        font-weight: 800;
-        background: var(--color-gold-light);
       }
 
       .has-dropdown { position: relative; }
@@ -423,6 +420,10 @@
       gap: 0.6rem;
     }
 
+    .footer-address {
+      display: inline-block;
+    }
+
     .footer-right {
       display: flex;
       flex-direction: column;
@@ -520,7 +521,7 @@
      ========================================== -->
   <header>
     <div class="header-top container">
-      <a href="index.html" class="logo">
+      <a href="./index.html" class="logo">
         <div class="logo-badge">
           <img src="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg" alt="Logo Officiel AS Thiais TT">
         </div>
@@ -540,8 +541,61 @@
     <div class="header-nav-bar">
       <div class="container">
         <nav class="nav-wrapper" id="navWrapper">
-          <ul class="nav-menu" id="navMenu">
-            <!-- Menu généré dynamiquement par js/site-data.js depuis data/navigation.json -->
+          <ul class="nav-menu">
+            <li class="nav-item"><a href="./index.html" class="nav-link">Accueil</a></li>
+            <li class="nav-item"><a href="./inscription.html" class="nav-link">Inscription</a></li>
+            
+            <li class="nav-item has-dropdown">
+              <a href="#" class="nav-link">
+                Équipes 
+                <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i>
+              </a>
+              <div class="dropdown">
+                <a href="#equipe-1">Équipe 1 (N3)</a>
+                <a href="#equipe-2">Équipe 2 (R2)</a>
+                <a href="#equipe-3">Équipe 3 (R3)</a>
+                <a href="#equipe-4">Équipe 4 (PR)</a>
+                <a href="#equipe-5">Équipe 5 (D1)</a>
+                <a href="#equipe-6">Équipe 6 (D1)</a>
+                <a href="#equipe-7">Équipe 7 (D2)</a>
+                <a href="#equipe-8">Équipe 8 (D2)</a>
+                <a href="#equipe-9">Équipe 9 (D2)</a>
+                <a href="#equipe-10">Équipe 10 (D3)</a>
+                <a href="#equipe-11">Équipe 11 (Jeunes)</a>
+                <a href="#equipe-12">Équipe 12 (Vétérans)</a>
+              </div>
+            </li>
+
+            <li class="nav-item has-dropdown">
+              <a href="#" class="nav-link">
+                La vie du Club 
+                <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i>
+              </a>
+              <div class="dropdown">
+                <a href="#">News</a>
+                <a href="#">Événements</a>
+                <a href="#">Albums Photos</a>
+                <a href="#">Albums Vidéos</a>
+              </div>
+            </li>
+
+            <li class="nav-item has-dropdown">
+              <a href="#" class="nav-link">
+                Infos pratiques 
+                <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i>
+              </a>
+              <div class="dropdown">
+                <a href="./le_club.html">Le club</a>
+                <a href="#">Organigramme</a>
+                <a href="./entrainements.html">Entraînements</a>
+                <a href="./reglement_interieur.html">Règlement intérieur</a>
+                <a href="./calendrier.html">Calendrier Sportif</a>
+                <a href="./liens_utiles.html">Liens utiles</a>
+                <a href="./documents.html">Documents</a>
+              </div>
+            </li>
+
+            <li class="nav-item"><a href="#contact" class="nav-link">Contact et plan</a></li>
           </ul>
         </nav>
       </div>
@@ -553,7 +607,7 @@
      ========================================== -->
   <section class="page-hero">
     <div class="container">
-      <span class="badge-gold" data-season-badge>Saison 2025/2026</span>
+      <span class="badge-gold">Saison 2025/2026</span>
       <h1>Règlement Intérieur</h1>
       <p>Cadre de vie, principes déontologiques et fonctionnement de l'association.</p>
     </div>
@@ -602,7 +656,7 @@
           </div>
           <p class="footer-address-line">
             <i class="fa-solid fa-location-dot" style="color:var(--color-gold); padding-top:0.15rem;"></i>
-            <span>
+            <span class="footer-address">
               Palais omnisports de Thiais<br>
               Place Vincent Van Gogh, 94320 Thiais
             </span>
@@ -635,13 +689,11 @@
   <!-- ==========================================
      JAVASCRIPT (MENU MOBILE)
      ========================================== -->
-  <script src="./js/site-data.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const mobileBtn = document.getElementById('mobileMenuBtn');
       const navWrapper = document.getElementById('navWrapper');
-      // Note : le binding des menus déroulants mobiles est géré par js/site-data.js
-      //       une fois le menu construit depuis data/navigation.json
+      const dropdownItems = document.querySelectorAll('.has-dropdown');
 
       if (mobileBtn && navWrapper) {
         mobileBtn.addEventListener('click', () => {
@@ -653,6 +705,17 @@
         });
       }
 
+      dropdownItems.forEach(item => {
+        const link = item.querySelector('.nav-link');
+        if (link) {
+          link.addEventListener('click', (e) => {
+            if (window.innerWidth < 991) {
+              e.preventDefault();
+              item.classList.toggle('active');
+            }
+          });
+        }
+      });
     });
   </script>
 </body>

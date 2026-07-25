@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entraînements — AS Thiais Tennis de Table</title>
+  <title>Liens Utiles — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -225,16 +225,6 @@
       .nav-link:hover {
         color: var(--color-gold);
         background: rgba(255, 255, 255, 0.05);
-      }
-
-      .nav-link.is-current {
-        color: var(--color-gold);
-      }
-
-      .dropdown a.is-current {
-        color: var(--color-navy);
-        font-weight: 800;
-        background: var(--color-gold-light);
       }
 
       .has-dropdown {
@@ -877,7 +867,7 @@
     }
 
     /* ==========================================================================
-       7. PAGE ENTRAINEMENTS
+       7. PAGE LIENS UTILES
        ========================================================================== */
     .page-hero {
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
@@ -909,84 +899,24 @@
       padding: 3.5rem 0 3.5rem;
     }
 
-    .info-strip {
-      display: flex;
-      gap: 1.2rem;
-      flex-wrap: wrap;
-      margin-bottom: 2.5rem;
+    .links-category {
+      margin-bottom: 2.75rem;
     }
 
-    .info-strip-item {
-      flex: 1;
-      min-width: 240px;
-      background: var(--color-white);
-      border: 1px solid rgba(4, 74, 110, 0.08);
-      border-left: 4px solid var(--color-gold);
-      border-radius: var(--radius-card);
-      padding: 1.2rem 1.4rem;
-      box-shadow: var(--shadow-subtle);
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
+    .links-category:last-child {
+      margin-bottom: 0;
     }
 
-    .info-strip-item i {
-      font-size: 1.4rem;
-      color: var(--color-navy);
-      margin-top: 0.15rem;
-    }
-
-    .info-strip-item strong {
-      display: block;
-      color: var(--color-navy);
-      margin-bottom: 0.2rem;
-      font-size: 0.98rem;
-    }
-
-    .info-strip-item span {
-      color: var(--color-text-muted);
-      font-size: 0.88rem;
-      line-height: 1.5;
-    }
-
-    .planning-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.75rem;
-      margin-bottom: 2.5rem;
-      align-items: start;
-    }
-
-    .planning-panel h2 {
-      color: var(--color-navy);
-      font-size: 1.2rem;
-      margin-bottom: 1.2rem;
+    .links-category-title {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.7rem;
+      margin-bottom: 1.3rem;
     }
 
-    .planning-panel h2 i { color: var(--color-gold); }
-
-    .planning-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-    }
-
-    .planning-list-item {
-      display: flex;
-      gap: 0.9rem;
-      align-items: flex-start;
-      padding: 0.9rem 1rem;
-      background: var(--color-bg-light);
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .planning-list-item i {
-      width: 34px;
-      height: 34px;
+    .links-category-title i {
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       background: var(--color-gold-light);
       color: var(--color-navy);
@@ -994,176 +924,177 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 1rem;
       flex-shrink: 0;
-      font-size: 0.9rem;
     }
 
-    .planning-list-item strong {
-      display: block;
+    .links-category-title h2 {
       color: var(--color-navy);
-      font-size: 0.92rem;
-      margin-bottom: 0.15rem;
+      font-size: 1.2rem;
     }
 
-    .planning-list-item span {
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .link-card {
+      background: var(--color-white);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(4, 74, 110, 0.06);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+    }
+
+    .link-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+      border-color: var(--color-gold);
+    }
+
+    .link-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--color-navy);
+      color: var(--color-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .link-card h3 {
+      color: var(--color-navy);
+      font-size: 1.02rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .link-card p {
       color: var(--color-text-muted);
-      font-size: 0.86rem;
-      line-height: 1.5;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      flex-grow: 1;
+      margin-bottom: 1.1rem;
     }
 
-    .holiday-note {
-      margin-top: 1.2rem;
+    .link-card-url {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.8rem;
+      word-break: break-all;
+    }
+
+    .link-card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
       background: var(--color-gold-light);
-      border-left: 4px solid var(--color-gold);
-      border-radius: 8px;
-      padding: 0.9rem 1.1rem;
-      font-size: 0.86rem;
       color: var(--color-navy);
-      line-height: 1.6;
+      border: 1px solid var(--color-gold);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      transition: var(--transition);
     }
 
-    .holiday-note i { color: var(--color-gold); margin-right: 0.3rem; }
+    .link-card-btn:hover {
+      background: var(--color-gold);
+      color: var(--color-navy-dark);
+    }
 
-    .retraites-panel {
+    .app-card {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
       color: var(--color-white);
       border-radius: var(--radius-card);
-      padding: 1.75rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      padding: 1.75rem 2rem;
     }
 
-    .retraites-panel .badge-gold {
-      align-self: flex-start;
+    .app-card-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
       background: rgba(255,255,255,0.1);
-      border-color: var(--color-gold);
       color: var(--color-gold);
-      margin-bottom: 0.9rem;
-    }
-
-    .retraites-panel h2 {
-      font-size: 1.2rem;
-      margin-bottom: 0.7rem;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      justify-content: center;
+      font-size: 1.8rem;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.15);
     }
 
-    .retraites-panel h2 i { color: var(--color-gold); }
+    .app-card-text {
+      flex: 1;
+      min-width: 220px;
+    }
 
-    .retraites-panel p {
+    .app-card-text h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .app-card-text p {
       color: #cbd5e1;
-      font-size: 0.9rem;
-      line-height: 1.7;
-      margin-bottom: 1.2rem;
+      font-size: 0.88rem;
+      line-height: 1.6;
     }
 
-    .retraites-slots {
+    .app-card-stores {
       display: flex;
       gap: 0.8rem;
       flex-wrap: wrap;
     }
 
-    .retraites-slot {
+    .app-store-btn {
       display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 0.5rem 0.9rem;
-      border-radius: 50px;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-
-    .retraites-slot i { color: var(--color-gold); }
-
-    .schedule-panel {
-      background: var(--color-white);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-subtle);
-      border: 1px solid rgba(4, 74, 110, 0.06);
-      padding: 1.75rem;
-    }
-
-    .schedule-panel h2 {
-      color: var(--color-navy);
-      font-size: 1.25rem;
-      margin-bottom: 0.4rem;
-      display: flex;
       align-items: center;
       gap: 0.6rem;
-    }
-
-    .schedule-panel h2 i { color: var(--color-gold); }
-
-    .schedule-panel-intro {
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 1.4rem;
-    }
-
-    .schedule-preview-link {
-      display: block;
-      position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-      max-width: 640px;
-      margin: 0 auto;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--color-white);
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
       transition: var(--transition);
     }
 
-    .schedule-preview-link:hover {
-      box-shadow: var(--shadow-hover);
-      border-color: var(--color-gold);
-      transform: translateY(-2px);
-    }
-
-    .schedule-preview-link img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .schedule-preview-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(2,44,67,0.85) 0%, rgba(2,44,67,0) 45%);
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 1.2rem;
-      opacity: 0;
-      transition: var(--transition);
-    }
-
-    .schedule-preview-link:hover .schedule-preview-overlay {
-      opacity: 1;
-    }
-
-    .schedule-preview-overlay span {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
+    .app-store-btn:hover {
       background: var(--color-gold);
       color: var(--color-navy-dark);
-      font-weight: 700;
-      font-size: 0.88rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: 50px;
+      border-color: var(--color-gold);
+    }
+
+    .app-store-btn i {
+      font-size: 1.15rem;
     }
 
     @media (max-width: 900px) {
-      .planning-grid {
-        grid-template-columns: 1fr;
+      .links-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
     @media (max-width: 600px) {
-      .info-strip {
+      .links-grid {
+        grid-template-columns: 1fr;
+      }
+      .app-card {
         flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -1195,8 +1126,62 @@
     <div class="header-nav-bar">
       <div class="container">
         <nav class="nav-wrapper" id="navWrapper">
-          <ul class="nav-menu" id="navMenu">
-            <!-- Menu généré dynamiquement par js/site-data.js depuis data/navigation.json -->
+          <ul class="nav-menu">
+            <li class="nav-item"><a href="./index.html" class="nav-link">Accueil</a></li>
+            <li class="nav-item"><a href="./inscription.html" class="nav-link">Inscription</a></li>
+            
+            <!-- Onglet Équipes -->
+            <li class="nav-item has-dropdown">
+              <a href="#" class="nav-link">
+                Équipes 
+                <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i>
+              </a>
+              <div class="dropdown">
+                <a href="#equipe-1">Équipe 1 (N3)</a>
+                <a href="#equipe-2">Équipe 2 (R2)</a>
+                <a href="#equipe-3">Équipe 3 (R3)</a>
+                <a href="#equipe-4">Équipe 4 (PR)</a>
+                <a href="#equipe-5">Équipe 5 (D1)</a>
+                <a href="#equipe-6">Équipe 6 (D1)</a>
+                <a href="#equipe-7">Équipe 7 (D2)</a>
+                <a href="#equipe-8">Équipe 8 (D2)</a>
+                <a href="#equipe-9">Équipe 9 (D2)</a>
+                <a href="#equipe-10">Équipe 10 (D3)</a>
+                <a href="#equipe-11">Équipe 11 (Jeunes)</a>
+                <a href="#equipe-12">Équipe 12 (Vétérans)</a>
+              </div>
+            </li>
+
+            <li class="nav-item has-dropdown">
+              <a href="#" class="nav-link">
+                La vie du Club 
+                <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i>
+              </a>
+              <div class="dropdown">
+                <a href="#">News</a>
+                <a href="#">Événements</a>
+                <a href="#">Albums Photos</a>
+                <a href="#">Albums Vidéos</a>
+              </div>
+            </li>
+
+            <li class="nav-item has-dropdown">
+              <a href="#" class="nav-link">
+                Infos pratiques 
+                <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;"></i>
+              </a>
+              <div class="dropdown">
+                <a href="./le_club.html">Le club</a>
+                <a href="#">Organigramme</a>
+                <a href="./entrainements.html">Entraînements</a>
+                <a href="./reglement_interieur.html">Règlement intérieur</a>
+                <a href="./calendrier.html">Calendrier Sportif</a>
+                <a href="./liens_utiles.html">Liens utiles</a>
+                <a href="./documents.html">Documents</a>
+              </div>
+            </li>
+
+            <li class="nav-item"><a href="#contact" class="nav-link">Contact et plan</a></li>
           </ul>
         </nav>
       </div>
@@ -1204,15 +1189,15 @@
   </header>
 
   <!-- ==========================================
-     HERO ENTRAINEMENTS
+     HERO LIENS UTILES
      ========================================== -->
   <section class="page-hero">
     <div class="container">
-      <span class="badge-gold" data-season-badge>Saison 2025-2026</span>
-      <h1>Entraînements</h1>
+      <span class="badge-gold">À consulter</span>
+      <h1>Liens Utiles</h1>
       <p>
-        Retrouvez toutes les informations pratiques concernant le lieu, le planning et les créneaux
-        d'entraînement du club pour la saison.
+        Une sélection de sites pour suivre l'actualité du tennis de table, consulter vos résultats,
+        trouver un tournoi ou choisir votre matériel.
       </p>
     </div>
   </section>
@@ -1223,67 +1208,137 @@
   <section class="page-content">
     <div class="container">
 
-      <!-- Lieu -->
-      <div class="info-strip">
-        <div class="info-strip-item">
-          <i class="fa-solid fa-location-dot"></i>
-          <div>
-            <strong>Lieu</strong>
-            <span>Palais Omnisports de Thiais, salle spécifique</span>
+      <!-- Instances officielles -->
+      <div class="links-category">
+        <div class="links-category-title">
+          <i class="fa-solid fa-landmark"></i>
+          <h2>Instances officielles</h2>
+        </div>
+        <div class="links-grid">
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-city"></i></div>
+            <h3>Ville de Thiais</h3>
+            <p>Le site officiel de la ville de Thiais, partenaire historique du club.</p>
+            <span class="link-card-url">www.ville-thiais.fr</span>
+            <a href="https://www.ville-thiais.fr" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
           </div>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-map"></i></div>
+            <h3>Comité du Val-de-Marne</h3>
+            <p>Le comité départemental de tennis de table du Val-de-Marne (CD94).</p>
+            <span class="link-card-url">www.cd94tt.com</span>
+            <a href="https://www.cd94tt.com" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-flag"></i></div>
+            <h3>Ligue Île-de-France</h3>
+            <p>Le site de la ligue régionale d'Île-de-France de tennis de table.</p>
+            <span class="link-card-url">www.fftt-idf.com</span>
+            <a href="https://www.fftt-idf.com" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-trophy"></i></div>
+            <h3>Fédération Française (FFTT)</h3>
+            <p>Le site officiel de la Fédération Française de Tennis de Table.</p>
+            <span class="link-card-url">www.fftt.com</span>
+            <a href="https://www.fftt.com" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
         </div>
       </div>
 
-      <!-- Planning + Créneaux retraités -->
-      <div class="planning-grid">
-        <div class="panel-card planning-panel">
-          <h2><i class="fa-solid fa-calendar-days"></i> Planning de la saison</h2>
-          <div class="planning-list">
-            <div class="planning-list-item">
-              <i class="fa-solid fa-play"></i>
-              <div>
-                <strong>Rentrée des entraînements</strong>
-                <span>Lundi 8 septembre 2025</span>
-              </div>
-            </div>
-            <div class="planning-list-item">
-              <i class="fa-solid fa-calendar-check"></i>
-              <div>
-                <strong>Sauf le samedi</strong>
-                <span>Début le samedi 20 septembre 2026</span>
-              </div>
-            </div>
-          </div>
-          <div class="holiday-note">
-            <i class="fa-solid fa-circle-info"></i>
-            Pas d'entraînement pendant les congés scolaires.
-          </div>
+      <!-- Compétition & résultats -->
+      <div class="links-category">
+        <div class="links-category-title">
+          <i class="fa-solid fa-chart-line"></i>
+          <h2>Compétition & résultats</h2>
         </div>
+        <div class="links-grid">
 
-        <div class="retraites-panel">
-          <span class="badge-gold">Créneau dédié</span>
-          <h2><i class="fa-solid fa-user-group"></i> Créneaux retraités</h2>
-          <p>Un créneau spécialement dédié aux retraités est proposé chaque semaine.</p>
-          <div class="retraites-slots">
-            <span class="retraites-slot"><i class="fa-solid fa-clock"></i> Lundi 9h - 12h</span>
-            <span class="retraites-slot"><i class="fa-solid fa-clock"></i> Vendredi 9h - 12h</span>
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
+            <h3>Tournois en France</h3>
+            <p>Retrouvez tous les tournois de tennis de table organisés en France.</p>
+            <span class="link-card-url">tournois-tt.fr</span>
+            <a href="https://tournois-tt.fr/" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
           </div>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <h3>PingPocket</h3>
+            <p>Suivez vos résultats et statistiques de compétition en temps réel.</p>
+            <span class="link-card-url">www.pingpocket.fr</span>
+            <a href="https://www.pingpocket.fr" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
         </div>
       </div>
 
-      <!-- Créneaux d'entraînement (image cliquable -> PDF) -->
-      <div class="schedule-panel">
-        <h2><i class="fa-solid fa-table-list"></i> Créneaux d'entraînement</h2>
-        <p class="schedule-panel-intro">
-          Consultez le détail de tous les créneaux d'entraînement par équipe et par catégorie. Cliquez sur
-          l'aperçu ci-dessous pour ouvrir le planning complet au format PDF.
-        </p>
-        <a href="./docs/entrainements-horaires.pdf" target="_blank" rel="noopener" class="schedule-preview-link">
-          <img src="./imgs/apercu-entrainement.png" alt="Aperçu des créneaux d'entraînement — cliquer pour ouvrir le PDF complet">
-          <div class="schedule-preview-overlay">
-            <span><i class="fa-solid fa-file-pdf"></i> Ouvrir le planning complet (PDF)</span>
+      <!-- Matériel -->
+      <div class="links-category">
+        <div class="links-category-title">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <h2>Matériel</h2>
+        </div>
+        <div class="links-grid">
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <h3>Revspin (Revues Plaques & Bois)</h3>
+            <p>Une revue complète en anglais des revêtements et bois de raquette.</p>
+            <span class="link-card-url">revspin.net/rubber</span>
+            <a href="https://revspin.net/rubber/" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
           </div>
-        </a>
+
+          <div class="link-card">
+            <div class="link-card-icon"><i class="fa-solid fa-store"></i></div>
+            <h3>Friendship</h3>
+            <p>Achat de matériel de tennis de table chez Friendship.</p>
+            <span class="link-card-url">theo384.free.fr</span>
+            <a href="http://theo384.free.fr/" target="_blank" rel="noopener" class="link-card-btn">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Application FFTT -->
+      <div class="links-category">
+        <div class="links-category-title">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+          <h2>Application mobile</h2>
+        </div>
+
+        <div class="app-card">
+          <div class="app-card-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
+          <div class="app-card-text">
+            <h3>Application FFTT</h3>
+            <p>Retrouvez vos licences, classements et résultats directement depuis votre téléphone.</p>
+          </div>
+          <div class="app-card-stores">
+            <a href="https://apps.apple.com/fr/app/fftt/id1148342433" target="_blank" rel="noopener" class="app-store-btn"><i class="fa-brands fa-apple"></i> App Store</a>
+            <a href="https://play.google.com/store/apps/details?id=com.fftt.fftt" target="_blank" rel="noopener" class="app-store-btn"><i class="fa-brands fa-google-play"></i> Google Play</a>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1336,7 +1391,6 @@
     </div>
   </footer>
 
-<script src="./js/site-data.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
       // 0. Rotation du logo partenaire mis en avant (toutes les 3 secondes)
@@ -1362,8 +1416,7 @@
       // 1. Menu Mobile
       const mobileBtn = document.getElementById('mobileMenuBtn');
       const navWrapper = document.getElementById('navWrapper');
-      // Note : le binding des menus déroulants mobiles est géré par js/site-data.js
-      //       une fois le menu construit depuis data/navigation.json
+      const dropdownItems = document.querySelectorAll('.has-dropdown');
 
       if (mobileBtn && navWrapper) {
         mobileBtn.addEventListener('click', () => {
@@ -1375,6 +1428,17 @@
         });
       }
 
+      dropdownItems.forEach(item => {
+        const link = item.querySelector('.nav-link');
+        if (link) {
+          link.addEventListener('click', (e) => {
+            if (window.innerWidth < 991) {
+              e.preventDefault();
+              item.classList.toggle('active');
+            }
+          });
+        }
+      });
 
       // 2. Carrousel avec Swipe boucle infinie + Auto 3.5s
       const container = document.getElementById('carouselContainer');
