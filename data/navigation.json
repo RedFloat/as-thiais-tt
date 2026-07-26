@@ -153,12 +153,6 @@
       "label": "Contact et plan",
       "link": "#contact",
       "type": "link"
-    },
-    {
-      "id": "sucy",
-      "label": "Sucy",
-      "link": "sucy-ping.fr",
-      "type": "link"
     }
   ]
 }
