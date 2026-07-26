@@ -297,6 +297,13 @@
     const grid = document.getElementById('teamsGrid');
     if (!grid || !Array.isArray(teams)) return;
 
+    const titleEl = document.getElementById('teamsSectionTitle');
+    if (titleEl) {
+      titleEl.textContent = teams.length === 1
+        ? "L'Équipe du Club"
+        : `Les ${teams.length} Équipes du Club`;
+    }
+
     grid.innerHTML = '';
 
     teams.forEach((team) => {
