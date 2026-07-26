@@ -2,17 +2,32 @@
   "id": "equipe-1",
   "name": "Équipe 1",
   "division": "Nationale 3",
+  "photo": "",
+  "description": "Test",
+  "players": [
+    "Nathan BAUDOUIN",
+    "Ethan BENALAL",
+    "Samy TOUKAL"
+  ],
+  "classification": {
+    "pool": "",
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
   "matches": [
     {
-      "date": "26/09/2026",
+      "date": "",
       "opponent": "TT Montreuil",
+      "home": true,
       "status": "played",
       "result": "V",
       "score": "V 8-4"
     },
     {
-      "date": "10/10/2026",
+      "date": "",
       "opponent": "US Fontenay",
+      "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
