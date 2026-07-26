@@ -60,14 +60,6 @@
           "file": "./docs/Certificat_medical.pdf",
           "icon": "fa-stethoscope",
           "expirationDate": null
-        },
-        {
-          "id": "test",
-          "title": "Test",
-          "description": "Test pour vérifier que le module fonctionne",
-          "file": "https://sucy-ping.fr/public/9075/upload/files/Certificat%20Médical%20Mineur%2025-26.pdf",
-          "icon": "fa-file",
-          "expirationDate": "2026-07-25"
         }
       ]
     },
