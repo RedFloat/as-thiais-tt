@@ -104,8 +104,8 @@
         <li><button type="button" class="nav-btn" data-view="sponsors">
           <i class="fa-solid fa-handshake"></i> Sponsors
         </button></li>
-        <li><button type="button" class="nav-btn" data-view="documents">
-          <i class="fa-solid fa-file-lines"></i> Documents
+        <li><button type="button" class="nav-btn" data-view="documents" disabled>
+          <i class="fa-solid fa-file-lines"></i> Documents <span class="soon-tag">Bientôt</span>
         </button></li>
         <li><button type="button" class="nav-btn" data-view="navigation" disabled>
           <i class="fa-solid fa-bars"></i> Menu du site <span class="soon-tag">Bientôt</span>
@@ -253,72 +253,10 @@
       </section>
 
       <section class="admin-view" id="view-documents">
-        <div class="view-header">
-          <h1>Documents</h1>
-          <p>Gère les documents à télécharger, avec des dates de péremption pour être alerté à temps.</p>
-        </div>
-
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-plus"></i> <span id="docFormTitle">Ajouter un document</span></h2>
-          <form id="docForm">
-            <input type="hidden" id="docId">
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="docCategory">Catégorie</label>
-                <select id="docCategory" required>
-                  <option value="administratifs">Administratifs</option>
-                  <option value="sportifs">Sportifs</option>
-                  <option value="divers">Divers</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="docTitle">Titre</label>
-                <input type="text" id="docTitle" placeholder="Règlement intérieur" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="docDescription">Description</label>
-              <textarea id="docDescription" rows="2" placeholder="Courte description du document"></textarea>
-              <span class="form-hint">Un peu de HTML simple est accepté (ex : &lt;br&gt; pour un retour à la ligne, un lien &lt;a href="mailto:..."&gt;).</span>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="docFile">Lien du fichier</label>
-                <input type="text" id="docFile" placeholder="./docs/mon-fichier.pdf" required>
-                <span class="form-hint">Chemin local (ex : ./docs/fichier.pdf) ou lien complet.</span>
-              </div>
-              <div class="form-group">
-                <label for="docIcon">Icône (Font Awesome)</label>
-                <input type="text" id="docIcon" placeholder="fa-file-lines" value="fa-file">
-                <span class="form-hint">Nom de classe Font Awesome, sans le préfixe "fa-solid".</span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="docExpiration">Date de péremption (facultatif)</label>
-              <input type="date" id="docExpiration">
-              <span class="form-hint">Laisse vide si ce document n'a pas de date d'expiration. Tu seras alerté sur le tableau de bord 30 jours avant l'échéance.</span>
-            </div>
-
-            <div style="display:flex; gap:0.7rem; align-items:center;">
-              <button type="submit" class="btn btn-primary" id="docSaveBtn">
-                <i class="fa-solid fa-floppy-disk"></i> <span id="docSaveLabel">Ajouter le document</span>
-              </button>
-              <button type="button" class="btn btn-ghost hidden" id="docCancelBtn">Annuler la modification</button>
-            </div>
-
-            <div class="status-msg" id="docStatus"></div>
-          </form>
-        </div>
-
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-list"></i> Documents actuels</h2>
-          <div id="docsList">
-            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
-          </div>
+        <div class="coming-soon">
+          <i class="fa-solid fa-file-lines"></i>
+          <h2>Gestion des documents</h2>
+          <p>Ce module arrive dans une prochaine étape.</p>
         </div>
       </section>
 

@@ -538,32 +538,6 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   padding: 1.5rem;
 }
 
-.admin-list-category-title {
-  color: var(--color-navy);
-  font-size: 0.82rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 1.2rem 0 0.6rem;
-}
-
-.admin-list-category-title:first-child { margin-top: 0; }
-
-.doc-status-badge {
-  display: inline-block;
-  font-size: 0.68rem;
-  font-weight: 800;
-  padding: 0.15rem 0.5rem;
-  border-radius: 50px;
-  text-transform: uppercase;
-  margin-left: 0.5rem;
-}
-
-.doc-status-expired { background: var(--color-danger-light); color: var(--color-danger); }
-.doc-status-soon { background: var(--color-warning-light); color: var(--color-warning); }
-.doc-status-ok { background: var(--color-success-light); color: var(--color-success); }
-.doc-status-none { background: #e2e8f0; color: var(--color-text-muted); }
-
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
