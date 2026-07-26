@@ -1,24 +1,82 @@
 {
   "items": [
-    { "id": "accueil", "label": "Accueil", "link": "./index.html", "type": "link" },
-    { "id": "inscription", "label": "Inscription", "link": "./inscription.html", "type": "link" },
+    {
+      "id": "accueil",
+      "label": "Accueil",
+      "link": "./index.html",
+      "type": "link"
+    },
+    {
+      "id": "inscription",
+      "label": "Inscription",
+      "link": "./inscription.html",
+      "type": "link"
+    },
     {
       "id": "equipes",
       "label": "Équipes",
       "type": "dropdown",
       "children": [
-        { "id": "equipe-1", "label": "Équipe 1 (N3)", "link": "#equipe-1" },
-        { "id": "equipe-2", "label": "Équipe 2 (R2)", "link": "#equipe-2" },
-        { "id": "equipe-3", "label": "Équipe 3 (R3)", "link": "#equipe-3" },
-        { "id": "equipe-4", "label": "Équipe 4 (PR)", "link": "#equipe-4" },
-        { "id": "equipe-5", "label": "Équipe 5 (D1)", "link": "#equipe-5" },
-        { "id": "equipe-6", "label": "Équipe 6 (D1)", "link": "#equipe-6" },
-        { "id": "equipe-7", "label": "Équipe 7 (D2)", "link": "#equipe-7" },
-        { "id": "equipe-8", "label": "Équipe 8 (D2)", "link": "#equipe-8" },
-        { "id": "equipe-9", "label": "Équipe 9 (D2)", "link": "#equipe-9" },
-        { "id": "equipe-10", "label": "Équipe 10 (D3)", "link": "#equipe-10" },
-        { "id": "equipe-11", "label": "Équipe 11 (Jeunes)", "link": "#equipe-11" },
-        { "id": "equipe-12", "label": "Équipe 12 (Vétérans)", "link": "#equipe-12" }
+        {
+          "id": "equipe-1",
+          "label": "Équipe 1 (N3)",
+          "link": "#equipe-1"
+        },
+        {
+          "id": "equipe-2",
+          "label": "Équipe 2 (R2)",
+          "link": "#equipe-2"
+        },
+        {
+          "id": "equipe-3",
+          "label": "Équipe 3 (R3)",
+          "link": "#equipe-3"
+        },
+        {
+          "id": "equipe-4",
+          "label": "Équipe 4 (PR)",
+          "link": "#equipe-4"
+        },
+        {
+          "id": "equipe-5",
+          "label": "Équipe 5 (D1)",
+          "link": "#equipe-5"
+        },
+        {
+          "id": "equipe-6",
+          "label": "Équipe 6 (D1)",
+          "link": "#equipe-6"
+        },
+        {
+          "id": "equipe-7",
+          "label": "Équipe 7 (D2)",
+          "link": "#equipe-7"
+        },
+        {
+          "id": "equipe-8",
+          "label": "Équipe 8 (D2)",
+          "link": "#equipe-8"
+        },
+        {
+          "id": "equipe-9",
+          "label": "Équipe 9 (D2)",
+          "link": "#equipe-9"
+        },
+        {
+          "id": "equipe-10",
+          "label": "Équipe 10 (D3)",
+          "link": "#equipe-10"
+        },
+        {
+          "id": "equipe-11",
+          "label": "Équipe 11 (Jeunes)",
+          "link": "#equipe-11"
+        },
+        {
+          "id": "equipe-12",
+          "label": "Équipe 12 (Vétérans)",
+          "link": "#equipe-12"
+        }
       ]
     },
     {
@@ -26,10 +84,26 @@
       "label": "La vie du Club",
       "type": "dropdown",
       "children": [
-        { "id": "news", "label": "News", "link": "#" },
-        { "id": "evenements", "label": "Événements", "link": "#" },
-        { "id": "albums-photos", "label": "Albums Photos", "link": "#" },
-        { "id": "albums-videos", "label": "Albums Vidéos", "link": "#" }
+        {
+          "id": "news",
+          "label": "News",
+          "link": "#"
+        },
+        {
+          "id": "evenements",
+          "label": "Événements",
+          "link": "#"
+        },
+        {
+          "id": "albums-photos",
+          "label": "Albums Photos",
+          "link": "#"
+        },
+        {
+          "id": "albums-videos",
+          "label": "Albums Vidéos",
+          "link": "#"
+        }
       ]
     },
     {
@@ -37,15 +111,54 @@
       "label": "Infos pratiques",
       "type": "dropdown",
       "children": [
-        { "id": "le-club", "label": "Le club", "link": "./le_club.html" },
-        { "id": "organigramme", "label": "Organigramme", "link": "#" },
-        { "id": "entrainements", "label": "Entraînements", "link": "./entrainements.html" },
-        { "id": "reglement", "label": "Règlement intérieur", "link": "./reglement_interieur.html" },
-        { "id": "calendrier", "label": "Calendrier Sportif", "link": "./calendrier.html" },
-        { "id": "liens-utiles", "label": "Liens utiles", "link": "./liens_utiles.html" },
-        { "id": "documents", "label": "Documents", "link": "./documents.html" }
+        {
+          "id": "le-club",
+          "label": "Le club",
+          "link": "./le_club.html"
+        },
+        {
+          "id": "organigramme",
+          "label": "Organigramme",
+          "link": "#"
+        },
+        {
+          "id": "entrainements",
+          "label": "Entraînements",
+          "link": "./entrainements.html"
+        },
+        {
+          "id": "reglement",
+          "label": "Règlement intérieur",
+          "link": "./reglement_interieur.html"
+        },
+        {
+          "id": "calendrier",
+          "label": "Calendrier Sportif",
+          "link": "./calendrier.html"
+        },
+        {
+          "id": "liens-utiles",
+          "label": "Liens utiles",
+          "link": "./liens_utiles.html"
+        },
+        {
+          "id": "documents",
+          "label": "Documents",
+          "link": "./documents.html"
+        }
       ]
     },
-    { "id": "contact", "label": "Contact et plan", "link": "#contact", "type": "link" }
+    {
+      "id": "contact",
+      "label": "Contact et plan",
+      "link": "#contact",
+      "type": "link"
+    },
+    {
+      "id": "sucy",
+      "label": "Sucy",
+      "link": "sucy-ping.fr",
+      "type": "link"
+    }
   ]
 }
