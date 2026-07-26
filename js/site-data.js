@@ -266,7 +266,10 @@
     if (match.status === 'upcoming') {
       return { cls: 'status-upcoming', label: 'À venir' };
     }
-    const scoreText = match.score ? ' ' + match.score : '';
+    // On retire une éventuelle lettre V/D/N déjà présente au début du score saisi,
+    // pour éviter un affichage du type "V V 8-4" si elle a été tapée par erreur.
+    const cleanScore = (match.score || '').replace(/^[VDN]\s*/i, '').trim();
+    const scoreText = cleanScore ? ' ' + cleanScore : '';
     if (match.result === 'V') return { cls: 'score-win', label: 'V' + scoreText };
     if (match.result === 'D') return { cls: 'score-loss', label: 'D' + scoreText };
     if (match.result === 'N') return { cls: 'score-draw', label: 'N' + scoreText };
@@ -417,10 +420,11 @@
     document.getElementById('teamHeroName').textContent = team.name;
     document.getElementById('teamHeroDivision').textContent = team.division || '';
 
-    const photoEl = document.getElementById('teamHeroPhoto');
-    if (team.photo) {
-      photoEl.style.backgroundImage = `url('${team.photo}')`;
-    }
+    const photoBlock = document.getElementById('teamPhotoBlock');
+    photoBlock.innerHTML = team.photo
+      ? `<img src="${team.photo}" alt="${team.name}">`
+      : '<div class="team-photo-placeholder"><i class="fa-solid fa-people-group"></i></div>';
+    photoBlock.innerHTML += `<div class="team-photo-caption"><strong>${team.name}</strong>${team.division || ''}</div>`;
 
     document.getElementById('teamDescription').textContent =
       team.description || 'Aucune présentation renseignée pour le moment.';

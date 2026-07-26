@@ -231,7 +231,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-value">${teams.length}</div>
-          <div class="stat-label">Équipes</div>
+          <div class="stat-label">${teams.length === 1 ? 'Équipe' : 'Équipes'}</div>
         </div>
         <div class="stat-box">
           <div class="stat-value">${(sponsorsData.sponsors || []).length}</div>
