@@ -264,7 +264,8 @@
 
     try {
       const path = 'data/site-config.json';
-      const current = fileState[path] ? fileState[path].json : {};
+      if (!fileState[path]) await readFile(path);
+      const current = fileState[path].json;
       const updated = Object.assign({}, current, {
         season: document.getElementById('settingsSeason').value.trim(),
         calendarEmbedUrl: document.getElementById('settingsCalendarUrl').value.trim()
@@ -303,7 +304,8 @@
 
     try {
       const path = 'data/site-config.json';
-      const current = fileState[path] ? fileState[path].json : {};
+      if (!fileState[path]) await readFile(path);
+      const current = fileState[path].json;
       const updated = Object.assign({}, current, {
         facebookUrl: document.getElementById('settingsFacebook').value.trim(),
         instagramUrl: document.getElementById('settingsInstagram').value.trim()
@@ -426,7 +428,8 @@
     setStatus(sponsorStatus, 'loading', 'Enregistrement en cours…');
 
     try {
-      const current = fileState[SPONSORS_PATH] ? fileState[SPONSORS_PATH].json : { sponsors: [] };
+      if (!fileState[SPONSORS_PATH]) await readFile(SPONSORS_PATH);
+      const current = fileState[SPONSORS_PATH].json;
       const sponsors = (current.sponsors || []).slice();
 
       const editingId = document.getElementById('sponsorId').value;
@@ -465,7 +468,8 @@
 
     setStatus(sponsorStatus, 'loading', 'Suppression en cours…');
     try {
-      const current = fileState[SPONSORS_PATH] ? fileState[SPONSORS_PATH].json : { sponsors: [] };
+      if (!fileState[SPONSORS_PATH]) await readFile(SPONSORS_PATH);
+      const current = fileState[SPONSORS_PATH].json;
       const sponsors = (current.sponsors || []).filter((s) => s.id !== id);
       const updated = { sponsors };
 
@@ -605,7 +609,8 @@
     setStatus(docStatus, 'loading', 'Enregistrement en cours…');
 
     try {
-      const current = fileState[DOCS_PATH] ? fileState[DOCS_PATH].json : { categories: [] };
+      if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
+      const current = fileState[DOCS_PATH].json;
       const categories = (current.categories || []).map((c) => Object.assign({}, c, { documents: (c.documents || []).slice() }));
 
       const editingId = document.getElementById('docId').value;
@@ -661,7 +666,8 @@
 
     setStatus(docStatus, 'loading', 'Suppression en cours…');
     try {
-      const current = fileState[DOCS_PATH] ? fileState[DOCS_PATH].json : { categories: [] };
+      if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
+      const current = fileState[DOCS_PATH].json;
       const categories = current.categories.map((c) => {
         if (c.id !== categoryId) return c;
         return Object.assign({}, c, { documents: (c.documents || []).filter((d) => d.id !== docId) });
