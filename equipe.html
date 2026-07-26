@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AS Thiais Tennis de Table — Site Officiel</title>
+  <title>Fiche Équipe — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -962,14 +962,162 @@
       .footer-contact-block { text-align: center; }
       .footer-contact-block h4 { justify-content: center; }
     }
+
+    /* ==========================================================================
+       7. PAGE FICHE ÉQUIPE
+       ========================================================================== */
+    .page-hero {
+      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
+      color: var(--color-white);
+      padding: 0;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .team-hero-photo {
+      width: 100%;
+      height: 260px;
+      background-size: cover;
+      background-position: center;
+      background-color: var(--color-navy-dark);
+      position: relative;
+    }
+
+    .team-hero-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(2,44,67,0.92) 0%, rgba(2,44,67,0.55) 60%, rgba(2,44,67,0.35) 100%);
+    }
+
+    .team-hero-content {
+      position: relative;
+      z-index: 1;
+      padding: 2rem 1.5rem 2.2rem;
+      margin-top: -90px;
+    }
+
+    .team-hero-content .badge-gold {
+      background: rgba(255,255,255,0.12);
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+
+    .team-hero-content h1 {
+      font-size: 2rem;
+      margin: 0.7rem 0 0.4rem;
+    }
+
+    .team-hero-content .team-division {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    .page-content { padding: 3rem 0 3.5rem; }
+
+    .team-not-found {
+      text-align: center;
+      padding: 4rem 1.5rem;
+      color: var(--color-text-muted);
+    }
+
+    .team-not-found i { font-size: 2.5rem; color: var(--color-gold); margin-bottom: 1rem; }
+    .team-not-found h2 { color: var(--color-navy); margin-bottom: 0.6rem; }
+
+    .team-content-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 1.75rem;
+      margin-bottom: 1.75rem;
+      align-items: start;
+    }
+
+    .team-form-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+
+    .team-form-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: var(--color-white);
+    }
+
+    .team-form-v { background: #059669; }
+    .team-form-n { background: #d97706; }
+    .team-form-d { background: #dc2626; }
+
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .player-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--color-bg-light);
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-navy);
+    }
+
+    .player-chip i { color: var(--color-gold); }
+
+    .team-calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .team-calendar-table th {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .team-calendar-table td {
+      padding: 0.65rem 0.8rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .team-calendar-table tr:last-child td { border-bottom: none; }
+
+    .home-away-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.12rem 0.4rem;
+      border-radius: 4px;
+      background: var(--color-gold-light);
+      color: var(--color-navy);
+    }
+
+    @media (max-width: 900px) {
+      .team-content-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .players-grid { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
-
-  <!-- ==========================================
-     HEADER : LOGO + BANDEAU DE NAVIGATION PC
-     ========================================== -->
-  <header>
+<header>
     <!-- Niveau 1 : Logo & Titre -->
     <div class="header-top container">
       <a href="./index.html" class="logo">
@@ -1004,158 +1152,71 @@
   </header>
 
   <!-- ==========================================
-     1. CARROUSEL NEWS
+     HERO FICHE ÉQUIPE (rempli dynamiquement)
      ========================================== -->
-  <section class="featured-news-section container">
-    <div class="news-wrapper">
-      <div class="news-carousel-container" id="carouselContainer">
-        <div class="news-track" id="newsTrack">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/news.json -->
-        </div>
-      </div>
-
-      <div class="carousel-dots" id="carouselDots"></div>
-
-      <div class="all-news-btn-container">
-        <a href="#" class="btn-primary" style="background: transparent; border: 2px solid var(--color-navy); color: var(--color-navy);">
-          Voir tous les articles <i class="fa-solid fa-arrow-right"></i>
-        </a>
-      </div>
+  <section class="page-hero" id="teamHero">
+    <div class="team-hero-photo" id="teamHeroPhoto"></div>
+    <div class="team-hero-content container">
+      <span class="badge-gold">Fiche équipe</span>
+      <h1 id="teamHeroName">Chargement…</h1>
+      <p class="team-division" id="teamHeroDivision"></p>
     </div>
   </section>
 
   <!-- ==========================================
-     2. LES 12 ÉQUIPES DU CLUB
+     CONTENU PRINCIPAL
      ========================================== -->
-  <section class="teams-section container" id="teamsSection">
-    <div class="section-title">
-      <span class="badge-gold" data-season-badge>Saison 2026-2027</span>
-      <h2>Les 12 Équipes du Club</h2>
-    </div>
+  <section class="page-content">
+    <div class="container" id="teamPageContent">
 
-    <div class="teams-grid" id="teamsGrid">
-      <!-- Généré dynamiquement par js/site-data.js depuis data/teams/*.json -->
-    </div>
-  </section>
-
-  <!-- ==========================================
-     2bis. CLASSEMENT DE FIN DE PHASE
-     ========================================== -->
-  <section class="standings-section container" id="standingsSection">
-    <div class="section-title">
-      <span class="badge-gold">Fin de phase</span>
-      <h2>Classement des Équipes</h2>
-    </div>
-    <div class="standings-table-wrap">
-      <table class="standings-table">
-        <thead>
-          <tr>
-            <th>Équipe</th>
-            <th>Division</th>
-            <th>Poule</th>
-            <th>Classement</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody id="standingsTableBody">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/teams/*.json -->
-        </tbody>
-      </table>
-    </div>
-  </section>
-  <!-- ==========================================
-     3. WIDGETS
-     ========================================== -->
-  <section class="widgets-section container">
-    <div class="widgets-grid">
-      
-      <!-- Galerie Photos -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-camera"></i> Galerie Photos</h3>
-        <div class="photo-mini-grid">
-          <div class="photo-item" style="background-image: url('https://images.unsplash.com/photo-1534158914592-062992fbe900?auto=format&fit=crop&w=300&q=80');"></div>
-          <div class="photo-item" style="background-image: url('https://images.unsplash.com/photo-1611251122616-160359871029?auto=format&fit=crop&w=300&q=80');"></div>
-          <div class="photo-item" style="background-image: url('https://images.unsplash.com/photo-1511067007398-7e4b90cfa4bc?auto=format&fit=crop&w=300&q=80');"></div>
-          <div class="photo-item" style="background-image: url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=300&q=80');"></div>
-        </div>
+      <!-- Message si l'équipe n'existe pas / id manquant -->
+      <div class="team-not-found hidden" id="teamNotFound">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <h2>Équipe introuvable</h2>
+        <p>Cette fiche équipe n'existe pas ou n'est plus disponible.</p>
       </div>
 
-      <!-- Calendrier -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-calendar-days"></i> Prochains Événements</h3>
-        <ul class="event-list-mini">
-          <li>
-            <div class="event-date-badge">
-              <div class="day">25</div>
-              <div class="month">Sep</div>
-            </div>
-            <div>
-              <strong>J1 Championnat de Paris</strong>
-              <div style="font-size:0.8rem; color:var(--color-text-muted);">Toutes équipes</div>
-            </div>
-          </li>
-          <li>
-            <div class="event-date-badge">
-              <div class="day">10</div>
-              <div class="month">Oct</div>
-            </div>
-            <div>
-              <strong>Critérium Fédéral (Tour 1)</strong>
-              <div style="font-size:0.8rem; color:var(--color-text-muted);">Individuels</div>
-            </div>
-          </li>
-        </ul>
-      </div>
+      <div id="teamPageBody" class="hidden">
 
-      <!-- Anniversaires -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-cake-candles"></i> Anniversaires du Mois</h3>
-        <div class="birthday-card">
-          <div class="birthday-avatar">LM</div>
-          <div>
-            <strong>Lucas Martin</strong>
-            <div style="font-size:0.8rem; color:var(--color-text-muted);">Aujourd'hui ! 🎂</div>
+        <div class="team-content-grid">
+          <div class="panel-card">
+            <h2><i class="fa-solid fa-align-left"></i> Présentation</h2>
+            <p id="teamDescription" style="color:var(--color-text-muted); font-size:0.92rem; line-height:1.7;"></p>
+
+            <h2 style="margin-top:1.5rem;"><i class="fa-solid fa-chart-line"></i> Forme actuelle</h2>
+            <p style="color:var(--color-text-muted); font-size:0.85rem;">Sur les 5 dernières rencontres jouées :</p>
+            <div class="team-form-row" id="teamFormRow"></div>
+          </div>
+
+          <div class="panel-card">
+            <h2><i class="fa-solid fa-people-group"></i> Effectif</h2>
+            <div class="players-grid" id="teamPlayersGrid"></div>
           </div>
         </div>
-        <div class="birthday-card">
-          <div class="birthday-avatar">SD</div>
-          <div>
-            <strong>Sophie Dubois</strong>
-            <div style="font-size:0.8rem; color:var(--color-text-muted);">28 Septembre</div>
+
+        <div class="panel-card">
+          <h2><i class="fa-solid fa-calendar-days"></i> Calendrier complet</h2>
+          <div style="overflow-x:auto;">
+            <table class="team-calendar-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Adversaire</th>
+                  <th>Lieu</th>
+                  <th>Résultat</th>
+                </tr>
+              </thead>
+              <tbody id="teamCalendarBody"></tbody>
+            </table>
           </div>
         </div>
-      </div>
 
-    </div>
-  </section>
-
-  <!-- ==========================================
-     PARTENAIRES
-     ========================================== -->
-  <section class="partners-section">
-    <div class="container">
-      <div class="section-title">
-        <span class="badge-gold">Merci à eux</span>
-        <h2>Nos Partenaires</h2>
-      </div>
-      <div class="partners-content">
-        <!-- Logo mis en avant, change automatiquement toutes les 3 secondes -->
-        <div class="partners-featured">
-          <img id="featuredPartnerLogo" src="" alt="" style="display:none;">
-        </div>
-
-        <!-- Mosaïque avec l'ensemble des partenaires -->
-        <div class="partners-mosaic" id="partnersMosaic">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- ==========================================
-     FOOTER RÉAGENCÉ AVEC BLOC CONTACT
-     ========================================== -->
-  <footer>
+
+<footer>
     <div class="container">
       <div class="footer-flex">
         
@@ -1201,10 +1262,7 @@
     </div>
   </footer>
 
-  <!-- ==========================================
-     SCRIPTS : NAVIGATION & CARROUSEL
-     ========================================== -->
-  <script src="./js/site-data.js"></script>
+<script src="./js/site-data.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Note : les sponsors (mosaïque + logo mis en avant) sont gérés par

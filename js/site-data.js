@@ -256,6 +256,12 @@
 
   /* ---------- Équipes / matchs ---------- */
 
+  function formatDateFR(isoDate) {
+    if (!isoDate) return '';
+    const [y, m, d] = isoDate.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
   function scoreBadge(match) {
     if (match.status === 'upcoming') {
       return { cls: 'status-upcoming', label: 'À venir' };
@@ -265,6 +271,26 @@
     if (match.result === 'D') return { cls: 'score-loss', label: 'D' + scoreText };
     if (match.result === 'N') return { cls: 'score-draw', label: 'N' + scoreText };
     return { cls: 'status-upcoming', label: scoreText.trim() || '—' };
+  }
+
+  // Dernier match joué (le plus récent) + prochain match à venir (le plus proche),
+  // calculés automatiquement à partir du calendrier complet de l'équipe.
+  function pickLastAndNext(matches) {
+    const played = (matches || [])
+      .filter((m) => m.status === 'played')
+      .sort((a, b) => (a.date < b.date ? 1 : -1));
+    const upcoming = (matches || [])
+      .filter((m) => m.status === 'upcoming')
+      .sort((a, b) => (a.date > b.date ? 1 : -1));
+    return { last: played[0] || null, next: upcoming[0] || null };
+  }
+
+  // Forme sur les 5 derniers matchs joués (façon Flashscore), du plus ancien au plus récent.
+  function computeForm(matches, count) {
+    return (matches || [])
+      .filter((m) => m.status === 'played' && m.result)
+      .sort((a, b) => (a.date > b.date ? 1 : -1))
+      .slice(-(count || 5));
   }
 
   function buildTeams(teams) {
@@ -285,39 +311,162 @@
         '<span class="mini-team-div">' + team.division + '</span>';
       card.appendChild(header);
 
-      (team.matches || []).forEach((match) => {
+      const form = computeForm(team.matches, 5);
+      if (form.length > 0) {
+        const formRow = document.createElement('div');
+        formRow.className = 'mini-team-form';
+        formRow.innerHTML = form
+          .map((m) => '<span class="form-badge form-' + m.result.toLowerCase() + '">' + m.result + '</span>')
+          .join('');
+        card.appendChild(formRow);
+      }
+
+      const { last, next } = pickLastAndNext(team.matches);
+      [last, next].forEach((match) => {
+        if (!match) return;
         const badge = scoreBadge(match);
         const line = document.createElement('div');
         line.className = 'match-line';
         line.innerHTML =
-          '<span class="match-date">' + match.date + '</span>' +
+          '<span class="match-date">' + formatDateFR(match.date) + '</span>' +
           '<span class="match-details">' + match.opponent + '</span>' +
           '<span class="score-badge ' + badge.cls + '">' + badge.label + '</span>';
         card.appendChild(line);
       });
 
+      const link = document.createElement('a');
+      link.className = 'mini-team-link';
+      link.href = './equipe.html?id=' + team.id;
+      link.textContent = 'Voir la fiche équipe';
+      card.appendChild(link);
+
       grid.appendChild(card);
     });
   }
 
-  // Applique l'interrupteur "afficher/masquer le bloc résultats & matchs à venir"
-  // et charge les 12 fichiers équipes seulement si le bloc est présent sur la page.
-  async function initTeamsSection(settings) {
-    const section = document.getElementById('teamsSection');
-    if (!section) return;
+  const STANDINGS_LABELS = {
+    up: { cls: 'standings-up', label: '▲ Monte', icon: 'fa-arrow-up' },
+    maintien: { cls: 'standings-maintien', label: '= Se maintient', icon: 'fa-equals' },
+    down: { cls: 'standings-down', label: '▼ Descend', icon: 'fa-arrow-down' }
+  };
 
-    if (settings && settings.showResultsAndUpcomingMatches === false) {
-      section.style.display = 'none';
+  function buildStandingsTable(teams) {
+    const tbody = document.getElementById('standingsTableBody');
+    if (!tbody || !Array.isArray(teams)) return;
+
+    tbody.innerHTML = '';
+
+    teams.forEach((team) => {
+      if (!team) return;
+      const c = team.classification || {};
+      const statusInfo = STANDINGS_LABELS[c.status];
+      const rankText = c.rank ? c.rank + (c.totalTeams ? ' / ' + c.totalTeams : '') : '—';
+
+      const row = document.createElement('tr');
+      row.innerHTML =
+        '<td><strong>' + team.name + '</strong></td>' +
+        '<td>' + team.division + '</td>' +
+        '<td>' + (c.pool || '—') + '</td>' +
+        '<td>' + rankText + '</td>' +
+        '<td>' + (statusInfo
+          ? '<span class="standings-status ' + statusInfo.cls + '">' + statusInfo.label + '</span>'
+          : '—') + '</td>';
+      tbody.appendChild(row);
+    });
+  }
+
+  async function fetchAllTeams() {
+    const index = await loadJSON('./data/teams/index.json');
+    const teamIds = (index && Array.isArray(index.teamIds)) ? index.teamIds : [];
+    const teams = await Promise.all(teamIds.map((id) => loadJSON(`./data/teams/${id}.json`)));
+    return teams.filter(Boolean);
+  }
+
+  // Applique les interrupteurs "résultats & matchs à venir" et "classement",
+  // et charge les fichiers équipes seulement si l'un des deux blocs est présent sur la page.
+  async function initTeamsSection(settings) {
+    const teamsSection = document.getElementById('teamsSection');
+    const standingsSection = document.getElementById('standingsSection');
+    if (!teamsSection && !standingsSection) return;
+
+    const showTeams = !settings || settings.showResultsAndUpcomingMatches !== false;
+    const showStandings = !!(settings && settings.showStandingsTable === true);
+
+    if (teamsSection) teamsSection.style.display = showTeams ? '' : 'none';
+    if (standingsSection) standingsSection.style.display = showStandings ? '' : 'none';
+
+    if (!showTeams && !showStandings) return;
+
+    const teams = await fetchAllTeams();
+    if (showTeams) buildTeams(teams);
+    if (showStandings) buildStandingsTable(teams);
+  }
+
+  /* ---------- Fiche équipe individuelle (equipe.html?id=...) ---------- */
+
+  const HOME_AWAY_LABELS = { true: 'Domicile', false: 'Extérieur' };
+
+  function renderTeamProfile(team) {
+    document.getElementById('teamHeroName').textContent = team.name;
+    document.getElementById('teamHeroDivision').textContent = team.division || '';
+
+    const photoEl = document.getElementById('teamHeroPhoto');
+    if (team.photo) {
+      photoEl.style.backgroundImage = `url('${team.photo}')`;
+    }
+
+    document.getElementById('teamDescription').textContent =
+      team.description || 'Aucune présentation renseignée pour le moment.';
+
+    const formRow = document.getElementById('teamFormRow');
+    const form = computeForm(team.matches, 5);
+    formRow.innerHTML = form.length > 0
+      ? form.map((m) => '<span class="team-form-badge team-form-' + m.result.toLowerCase() + '">' + m.result + '</span>').join('')
+      : '<span style="color:var(--color-text-muted); font-size:0.85rem;">Pas encore de match joué.</span>';
+
+    const playersGrid = document.getElementById('teamPlayersGrid');
+    const players = team.players || [];
+    playersGrid.innerHTML = players.length > 0
+      ? players.map((p) => '<div class="player-chip"><i class="fa-solid fa-user"></i>' + p + '</div>').join('')
+      : '<p style="color:var(--color-text-muted); font-size:0.85rem;">Effectif à venir.</p>';
+
+    const calendarBody = document.getElementById('teamCalendarBody');
+    const allMatches = (team.matches || []).slice().sort((a, b) => (a.date > b.date ? 1 : -1));
+    calendarBody.innerHTML = allMatches.length > 0
+      ? allMatches.map((m) => {
+          const badge = scoreBadge(m);
+          return '<tr>' +
+            '<td>' + formatDateFR(m.date) + '</td>' +
+            '<td>' + m.opponent + '</td>' +
+            '<td><span class="home-away-tag">' + (HOME_AWAY_LABELS[m.home] || '—') + '</span></td>' +
+            '<td><span class="score-badge ' + badge.cls + '">' + badge.label + '</span></td>' +
+            '</tr>';
+        }).join('')
+      : '<tr><td colspan="4" style="text-align:center; color:var(--color-text-muted);">Aucun match programmé pour le moment.</td></tr>';
+
+    document.getElementById('teamNotFound').classList.add('hidden');
+    document.getElementById('teamPageBody').classList.remove('hidden');
+  }
+
+  async function initTeamProfilePage() {
+    const hero = document.getElementById('teamHero');
+    if (!hero) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const teamId = params.get('id');
+
+    if (!teamId) {
+      document.getElementById('teamNotFound').classList.remove('hidden');
       return;
     }
 
-    section.style.display = '';
+    const team = await loadJSON(`./data/teams/${teamId}.json`);
+    if (!team) {
+      document.getElementById('teamNotFound').classList.remove('hidden');
+      return;
+    }
 
-    const teamIds = Array.from({ length: 12 }, (_, i) => `equipe-${i + 1}`);
-    const teams = await Promise.all(
-      teamIds.map((id) => loadJSON(`./data/teams/${id}.json`))
-    );
-    buildTeams(teams.filter(Boolean));
+    renderTeamProfile(team);
   }
 
   /* ---------- News (carrousel d'accueil) ---------- */
@@ -492,6 +641,7 @@
     buildDocuments(documents);
     initTeamsSection(homepageSettings);
     initNews();
+    initTeamProfilePage();
   }
 
   if (document.readyState === 'loading') {

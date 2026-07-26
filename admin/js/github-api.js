@@ -92,5 +92,71 @@ const GitHubAPI = (function () {
     return res.json();
   }
 
-  return { testConnection, getJSON, saveJSON, utf8ToBase64, base64ToUtf8 };
+  /* ---------- Upload d'un fichier binaire (ex : photo d'équipe) ---------- */
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = () => reject(new Error('Lecture du fichier impossible.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadFile(cfg, path, file, message) {
+    const base64Content = await fileToBase64(file);
+
+    // On récupère le sha si un fichier existe déjà à cet emplacement (remplacement)
+    let sha;
+    try {
+      const existing = await fetch(apiUrl(cfg, path) + `?ref=${encodeURIComponent(cfg.branch)}`, {
+        headers: authHeaders(cfg.token)
+      });
+      if (existing.ok) {
+        const data = await existing.json();
+        sha = data.sha;
+      }
+    } catch (e) {
+      /* le fichier n'existe pas encore, ce n'est pas un problème */
+    }
+
+    const body = {
+      message: message || `Admin AS Thiais TT : upload de ${path}`,
+      content: base64Content,
+      branch: cfg.branch
+    };
+    if (sha) body.sha = sha;
+
+    const res = await fetch(apiUrl(cfg, path), {
+      method: 'PUT',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders(cfg.token)),
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      throw new Error(`Envoi du fichier "${path}" impossible : ` + (await parseError(res)));
+    }
+    return res.json();
+  }
+
+  /* ---------- Suppression d'un fichier ---------- */
+
+  async function deleteFile(cfg, path, sha, message) {
+    const res = await fetch(apiUrl(cfg, path), {
+      method: 'DELETE',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders(cfg.token)),
+      body: JSON.stringify({
+        message: message || `Admin AS Thiais TT : suppression de ${path}`,
+        sha,
+        branch: cfg.branch
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error(`Suppression de "${path}" impossible : ` + (await parseError(res)));
+    }
+    return res.json();
+  }
+
+  return { testConnection, getJSON, saveJSON, uploadFile, deleteFile, utf8ToBase64, base64ToUtf8 };
 })();

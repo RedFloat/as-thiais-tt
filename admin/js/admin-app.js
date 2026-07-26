@@ -123,6 +123,7 @@
       if (btn.dataset.view === 'sponsors') loadSponsorsView();
       if (btn.dataset.view === 'documents') loadDocumentsView();
       if (btn.dataset.view === 'navigation') loadNavigationView();
+      if (btn.dataset.view === 'teams') loadTeamsView();
     });
   });
 
@@ -150,12 +151,16 @@
     statsEl.innerHTML = '';
 
     try {
-      const [documentsData, sponsorsData, newsData, siteConfig] = await Promise.all([
+      const [documentsData, sponsorsData, newsData, siteConfig, teamsIndex] = await Promise.all([
         readFile('data/documents.json'),
         readFile('data/sponsors.json'),
         readFile('data/news.json'),
-        readFile('data/site-config.json')
+        readFile('data/site-config.json'),
+        readFile('data/teams/index.json').catch(() => ({ teamIds: [] }))
       ]);
+
+      const teamIds = teamsIndex.teamIds || [];
+      const teams = (await Promise.all(teamIds.map((id) => readFile(`data/teams/${id}.json`).catch(() => null)))).filter(Boolean);
 
       /* --- Alertes documents --- */
       const expired = [];
@@ -172,7 +177,25 @@
         });
       });
 
+      /* --- Alertes résultats de matchs à saisir --- */
+      const pendingResults = [];
+      teams.forEach((team) => {
+        (team.matches || []).forEach((match) => {
+          if (match.status === 'upcoming' && match.date && daysBetween(match.date) < 0) {
+            pendingResults.push(`${team.name} vs ${match.opponent} (${match.date.split('-').reverse().join('/')})`);
+          }
+        });
+      });
+
       alertsEl.innerHTML = '';
+
+      if (pendingResults.length > 0) {
+        alertsEl.appendChild(
+          buildAlert('alert-warning', 'fa-table-tennis-paddle-ball',
+            `${pendingResults.length} résultat${pendingResults.length > 1 ? 's' : ''} de match à saisir`,
+            pendingResults)
+        );
+      }
 
       if (expired.length > 0) {
         alertsEl.appendChild(
@@ -190,9 +213,9 @@
         );
       }
 
-      if (expired.length === 0 && soon.length === 0) {
+      if (expired.length === 0 && soon.length === 0 && pendingResults.length === 0) {
         alertsEl.appendChild(
-          buildAlert('alert-success', 'fa-circle-check', 'Aucun document à mettre à jour pour le moment', [])
+          buildAlert('alert-success', 'fa-circle-check', 'Tout est à jour, rien à traiter pour le moment', [])
         );
       }
 
@@ -207,12 +230,12 @@
           <div class="stat-label">Documents</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">${(sponsorsData.sponsors || []).length}</div>
-          <div class="stat-label">Sponsors</div>
+          <div class="stat-value">${teams.length}</div>
+          <div class="stat-label">Équipes</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">${(newsData.news || []).length}</div>
-          <div class="stat-label">News</div>
+          <div class="stat-value">${(sponsorsData.sponsors || []).length}</div>
+          <div class="stat-label">Sponsors</div>
         </div>
       `;
     } catch (err) {
@@ -987,6 +1010,337 @@
       setStatus(navCategoryStatus, 'success', 'Catégorie supprimée.');
     } catch (err) {
       setStatus(navCategoryStatus, 'error', 'Erreur : ' + err.message);
+    }
+  }
+
+  /* ---------- Équipes & matchs ---------- */
+
+  const TEAMS_INDEX_PATH = 'data/teams/index.json';
+  const HOMEPAGE_SETTINGS_PATH = 'data/homepage-settings.json';
+
+  const teamsList = document.getElementById('teamsList');
+  const teamEditorCard = document.getElementById('teamEditorCard');
+  const teamEditorForm = document.getElementById('teamEditorForm');
+  const teamEditorStatus = document.getElementById('teamEditorStatus');
+  const teamsTogglesStatus = document.getElementById('teamsTogglesStatus');
+  const teamPlayersRows = document.getElementById('teamPlayersRows');
+  const teamMatchesRows = document.getElementById('teamMatchesRows');
+  const teamPhotoInput = document.getElementById('teamPhotoInput');
+  const teamPhotoPreviewWrap = document.getElementById('teamPhotoPreviewWrap');
+
+  let currentTeamsCache = []; // liste des équipes chargées (pour retrouver rapidement une équipe par id)
+  let pendingTeamPhotoFile = null;
+  let currentTeamPhotoPath = '';
+
+  function teamPath(id) {
+    return `data/teams/${id}.json`;
+  }
+
+  async function loadTeamsView() {
+    setStatus(teamsTogglesStatus, 'loading', 'Chargement…');
+    try {
+      const settings = await readFile(HOMEPAGE_SETTINGS_PATH);
+      document.getElementById('toggleResultsBlock').checked = settings.showResultsAndUpcomingMatches !== false;
+      document.getElementById('toggleStandingsBlock').checked = settings.showStandingsTable === true;
+      hideStatus(teamsTogglesStatus);
+    } catch (err) {
+      setStatus(teamsTogglesStatus, 'error', 'Erreur : ' + err.message);
+    }
+
+    teamsList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const index = await readFile(TEAMS_INDEX_PATH);
+      const ids = index.teamIds || [];
+      const teams = await Promise.all(ids.map((id) => readFile(teamPath(id)).catch(() => null)));
+      currentTeamsCache = teams.filter(Boolean);
+      renderTeamsList(currentTeamsCache);
+    } catch (err) {
+      teamsList.innerHTML = '';
+      teamsList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les équipes', [err.message]));
+    }
+  }
+
+  async function saveToggle(key, value) {
+    setStatus(teamsTogglesStatus, 'loading', 'Enregistrement…');
+    try {
+      if (!fileState[HOMEPAGE_SETTINGS_PATH]) await readFile(HOMEPAGE_SETTINGS_PATH);
+      const current = fileState[HOMEPAGE_SETTINGS_PATH].json;
+      const updated = Object.assign({}, current, { [key]: value });
+      const sha = fileState[HOMEPAGE_SETTINGS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, HOMEPAGE_SETTINGS_PATH, updated, sha, 'Admin : mise à jour de l\'affichage de l\'accueil');
+      fileState[HOMEPAGE_SETTINGS_PATH] = { json: updated, sha: result.content.sha };
+      setStatus(teamsTogglesStatus, 'success', 'Enregistré !');
+    } catch (err) {
+      setStatus(teamsTogglesStatus, 'error', 'Erreur : ' + err.message);
+    }
+  }
+
+  document.getElementById('toggleResultsBlock').addEventListener('change', (e) => {
+    saveToggle('showResultsAndUpcomingMatches', e.target.checked);
+  });
+  document.getElementById('toggleStandingsBlock').addEventListener('change', (e) => {
+    saveToggle('showStandingsTable', e.target.checked);
+  });
+
+  function renderTeamsList(teams) {
+    teamsList.innerHTML = '';
+    if (teams.length === 0) {
+      teamsList.innerHTML = '<p class="empty-list-msg">Aucune équipe pour le moment.</p>';
+      return;
+    }
+
+    teams.forEach((team) => {
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      row.innerHTML = `
+        ${team.photo
+          ? `<img class="team-row-thumb" src="${team.photo}" alt="">`
+          : `<div class="admin-list-thumb"><i class="fa-solid fa-people-group" style="color:var(--color-navy);"></i></div>`}
+        <div class="admin-list-info">
+          <strong>${team.name}</strong>
+          <span>${team.division || ''}</span>
+        </div>
+        <div class="admin-list-actions">
+          <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+      row.querySelector('.edit-btn').addEventListener('click', () => startEditTeam(team));
+      row.querySelector('.delete-btn').addEventListener('click', () => deleteTeam(team.id, team.name));
+      teamsList.appendChild(row);
+    });
+  }
+
+  /* --- Lignes dynamiques : joueurs --- */
+
+  function addPlayerRow(name) {
+    const row = document.createElement('div');
+    row.className = 'dynamic-row player-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Nom du joueur" value="${name || ''}">
+      <button type="button" class="remove-row-btn" title="Retirer"><i class="fa-solid fa-xmark"></i></button>
+    `;
+    row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+    teamPlayersRows.appendChild(row);
+  }
+
+  document.getElementById('addPlayerRowBtn').addEventListener('click', () => addPlayerRow(''));
+
+  /* --- Lignes dynamiques : matchs --- */
+
+  function addMatchRow(match) {
+    match = match || {};
+    const row = document.createElement('div');
+    row.className = 'dynamic-row match-row';
+    row.innerHTML = `
+      <input type="date" class="match-date-input" value="${match.date || ''}">
+      <input type="text" class="match-opponent-input" placeholder="Adversaire" value="${match.opponent || ''}">
+      <select class="match-home-select">
+        <option value="true" ${match.home !== false ? 'selected' : ''}>Domicile</option>
+        <option value="false" ${match.home === false ? 'selected' : ''}>Extérieur</option>
+      </select>
+      <select class="match-status-select">
+        <option value="upcoming" ${match.status !== 'played' ? 'selected' : ''}>À venir</option>
+        <option value="played" ${match.status === 'played' ? 'selected' : ''}>Joué</option>
+      </select>
+      <select class="match-result-select">
+        <option value="">Résultat</option>
+        <option value="V" ${match.result === 'V' ? 'selected' : ''}>Victoire</option>
+        <option value="N" ${match.result === 'N' ? 'selected' : ''}>Nul</option>
+        <option value="D" ${match.result === 'D' ? 'selected' : ''}>Défaite</option>
+      </select>
+      <input type="text" class="match-score-input" placeholder="Score (ex : 8-4)" value="${match.score || ''}">
+      <button type="button" class="remove-row-btn" title="Retirer"><i class="fa-solid fa-xmark"></i></button>
+    `;
+    row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+    teamMatchesRows.appendChild(row);
+  }
+
+  document.getElementById('addMatchRowBtn').addEventListener('click', () => addMatchRow());
+
+  /* --- Photo --- */
+
+  teamPhotoInput.addEventListener('change', () => {
+    const file = teamPhotoInput.files[0];
+    if (!file) return;
+    pendingTeamPhotoFile = file;
+    const reader = new FileReader();
+    reader.onload = () => {
+      teamPhotoPreviewWrap.innerHTML = `<img class="team-photo-preview" src="${reader.result}" alt="">`;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* --- Ouverture de l'éditeur (ajout / édition) --- */
+
+  function generateTeamId(teams) {
+    const numbers = teams
+      .map((t) => parseInt((t.id.match(/(\d+)/) || [0, 0])[1], 10))
+      .filter((n) => !isNaN(n));
+    const next = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
+    return `equipe-${next}`;
+  }
+
+  document.getElementById('addTeamBtn').addEventListener('click', () => {
+    openTeamEditor(null);
+  });
+
+  function openTeamEditor(team) {
+    teamEditorForm.reset();
+    teamPlayersRows.innerHTML = '';
+    teamMatchesRows.innerHTML = '';
+    teamPhotoPreviewWrap.innerHTML = '';
+    pendingTeamPhotoFile = null;
+
+    if (team) {
+      document.getElementById('teamEditId').value = team.id;
+      document.getElementById('teamName').value = team.name || '';
+      document.getElementById('teamDivision').value = team.division || '';
+      document.getElementById('teamDescription').value = team.description || '';
+      currentTeamPhotoPath = team.photo || '';
+      if (team.photo) {
+        teamPhotoPreviewWrap.innerHTML = `<img class="team-photo-preview" src="${team.photo}" alt="">`;
+      }
+
+      const c = team.classification || {};
+      document.getElementById('teamPool').value = c.pool || '';
+      document.getElementById('teamRank').value = c.rank || '';
+      document.getElementById('teamTotalTeams').value = c.totalTeams || '';
+      document.getElementById('teamStatus').value = c.status || '';
+
+      (team.players || []).forEach((p) => addPlayerRow(p));
+      (team.matches || []).forEach((m) => addMatchRow(m));
+
+      document.getElementById('teamEditorTitle').textContent = 'Modifier l\'équipe';
+    } else {
+      document.getElementById('teamEditId').value = '';
+      currentTeamPhotoPath = '';
+      document.getElementById('teamEditorTitle').textContent = 'Ajouter une équipe';
+    }
+
+    hideStatus(teamEditorStatus);
+    teamEditorCard.classList.remove('hidden');
+    teamEditorCard.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function startEditTeam(team) {
+    openTeamEditor(team);
+  }
+
+  document.getElementById('teamEditorCancelBtn').addEventListener('click', () => {
+    teamEditorCard.classList.add('hidden');
+  });
+
+  /* --- Enregistrement --- */
+
+  teamEditorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('teamSaveBtn');
+    saveBtn.disabled = true;
+    setStatus(teamEditorStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      const editingId = document.getElementById('teamEditId').value;
+      const isNewTeam = !editingId;
+      const id = editingId || generateTeamId(currentTeamsCache);
+
+      const name = document.getElementById('teamName').value.trim();
+      const division = document.getElementById('teamDivision').value.trim();
+      const description = document.getElementById('teamDescription').value.trim();
+
+      const players = Array.from(teamPlayersRows.querySelectorAll('input'))
+        .map((input) => input.value.trim())
+        .filter(Boolean);
+
+      const matches = Array.from(teamMatchesRows.querySelectorAll('.match-row')).map((row) => {
+        const status = row.querySelector('.match-status-select').value;
+        const result = row.querySelector('.match-result-select').value || null;
+        const score = row.querySelector('.match-score-input').value.trim() || null;
+        return {
+          date: row.querySelector('.match-date-input').value,
+          opponent: row.querySelector('.match-opponent-input').value.trim(),
+          home: row.querySelector('.match-home-select').value === 'true',
+          status,
+          result: status === 'played' ? result : null,
+          score: status === 'played' ? score : null
+        };
+      });
+
+      const rank = document.getElementById('teamRank').value;
+      const totalTeams = document.getElementById('teamTotalTeams').value;
+
+      const classification = {
+        pool: document.getElementById('teamPool').value.trim(),
+        rank: rank ? parseInt(rank, 10) : null,
+        totalTeams: totalTeams ? parseInt(totalTeams, 10) : null,
+        status: document.getElementById('teamStatus').value || null
+      };
+
+      // Photo : upload si un nouveau fichier a été choisi
+      let photo = currentTeamPhotoPath;
+      if (pendingTeamPhotoFile) {
+        setStatus(teamEditorStatus, 'loading', 'Envoi de la photo…');
+        const ext = (pendingTeamPhotoFile.name.split('.').pop() || 'jpg').toLowerCase();
+        const photoPath = `imgs/teams/${id}.${ext}`;
+        await GitHubAPI.uploadFile(cfg, photoPath, pendingTeamPhotoFile, `Admin : photo de l'équipe "${name}"`);
+        photo = './' + photoPath;
+      }
+
+      const teamData = { id, name, division, photo, description, players, classification, matches };
+
+      setStatus(teamEditorStatus, 'loading', 'Enregistrement de la fiche équipe…');
+      const path = teamPath(id);
+      const sha = fileState[path] ? fileState[path].sha : undefined;
+      const result = await GitHubAPI.saveJSON(
+        cfg, path, teamData, sha,
+        isNewTeam ? `Admin : création de l'équipe "${name}"` : `Admin : modification de l'équipe "${name}"`
+      );
+      fileState[path] = { json: teamData, sha: result.content.sha };
+
+      // Si nouvelle équipe : on l'ajoute à l'index
+      if (isNewTeam) {
+        if (!fileState[TEAMS_INDEX_PATH]) await readFile(TEAMS_INDEX_PATH);
+        const indexJson = fileState[TEAMS_INDEX_PATH].json;
+        const teamIds = (indexJson.teamIds || []).concat(id);
+        const indexSha = fileState[TEAMS_INDEX_PATH].sha;
+        const indexResult = await GitHubAPI.saveJSON(
+          cfg, TEAMS_INDEX_PATH, { teamIds }, indexSha, `Admin : ajout de l'équipe "${name}" à l'index`
+        );
+        fileState[TEAMS_INDEX_PATH] = { json: { teamIds }, sha: indexResult.content.sha };
+      }
+
+      await loadTeamsView();
+      teamEditorCard.classList.add('hidden');
+      setStatus(teamEditorStatus, 'success', 'Équipe enregistrée ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
+    } catch (err) {
+      setStatus(teamEditorStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  /* --- Suppression --- */
+
+  async function deleteTeam(id, name) {
+    if (!confirm(`Supprimer l'équipe "${name}" ? Sa fiche et son calendrier seront définitivement supprimés.`)) return;
+
+    try {
+      const path = teamPath(id);
+      if (!fileState[path]) await readFile(path);
+      await GitHubAPI.deleteFile(cfg, path, fileState[path].sha, `Admin : suppression de l'équipe "${name}"`);
+      delete fileState[path];
+
+      if (!fileState[TEAMS_INDEX_PATH]) await readFile(TEAMS_INDEX_PATH);
+      const teamIds = (fileState[TEAMS_INDEX_PATH].json.teamIds || []).filter((tid) => tid !== id);
+      const indexSha = fileState[TEAMS_INDEX_PATH].sha;
+      const indexResult = await GitHubAPI.saveJSON(
+        cfg, TEAMS_INDEX_PATH, { teamIds }, indexSha, `Admin : retrait de l'équipe "${name}" de l'index`
+      );
+      fileState[TEAMS_INDEX_PATH] = { json: { teamIds }, sha: indexResult.content.sha };
+
+      await loadTeamsView();
+    } catch (err) {
+      alert('Erreur lors de la suppression : ' + err.message);
     }
   }
 

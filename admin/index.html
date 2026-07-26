@@ -110,8 +110,8 @@
         <li><button type="button" class="nav-btn" data-view="navigation">
           <i class="fa-solid fa-bars"></i> Menu du site
         </button></li>
-        <li><button type="button" class="nav-btn" data-view="teams" disabled>
-          <i class="fa-solid fa-people-group"></i> Équipes & matchs <span class="soon-tag">Bientôt</span>
+        <li><button type="button" class="nav-btn" data-view="teams">
+          <i class="fa-solid fa-people-group"></i> Équipes & matchs
         </button></li>
         <li><button type="button" class="nav-btn" data-view="news" disabled>
           <i class="fa-solid fa-newspaper"></i> News <span class="soon-tag">Bientôt</span>
@@ -391,10 +391,106 @@
       </section>
 
       <section class="admin-view" id="view-teams">
-        <div class="coming-soon">
-          <i class="fa-solid fa-people-group"></i>
-          <h2>Équipes & matchs</h2>
-          <p>Ce module arrive dans une prochaine étape.</p>
+        <div class="view-header">
+          <h1>Équipes & matchs</h1>
+          <p>Gère les 12 équipes du club : calendrier, résultats, effectif, photo et classement de fin de phase.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-eye"></i> Affichage sur la page d'accueil</h2>
+          <div style="display:flex; flex-direction:column; gap:0.9rem;">
+            <label style="display:flex; align-items:center; gap:0.7rem; font-size:0.9rem; color:var(--color-text-main); font-weight:600;">
+              <input type="checkbox" id="toggleResultsBlock" style="width:auto; transform:scale(1.2);">
+              Afficher le bloc "Résultats & matchs à venir" sur l'accueil
+            </label>
+            <label style="display:flex; align-items:center; gap:0.7rem; font-size:0.9rem; color:var(--color-text-main); font-weight:600;">
+              <input type="checkbox" id="toggleStandingsBlock" style="width:auto; transform:scale(1.2);">
+              Afficher le tableau de classement (fin de phase) sur l'accueil
+            </label>
+          </div>
+          <div class="status-msg" id="teamsTogglesStatus"></div>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Liste des équipes</h2>
+          <button type="button" class="btn btn-primary" id="addTeamBtn" style="margin-bottom:1rem;">
+            <i class="fa-solid fa-plus"></i> Ajouter une équipe
+          </button>
+          <div id="teamsList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+
+        <div class="admin-card hidden" id="teamEditorCard">
+          <h2><i class="fa-solid fa-pen"></i> <span id="teamEditorTitle">Modifier l'équipe</span></h2>
+          <form id="teamEditorForm">
+            <input type="hidden" id="teamEditId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="teamName">Nom de l'équipe</label>
+                <input type="text" id="teamName" placeholder="Équipe 1" required>
+              </div>
+              <div class="form-group">
+                <label for="teamDivision">Division</label>
+                <input type="text" id="teamDivision" placeholder="Nationale 3" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="teamPhotoInput">Photo de l'équipe</label>
+              <input type="file" id="teamPhotoInput" accept="image/*">
+              <span class="form-hint">Facultatif. Envoyée directement dans le dépôt GitHub au moment de l'enregistrement.</span>
+              <div id="teamPhotoPreviewWrap" style="margin-top:0.6rem;"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="teamDescription">Présentation de l'équipe</label>
+              <textarea id="teamDescription" rows="3" placeholder="Quelques mots sur l'équipe..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Effectif</label>
+              <div id="teamPlayersRows"></div>
+              <button type="button" class="btn btn-ghost" id="addPlayerRowBtn" style="margin-top:0.5rem;">
+                <i class="fa-solid fa-plus"></i> Ajouter un joueur
+              </button>
+            </div>
+
+            <div class="form-group">
+              <label>Classement (fin de phase)</label>
+              <div class="form-row">
+                <input type="text" id="teamPool" placeholder="Poule (ex : Poule A)">
+                <input type="number" id="teamRank" placeholder="Rang (ex : 3)" min="1">
+              </div>
+              <div class="form-row" style="margin-top:0.7rem;">
+                <input type="number" id="teamTotalTeams" placeholder="Nombre d'équipes dans la poule" min="1">
+                <select id="teamStatus">
+                  <option value="">Statut non défini</option>
+                  <option value="up">Monte</option>
+                  <option value="maintien">Se maintient</option>
+                  <option value="down">Descend</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Calendrier des rencontres</label>
+              <div id="teamMatchesRows"></div>
+              <button type="button" class="btn btn-ghost" id="addMatchRowBtn" style="margin-top:0.5rem;">
+                <i class="fa-solid fa-plus"></i> Ajouter une rencontre
+              </button>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center; margin-top:1rem;">
+              <button type="submit" class="btn btn-primary" id="teamSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> Enregistrer l'équipe
+              </button>
+              <button type="button" class="btn btn-ghost" id="teamEditorCancelBtn">Annuler</button>
+            </div>
+
+            <div class="status-msg" id="teamEditorStatus"></div>
+          </form>
         </div>
       </section>
 
