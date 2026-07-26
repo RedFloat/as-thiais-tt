@@ -107,8 +107,8 @@
         <li><button type="button" class="nav-btn" data-view="documents">
           <i class="fa-solid fa-file-lines"></i> Documents
         </button></li>
-        <li><button type="button" class="nav-btn" data-view="navigation">
-          <i class="fa-solid fa-bars"></i> Menu du site
+        <li><button type="button" class="nav-btn" data-view="navigation" disabled>
+          <i class="fa-solid fa-bars"></i> Menu du site <span class="soon-tag">Bientôt</span>
         </button></li>
         <li><button type="button" class="nav-btn" data-view="teams" disabled>
           <i class="fa-solid fa-people-group"></i> Équipes & matchs <span class="soon-tag">Bientôt</span>
@@ -323,70 +323,10 @@
       </section>
 
       <section class="admin-view" id="view-navigation">
-        <div class="view-header">
-          <h1>Menu du site</h1>
-          <p>Ajoute une nouvelle page au menu de navigation, avec ou sans catégorie. Répercuté automatiquement sur les 8 pages du site.</p>
-        </div>
-
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-folder-plus"></i> Catégories</h2>
-          <p style="color:var(--color-text-muted); font-size:0.85rem; margin-bottom:1rem;">
-            Une catégorie regroupe plusieurs pages dans un sous-menu déroulant (comme "Infos pratiques").
-          </p>
-          <div id="navCategoriesList"></div>
-
-          <div class="form-row" style="margin-top:1.2rem;">
-            <div class="form-group" style="margin-bottom:0;">
-              <label for="newCategoryLabel">Nom de la nouvelle catégorie</label>
-              <input type="text" id="newCategoryLabel" placeholder="Ex : Vie du club">
-            </div>
-          </div>
-          <button type="button" class="btn btn-ghost" id="addCategoryBtn" style="margin-top:0.8rem;">
-            <i class="fa-solid fa-plus"></i> Créer la catégorie
-          </button>
-          <div class="status-msg" id="navCategoryStatus"></div>
-        </div>
-
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-plus"></i> <span id="navFormTitle">Ajouter une page au menu</span></h2>
-          <form id="navPageForm">
-            <input type="hidden" id="navPageId">
-            <input type="hidden" id="navPageParentId">
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="navPageLabel">Titre affiché dans le menu</label>
-                <input type="text" id="navPageLabel" placeholder="Ex : Boutique du club" required>
-              </div>
-              <div class="form-group">
-                <label for="navPageLink">Lien de la page</label>
-                <input type="text" id="navPageLink" placeholder="./ma-page.html" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="navPageCategory">Catégorie</label>
-              <select id="navPageCategory">
-                <option value="">Aucune — lien direct dans le menu</option>
-              </select>
-            </div>
-
-            <div style="display:flex; gap:0.7rem; align-items:center;">
-              <button type="submit" class="btn btn-primary" id="navPageSaveBtn">
-                <i class="fa-solid fa-floppy-disk"></i> <span id="navPageSaveLabel">Ajouter la page</span>
-              </button>
-              <button type="button" class="btn btn-ghost hidden" id="navPageCancelBtn">Annuler la modification</button>
-            </div>
-
-            <div class="status-msg" id="navPageStatus"></div>
-          </form>
-        </div>
-
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-list"></i> Menu actuel</h2>
-          <div id="navItemsList">
-            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
-          </div>
+        <div class="coming-soon">
+          <i class="fa-solid fa-bars"></i>
+          <h2>Gestion du menu du site</h2>
+          <p>Ce module arrive dans une prochaine étape.</p>
         </div>
       </section>
 
