@@ -6,14 +6,6 @@
       "icon": "fa-folder-open",
       "documents": [
         {
-          "id": "questionnaire-sante-mineur",
-          "title": "Questionnaire de santé pour Mineur",
-          "description": "Questionnaire de santé requis pour les joueurs mineurs.",
-          "file": "./docs/questionnaire_sante_mineur.pdf",
-          "icon": "fa-file-medical",
-          "expirationDate": null
-        },
-        {
           "id": "questionnaire-sante-majeur",
           "title": "Questionnaire de santé pour majeur",
           "description": "Questionnaire de santé requis pour les joueurs majeurs.",
@@ -59,6 +51,14 @@
           "description": "Planning des horaires et créneaux d'entraînements de la saison.",
           "file": "./docs/entrainements-horaires.pdf",
           "icon": "fa-calendar-days",
+          "expirationDate": "2026-06-30"
+        },
+        {
+          "id": "questionnaire-sante-mineur",
+          "title": "Questionnaire de santé pour Mineur",
+          "description": "Questionnaire de santé requis pour les joueurs mineurs.",
+          "file": "./docs/questionnaire_sante_mineur.pdf",
+          "icon": "fa-file-medical",
           "expirationDate": "2026-06-30"
         }
       ]
