@@ -6,14 +6,6 @@
       "icon": "fa-folder-open",
       "documents": [
         {
-          "id": "pouvoir-ag-2026",
-          "title": "Pouvoir AG 2026",
-          "description": "Document de pouvoir pour l'Assemblée Générale de l'association.",
-          "file": "./docs/pouvoir_ag.docx",
-          "icon": "fa-file-word",
-          "expirationDate": null
-        },
-        {
           "id": "reglement-interieur",
           "title": "Règlement intérieur",
           "description": "Règlement intérieur officiel régissant la vie du club et des installations.",
@@ -59,6 +51,14 @@
           "description": "Mutations ordinaires des joueurs, du 15 mai au 30 juin 2026.<br>Merci de transmettre vos documents à Fabrice Couturas : <a href=\"mailto:asthiaistt94@gmail.com\" style=\"color:var(--color-navy); font-weight:600; text-decoration:underline;\">asthiaistt94@gmail.com</a>",
           "file": "./docs/mutation.pdf",
           "icon": "fa-file-arrow-down",
+          "expirationDate": "2026-06-30"
+        },
+        {
+          "id": "pouvoir-ag-2026",
+          "title": "Pouvoir AG 2026",
+          "description": "Document de pouvoir pour l'Assemblée Générale de l'association.",
+          "file": "./docs/pouvoir_ag.docx",
+          "icon": "fa-file-word",
           "expirationDate": "2026-06-30"
         }
       ]
