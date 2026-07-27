@@ -422,9 +422,8 @@
 
     const photoBlock = document.getElementById('teamPhotoBlock');
     photoBlock.innerHTML = team.photo
-      ? `<img src="${team.photo}" alt="${team.name}">`
-      : '<div class="team-photo-placeholder"><i class="fa-solid fa-people-group"></i></div>';
-    photoBlock.innerHTML += `<div class="team-photo-caption"><strong>${team.name}</strong>${team.division || ''}</div>`;
+      ? `<img src="${team.photo}" alt="Photo de l'équipe ${team.name}">`
+      : `<div class="team-photo-placeholder"><i class="fa-solid fa-people-group"></i></div>`;
 
     document.getElementById('teamDescription').textContent =
       team.description || 'Aucune présentation renseignée pour le moment.';
