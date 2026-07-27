@@ -497,9 +497,8 @@
         '<div class="slide-content">' +
         '<div class="slide-tag"><span class="badge-gold">' + (item.tag || '') + '</span></div>' +
         '<h3>' + item.title + '</h3>' +
-        '<p>' + item.text + '</p>' +
-        '<div><a href="' + (item.buttonLink || '#') + '" class="btn-primary">' +
-        (item.buttonLabel || 'Lire la suite') + '</a></div>' +
+        '<p>' + (item.excerpt || '') + '</p>' +
+        '<div><a href="./news-article.html?id=' + item.id + '" class="btn-primary">Lire l\'article complet</a></div>' +
         '</div>';
       track.appendChild(slide);
     });
@@ -632,6 +631,64 @@
     if (built) initNewsCarousel();
   }
 
+  /* ---------- Page article complète (news-article.html?id=...) ---------- */
+
+  function formatDateFRLong(isoDate) {
+    if (!isoDate) return '';
+    const [y, m, d] = isoDate.split('-');
+    const mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    return `${parseInt(d, 10)} ${mois[parseInt(m, 10) - 1]} ${y}`;
+  }
+
+  function renderNewsArticle(item) {
+    document.getElementById('articleTag').textContent = item.tag || '';
+    document.getElementById('articleTitle').textContent = item.title;
+    document.getElementById('articleDate').textContent = formatDateFRLong(item.date);
+
+    const coverEl = document.getElementById('articleCover');
+    if (item.image) {
+      coverEl.innerHTML = `<img src="${item.image}" alt="${item.title}">`;
+    }
+
+    document.getElementById('articleBody').innerHTML = item.body || '<p>' + (item.excerpt || '') + '</p>';
+
+    const albumWrap = document.getElementById('articleAlbumWrap');
+    if (item.albumLink) {
+      albumWrap.innerHTML =
+        `<a href="${item.albumLink}" target="_blank" rel="noopener" class="btn-primary">
+          <i class="fa-solid fa-images"></i> Voir l'album photo
+        </a>`;
+    }
+
+    document.getElementById('articleNotFound').classList.add('hidden');
+    document.getElementById('articlePageBody').classList.remove('hidden');
+  }
+
+  async function initNewsArticlePage() {
+    const hero = document.getElementById('articleHero');
+    if (!hero) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const newsId = params.get('id');
+
+    if (!newsId) {
+      document.getElementById('articleNotFound').classList.remove('hidden');
+      return;
+    }
+
+    const newsData = await loadJSON('./data/news.json');
+    const item = newsData && Array.isArray(newsData.news)
+      ? newsData.news.find((n) => n.id === newsId)
+      : null;
+
+    if (!item) {
+      document.getElementById('articleNotFound').classList.remove('hidden');
+      return;
+    }
+
+    renderNewsArticle(item);
+  }
+
   /* ---------- Initialisation ---------- */
 
   async function init() {
@@ -652,6 +709,7 @@
     initTeamsSection(homepageSettings);
     initNews();
     initTeamProfilePage();
+    initNewsArticlePage();
   }
 
   if (document.readyState === 'loading') {

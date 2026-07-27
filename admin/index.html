@@ -113,8 +113,8 @@
         <li><button type="button" class="nav-btn" data-view="teams">
           <i class="fa-solid fa-people-group"></i> Équipes & matchs
         </button></li>
-        <li><button type="button" class="nav-btn" data-view="news" disabled>
-          <i class="fa-solid fa-newspaper"></i> News <span class="soon-tag">Bientôt</span>
+        <li><button type="button" class="nav-btn" data-view="news">
+          <i class="fa-solid fa-newspaper"></i> News
         </button></li>
       </ul>
     </nav>
@@ -495,10 +495,98 @@
       </section>
 
       <section class="admin-view" id="view-news">
-        <div class="coming-soon">
-          <i class="fa-solid fa-newspaper"></i>
-          <h2>Gestion des news</h2>
-          <p>Ce module arrive dans une prochaine étape.</p>
+        <div class="view-header">
+          <h1>News</h1>
+          <p>Écris tes actualités avec texte et images. Chaque news obtient sa propre page, et celles "à la une" défilent sur l'accueil.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Actualités</h2>
+          <button type="button" class="btn btn-primary" id="addNewsBtn" style="margin-bottom:1rem;">
+            <i class="fa-solid fa-plus"></i> Écrire une news
+          </button>
+          <div id="newsList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+
+        <div class="admin-card hidden" id="newsEditorCard">
+          <h2><i class="fa-solid fa-pen"></i> <span id="newsEditorTitle">Écrire une news</span></h2>
+          <form id="newsEditorForm">
+            <input type="hidden" id="newsEditId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="newsTitle">Titre</label>
+                <input type="text" id="newsTitle" placeholder="Victoire de l'Équipe 1 !" required>
+              </div>
+              <div class="form-group">
+                <label for="newsTag">Étiquette</label>
+                <input type="text" id="newsTag" placeholder="À La Une, Vie du Club..." required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="newsDate">Date</label>
+                <input type="date" id="newsDate" required>
+              </div>
+              <div class="form-group" style="display:flex; align-items:flex-end;">
+                <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem; margin-bottom:0.65rem;">
+                  <input type="checkbox" id="newsFeatured" style="width:auto; transform:scale(1.2);" checked>
+                  Afficher "à la une" sur l'accueil
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="newsExcerpt">Résumé court (affiché sur l'accueil)</label>
+              <textarea id="newsExcerpt" rows="2" placeholder="Une ou deux phrases d'accroche" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="newsCoverInput">Photo de couverture</label>
+              <input type="file" id="newsCoverInput" accept="image/*">
+              <span class="form-hint">Utilisée sur l'accueil et en haut de la page complète de l'article.</span>
+              <div id="newsCoverPreviewWrap" style="margin-top:0.6rem;"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="newsAlbumLink">Lien vers l'album photo (facultatif)</label>
+              <input type="url" id="newsAlbumLink" placeholder="https://...">
+              <span class="form-hint">S'affichera comme un bouton en bas de l'article, une fois l'album créé.</span>
+            </div>
+
+            <div class="form-group">
+              <label>Contenu de l'article</label>
+              <div class="richtext-toolbar" id="richtextToolbar">
+                <button type="button" data-cmd="bold" title="Gras"><i class="fa-solid fa-bold"></i></button>
+                <button type="button" data-cmd="italic" title="Italique"><i class="fa-solid fa-italic"></i></button>
+                <button type="button" data-cmd="underline" title="Souligné"><i class="fa-solid fa-underline"></i></button>
+                <span class="richtext-sep"></span>
+                <button type="button" data-cmd="insertUnorderedList" title="Liste à puces"><i class="fa-solid fa-list-ul"></i></button>
+                <button type="button" data-cmd="insertOrderedList" title="Liste numérotée"><i class="fa-solid fa-list-ol"></i></button>
+                <span class="richtext-sep"></span>
+                <button type="button" data-cmd="formatBlock:H2" title="Titre">H2</button>
+                <button type="button" data-cmd="formatBlock:P" title="Paragraphe">¶</button>
+                <span class="richtext-sep"></span>
+                <button type="button" id="richtextLinkBtn" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
+                <button type="button" id="richtextImageBtn" title="Insérer une image"><i class="fa-solid fa-image"></i></button>
+              </div>
+              <div class="richtext-editor" id="richtextEditor" contenteditable="true"></div>
+              <input type="file" id="richtextImageInput" accept="image/*" class="hidden">
+              <span class="form-hint">Sélectionne du texte puis clique sur un bouton pour le mettre en forme. Les images insérées sont envoyées automatiquement sur GitHub.</span>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center; margin-top:1rem;">
+              <button type="submit" class="btn btn-primary" id="newsSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> Enregistrer la news
+              </button>
+              <button type="button" class="btn btn-ghost" id="newsEditorCancelBtn">Annuler</button>
+            </div>
+
+            <div class="status-msg" id="newsEditorStatus"></div>
+          </form>
         </div>
       </section>
 

@@ -124,6 +124,7 @@
       if (btn.dataset.view === 'documents') loadDocumentsView();
       if (btn.dataset.view === 'navigation') loadNavigationView();
       if (btn.dataset.view === 'teams') loadTeamsView();
+      if (btn.dataset.view === 'news') loadNewsView();
     });
   });
 
@@ -1339,6 +1340,249 @@
       fileState[TEAMS_INDEX_PATH] = { json: { teamIds }, sha: indexResult.content.sha };
 
       await loadTeamsView();
+    } catch (err) {
+      alert('Erreur lors de la suppression : ' + err.message);
+    }
+  }
+
+  /* ---------- News ---------- */
+
+  const NEWS_PATH = 'data/news.json';
+
+  const newsList = document.getElementById('newsList');
+  const newsEditorCard = document.getElementById('newsEditorCard');
+  const newsEditorForm = document.getElementById('newsEditorForm');
+  const newsEditorStatus = document.getElementById('newsEditorStatus');
+  const newsCoverInput = document.getElementById('newsCoverInput');
+  const newsCoverPreviewWrap = document.getElementById('newsCoverPreviewWrap');
+  const richtextEditor = document.getElementById('richtextEditor');
+  const richtextImageInput = document.getElementById('richtextImageInput');
+
+  let pendingNewsCoverFile = null;
+  let currentNewsCoverPath = '';
+  let currentNewsList = [];
+
+  async function loadNewsView() {
+    newsList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(NEWS_PATH);
+      currentNewsList = data.news || [];
+      renderNewsList(currentNewsList);
+    } catch (err) {
+      newsList.innerHTML = '';
+      newsList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les news', [err.message]));
+    }
+  }
+
+  function renderNewsList(newsArray) {
+    newsList.innerHTML = '';
+    if (newsArray.length === 0) {
+      newsList.innerHTML = '<p class="empty-list-msg">Aucune news pour le moment.</p>';
+      return;
+    }
+
+    newsArray.forEach((item) => {
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      row.innerHTML = `
+        ${item.image
+          ? `<img class="team-row-thumb" src="${item.image}" alt="">`
+          : `<div class="admin-list-thumb"><i class="fa-solid fa-newspaper" style="color:var(--color-navy);"></i></div>`}
+        <div class="admin-list-info">
+          <strong>${item.title} ${item.featured !== false ? '<span class="doc-status-badge doc-status-ok">À la une</span>' : ''}</strong>
+          <span>${item.tag || ''} — ${item.date || ''}</span>
+        </div>
+        <div class="admin-list-actions">
+          <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+      row.querySelector('.edit-btn').addEventListener('click', () => openNewsEditor(item));
+      row.querySelector('.delete-btn').addEventListener('click', () => deleteNews(item.id, item.title));
+      newsList.appendChild(row);
+    });
+  }
+
+  function generateNewsId(newsArray) {
+    const numbers = newsArray
+      .map((n) => parseInt((n.id.match(/(\d+)/) || [0, 0])[1], 10))
+      .filter((n) => !isNaN(n));
+    const next = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
+    return `news-${next}`;
+  }
+
+  document.getElementById('addNewsBtn').addEventListener('click', () => openNewsEditor(null));
+
+  function openNewsEditor(item) {
+    newsEditorForm.reset();
+    richtextEditor.innerHTML = '';
+    newsCoverPreviewWrap.innerHTML = '';
+    pendingNewsCoverFile = null;
+
+    if (item) {
+      document.getElementById('newsEditId').value = item.id;
+      document.getElementById('newsTitle').value = item.title || '';
+      document.getElementById('newsTag').value = item.tag || '';
+      document.getElementById('newsDate').value = item.date || '';
+      document.getElementById('newsFeatured').checked = item.featured !== false;
+      document.getElementById('newsExcerpt').value = item.excerpt || '';
+      document.getElementById('newsAlbumLink').value = item.albumLink || '';
+      richtextEditor.innerHTML = item.body || '';
+      currentNewsCoverPath = item.image || '';
+      if (item.image) {
+        newsCoverPreviewWrap.innerHTML = `<img class="news-cover-preview" src="${item.image}" alt="">`;
+      }
+      document.getElementById('newsEditorTitle').textContent = 'Modifier la news';
+    } else {
+      document.getElementById('newsEditId').value = generateNewsId(currentNewsList);
+      document.getElementById('newsDate').value = new Date().toISOString().slice(0, 10);
+      currentNewsCoverPath = '';
+      document.getElementById('newsEditorTitle').textContent = 'Écrire une news';
+    }
+
+    hideStatus(newsEditorStatus);
+    newsEditorCard.classList.remove('hidden');
+    newsEditorCard.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  document.getElementById('newsEditorCancelBtn').addEventListener('click', () => {
+    newsEditorCard.classList.add('hidden');
+  });
+
+  /* --- Aperçu de la couverture --- */
+
+  newsCoverInput.addEventListener('change', () => {
+    const file = newsCoverInput.files[0];
+    if (!file) return;
+    pendingNewsCoverFile = file;
+    const reader = new FileReader();
+    reader.onload = () => {
+      newsCoverPreviewWrap.innerHTML = `<img class="news-cover-preview" src="${reader.result}" alt="">`;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* --- Barre d'outils de mise en forme --- */
+
+  document.querySelectorAll('#richtextToolbar button[data-cmd]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      richtextEditor.focus();
+      const cmd = btn.dataset.cmd;
+      if (cmd.startsWith('formatBlock:')) {
+        document.execCommand('formatBlock', false, cmd.split(':')[1]);
+      } else {
+        document.execCommand(cmd, false, null);
+      }
+    });
+  });
+
+  document.getElementById('richtextLinkBtn').addEventListener('click', () => {
+    const url = prompt('Lien à insérer (https://...) :');
+    if (!url) return;
+    richtextEditor.focus();
+    document.execCommand('createLink', false, url);
+  });
+
+  document.getElementById('richtextImageBtn').addEventListener('click', () => {
+    richtextImageInput.click();
+  });
+
+  richtextImageInput.addEventListener('change', async () => {
+    const file = richtextImageInput.files[0];
+    if (!file) return;
+
+    const newsId = document.getElementById('newsEditId').value || 'news-brouillon';
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `imgs/news/${newsId}-inline-${Date.now()}.${ext}`;
+
+    setStatus(newsEditorStatus, 'loading', 'Envoi de l\'image…');
+    try {
+      await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une news`);
+      richtextEditor.focus();
+      document.execCommand('insertHTML', false, `<img src="./${path}" alt="">`);
+      hideStatus(newsEditorStatus);
+    } catch (err) {
+      setStatus(newsEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message);
+    } finally {
+      richtextImageInput.value = '';
+    }
+  });
+
+  /* --- Enregistrement --- */
+
+  newsEditorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('newsSaveBtn');
+    saveBtn.disabled = true;
+    setStatus(newsEditorStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      if (!fileState[NEWS_PATH]) await readFile(NEWS_PATH);
+      const newsArray = fileState[NEWS_PATH].json.news.slice();
+
+      const id = document.getElementById('newsEditId').value;
+      const isNew = !newsArray.some((n) => n.id === id);
+
+      let image = currentNewsCoverPath;
+      if (pendingNewsCoverFile) {
+        setStatus(newsEditorStatus, 'loading', 'Envoi de la photo de couverture…');
+        const ext = (pendingNewsCoverFile.name.split('.').pop() || 'jpg').toLowerCase();
+        const coverPath = `imgs/news/${id}-cover.${ext}`;
+        await GitHubAPI.uploadFile(cfg, coverPath, pendingNewsCoverFile, `Admin : photo de couverture de la news "${id}"`);
+        image = './' + coverPath;
+      }
+
+      const entry = {
+        id,
+        featured: document.getElementById('newsFeatured').checked,
+        tag: document.getElementById('newsTag').value.trim(),
+        title: document.getElementById('newsTitle').value.trim(),
+        excerpt: document.getElementById('newsExcerpt').value.trim(),
+        body: richtextEditor.innerHTML,
+        image,
+        albumLink: document.getElementById('newsAlbumLink').value.trim(),
+        date: document.getElementById('newsDate').value
+      };
+
+      const updatedArray = isNew
+        ? newsArray.concat(entry)
+        : newsArray.map((n) => (n.id === id ? entry : n));
+
+      setStatus(newsEditorStatus, 'loading', 'Enregistrement de la news…');
+      const updated = { news: updatedArray };
+      const sha = fileState[NEWS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, NEWS_PATH, updated, sha,
+        isNew ? `Admin : publication de la news "${entry.title}"` : `Admin : modification de la news "${entry.title}"`
+      );
+      fileState[NEWS_PATH] = { json: updated, sha: result.content.sha };
+
+      currentNewsList = updatedArray;
+      renderNewsList(updatedArray);
+      newsEditorCard.classList.add('hidden');
+      setStatus(newsEditorStatus, 'success', 'News enregistrée ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
+    } catch (err) {
+      setStatus(newsEditorStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  async function deleteNews(id, title) {
+    if (!confirm(`Supprimer la news "${title}" ? Cette action est immédiate.`)) return;
+
+    setStatus(newsEditorStatus, 'loading', 'Suppression en cours…');
+    try {
+      if (!fileState[NEWS_PATH]) await readFile(NEWS_PATH);
+      const updatedArray = fileState[NEWS_PATH].json.news.filter((n) => n.id !== id);
+      const updated = { news: updatedArray };
+
+      const sha = fileState[NEWS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, NEWS_PATH, updated, sha, `Admin : suppression de la news "${title}"`);
+      fileState[NEWS_PATH] = { json: updated, sha: result.content.sha };
+
+      currentNewsList = updatedArray;
+      renderNewsList(updatedArray);
     } catch (err) {
       alert('Erreur lors de la suppression : ' + err.message);
     }
