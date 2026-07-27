@@ -32,6 +32,17 @@
       "albumLink": "",
       "season": "2025-2026",
       "date": "2026-06-10"
+    },
+    {
+      "id": "news-4",
+      "featured": true,
+      "season": "2026-2027",
+      "title": "NEws de test",
+      "excerpt": "Ceci est un article de test",
+      "body": "J'écris ici un article de test pour vérifier si tout peu bien fonctionner",
+      "image": "./imgs/news/news-4-cover.png",
+      "albumLink": "",
+      "date": "2026-07-27"
     }
   ]
 }
