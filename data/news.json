@@ -32,6 +32,17 @@
       "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
       "albumLink": "",
       "date": "2026-09-10"
+    },
+    {
+      "id": "news-4",
+      "featured": true,
+      "tag": "Vie du Club",
+      "title": "Test",
+      "excerpt": "Ceci est un message de test",
+      "body": "Message de test ceci est",
+      "image": "./imgs/news/news-4-cover.jpg",
+      "albumLink": "",
+      "date": "2026-07-27"
     }
   ]
 }
