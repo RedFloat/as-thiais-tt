@@ -6,14 +6,6 @@
       "icon": "fa-folder-open",
       "documents": [
         {
-          "id": "questionnaire-sante-majeur",
-          "title": "Questionnaire de santé pour majeur",
-          "description": "Questionnaire de santé requis pour les joueurs majeurs.",
-          "file": "./docs/questionnaire_sante_majeur.pdf",
-          "icon": "fa-file-medical",
-          "expirationDate": null
-        },
-        {
           "id": "certificat-medical",
           "title": "Certificat médical",
           "description": "Modèle de certificat médical pour la pratique en compétition.",
@@ -58,6 +50,14 @@
           "title": "Questionnaire de santé pour Mineur",
           "description": "Questionnaire de santé requis pour les joueurs mineurs.",
           "file": "./docs/questionnaire_sante_mineur.pdf",
+          "icon": "fa-file-medical",
+          "expirationDate": "2026-06-30"
+        },
+        {
+          "id": "questionnaire-sante-majeur",
+          "title": "Questionnaire de santé pour majeur",
+          "description": "Questionnaire de santé requis pour les joueurs majeurs.",
+          "file": "./docs/questionnaire_sante_majeur.pdf",
           "icon": "fa-file-medical",
           "expirationDate": "2026-06-30"
         }
