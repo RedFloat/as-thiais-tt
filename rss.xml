@@ -6,25 +6,12 @@
     <description>Les actualités du club AS Thiais Tennis de Table</description>
     <language>fr-fr</language>
     <item>
-      <title>Ouverture des Inscriptions : Stage de Toussaint 2026</title>
-      <link>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-2</link>
-      <guid>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-2</guid>
-      <description>Perfectionnez votre jeu pendant les vacances ! Stages ouverts aux jeunes et adultes, encadrés par nos entraîneurs diplômés.</description>
-      <pubDate>Tue, 15 Sep 2026 00:00:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>NEws de test</title>
-      <link>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-4</link>
-      <guid>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-4</guid>
-      <description>Ceci est un article de test</description>
+      <title>Lucian et Denis, Champion du monde Vétérans</title>
+      <link>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-1</link>
+      <guid>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-1</guid>
+      <description>Du 5 au 12 juin 2026 se sont déroulé, se sont déroulé les championnats du monde vétérans en Corée du Sud.
+2 joueurs ont représenté notre club, Denis Forbault et Lucian Filimon...</description>
       <pubDate>Mon, 27 Jul 2026 00:00:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>Retour sur la Fête du Club</title>
-      <link>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-3</link>
-      <guid>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-3</guid>
-      <description>Plus de 80 adhérents se sont réunis au gymnase pour partager un moment de convivialité après le tournoi de fin d&apos;année.</description>
-      <pubDate>Wed, 10 Jun 2026 00:00:00 GMT</pubDate>
     </item>
   </channel>
 </rss>
