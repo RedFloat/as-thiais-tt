@@ -6,14 +6,6 @@
       "icon": "fa-folder-open",
       "documents": [
         {
-          "id": "planning-2025-2026",
-          "title": "Planning 2025 - 2026",
-          "description": "Planning des horaires et créneaux d'entraînements de la saison.",
-          "file": "./docs/entrainements-horaires.pdf",
-          "icon": "fa-calendar-days",
-          "expirationDate": null
-        },
-        {
           "id": "questionnaire-sante-mineur",
           "title": "Questionnaire de santé pour Mineur",
           "description": "Questionnaire de santé requis pour les joueurs mineurs.",
@@ -60,6 +52,14 @@
           "file": "./docs/reglement_interieur.pdf",
           "icon": "fa-file-lines",
           "expirationDate": "2026-08-01"
+        },
+        {
+          "id": "planning-2025-2026",
+          "title": "Planning 2025 - 2026",
+          "description": "Planning des horaires et créneaux d'entraînements de la saison.",
+          "file": "./docs/entrainements-horaires.pdf",
+          "icon": "fa-calendar-days",
+          "expirationDate": "2026-06-30"
         }
       ]
     },
