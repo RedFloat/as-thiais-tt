@@ -1,17 +1,6 @@
 {
   "news": [
     {
-      "id": "news-3",
-      "featured": true,
-      "title": "Retour sur la Fête du Club",
-      "excerpt": "Plus de 80 adhérents se sont réunis au gymnase pour partager un moment de convivialité après le tournoi de fin d'année.",
-      "body": "<p>Plus de 80 adhérents se sont réunis au gymnase pour partager un moment de convivialité après le tournoi de fin d'année.</p>",
-      "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
-      "albumLink": "",
-      "season": "2025-2026",
-      "date": "2026-06-10"
-    },
-    {
       "id": "news-4",
       "featured": true,
       "season": "2026-2027",
