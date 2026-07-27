@@ -1,17 +1,6 @@
 {
   "news": [
     {
-      "id": "news-2",
-      "featured": true,
-      "title": "Ouverture des Inscriptions : Stage de Toussaint 2026",
-      "excerpt": "Perfectionnez votre jeu pendant les vacances ! Stages ouverts aux jeunes et adultes, encadrés par nos entraîneurs diplômés.",
-      "body": "<p>Perfectionnez votre jeu pendant les vacances ! Stages ouverts aux jeunes et adultes, encadrés par nos entraîneurs diplômés.</p>",
-      "image": "https://images.unsplash.com/photo-1511067007398-7e4b90cfa4bc?auto=format&fit=crop&w=800&q=80",
-      "albumLink": "",
-      "season": "2026-2027",
-      "date": "2026-09-15"
-    },
-    {
       "id": "news-3",
       "featured": true,
       "title": "Retour sur la Fête du Club",
