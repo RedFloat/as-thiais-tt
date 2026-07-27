@@ -11,7 +11,7 @@
           "description": "Mutations ordinaires des joueurs, du 15 mai au 30 juin 2026.<br>Merci de transmettre vos documents à Fabrice Couturas : <a href=\"mailto:asthiaistt94@gmail.com\" style=\"color:var(--color-navy); font-weight:600; text-decoration:underline;\">asthiaistt94@gmail.com</a>",
           "file": "./docs/mutation.pdf",
           "icon": "fa-file-arrow-down",
-          "expirationDate": null
+          "expirationDate": "2026-06-30"
         },
         {
           "id": "pouvoir-ag-2026",
@@ -19,7 +19,7 @@
           "description": "Document de pouvoir pour l'Assemblée Générale de l'association.",
           "file": "./docs/pouvoir_ag.docx",
           "icon": "fa-file-word",
-          "expirationDate": null
+          "expirationDate": "2026-06-30"
         },
         {
           "id": "reglement-interieur",
@@ -27,7 +27,7 @@
           "description": "Règlement intérieur officiel régissant la vie du club et des installations.",
           "file": "./docs/reglement_interieur.pdf",
           "icon": "fa-file-lines",
-          "expirationDate": null
+          "expirationDate": "2026-08-01"
         },
         {
           "id": "planning-2025-2026",
@@ -35,7 +35,7 @@
           "description": "Planning des horaires et créneaux d'entraînements de la saison.",
           "file": "./docs/entrainements-horaires.pdf",
           "icon": "fa-calendar-days",
-          "expirationDate": null
+          "expirationDate": "2026-06-30"
         },
         {
           "id": "questionnaire-sante-mineur",
@@ -43,7 +43,7 @@
           "description": "Questionnaire de santé requis pour les joueurs mineurs.",
           "file": "./docs/questionnaire_sante_mineur.pdf",
           "icon": "fa-file-medical",
-          "expirationDate": null
+          "expirationDate": "2026-06-30"
         },
         {
           "id": "questionnaire-sante-majeur",
@@ -51,7 +51,7 @@
           "description": "Questionnaire de santé requis pour les joueurs majeurs.",
           "file": "./docs/questionnaire_sante_majeur.pdf",
           "icon": "fa-file-medical",
-          "expirationDate": null
+          "expirationDate": "2026-06-30"
         },
         {
           "id": "certificat-medical",
@@ -59,7 +59,7 @@
           "description": "Modèle de certificat médical pour la pratique en compétition.",
           "file": "./docs/Certificat_medical.pdf",
           "icon": "fa-stethoscope",
-          "expirationDate": null
+          "expirationDate": "2026-06-30"
         }
       ]
     },
@@ -74,7 +74,7 @@
           "description": "Calendrier officiel des rencontres et compétitions du club.",
           "file": "./docs/calendrier_competitions.pdf",
           "icon": "fa-calendar-check",
-          "expirationDate": null
+          "expirationDate": "2026-06-30"
         }
       ]
     },
