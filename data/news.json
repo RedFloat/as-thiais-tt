@@ -1,17 +1,6 @@
 {
   "news": [
     {
-      "id": "news-1",
-      "featured": true,
-      "title": "Victoire éclatante de l'Équipe 1 en Nationale 3 !",
-      "excerpt": "L'équipe fanion s'impose avec la manière à domicile face à Montreuil lors de la 1ère journée de phase 2. Une magnifique entame de saison.",
-      "body": "<p>L'équipe fanion s'impose avec la manière à domicile face à Montreuil lors de la 1ère journée de phase 2. Une magnifique entame de saison.</p>",
-      "image": "https://images.unsplash.com/photo-1611251122616-160359871029?auto=format&fit=crop&w=800&q=80",
-      "albumLink": "",
-      "season": "2026-2027",
-      "date": "2026-09-20"
-    },
-    {
       "id": "news-2",
       "featured": true,
       "title": "Ouverture des Inscriptions : Stage de Toussaint 2026",
