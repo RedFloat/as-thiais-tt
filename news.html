@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Article — AS Thiais Tennis de Table</title>
+  <title>Actualités — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -964,88 +964,137 @@
     }
 
     /* ==========================================================================
-       7. PAGE ARTICLE NEWS
+       7. PAGE LISTE DES NEWS
        ========================================================================== */
-    .hidden { display: none !important; }
-
     .page-hero {
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
       color: var(--color-white);
-      padding: 2.5rem 0;
+      padding: 3rem 0;
       text-align: center;
     }
 
     .page-hero .badge-gold {
-      background: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.1);
       border-color: var(--color-gold);
       color: var(--color-gold);
     }
 
     .page-hero h1 {
-      font-size: 1.9rem;
-      margin: 0.7rem 0 0.4rem;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
+      font-size: 2.2rem;
+      margin: 0.8rem 0 1rem;
     }
 
-    .page-hero .article-date {
+    .page-hero p {
+      max-width: 700px;
+      margin: 0 auto;
       color: #cbd5e1;
-      font-size: 0.9rem;
+      font-size: 1rem;
+      line-height: 1.7;
     }
 
     .page-content { padding: 3rem 0 3.5rem; }
 
-    .article-not-found {
+    .rss-link-bar {
       text-align: center;
-      padding: 4rem 1.5rem;
-      color: var(--color-text-muted);
+      margin-bottom: 2rem;
     }
 
-    .article-not-found i { font-size: 2.5rem; color: var(--color-gold); margin-bottom: 1rem; }
-    .article-not-found h2 { color: var(--color-navy); margin-bottom: 0.6rem; }
-
-    .article-cover {
-      margin-bottom: 1.75rem;
+    .rss-link-bar a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--color-gold-light);
+      color: var(--color-navy);
+      border: 1px solid var(--color-gold);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      transition: var(--transition);
     }
 
-    .article-cover img {
-      display: block;
-      width: 100%;
-      height: auto;
-      max-height: 600px;
-      object-fit: contain;
-      background: var(--color-bg-light);
+    .rss-link-bar a:hover { background: var(--color-gold); }
+
+    .news-season-block { margin-bottom: 2.5rem; }
+    .news-season-block:last-child { margin-bottom: 0; }
+
+    .news-season-title {
+      color: var(--color-navy);
+      font-size: 1.15rem;
+      margin-bottom: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--color-gold-light);
+    }
+
+    .news-season-title i { color: var(--color-gold); }
+
+    .news-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .news-list-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--color-white);
       border-radius: var(--radius-card);
-      border: 1px solid #e2e8f0;
       box-shadow: var(--shadow-subtle);
-      margin: 0 auto;
+      border: 1px solid rgba(4, 74, 110, 0.06);
+      overflow: hidden;
+      transition: var(--transition);
     }
 
-    .article-body-wrap {
-      max-width: 760px;
-      margin: 0 auto;
+    .news-list-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
     }
 
-    .article-body {
-      color: var(--color-text-main);
+    .news-list-card-img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--color-bg-light);
+      overflow: hidden;
+    }
+
+    .news-list-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-list-card-content {
+      padding: 1.1rem 1.25rem 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .news-list-card-content h3 {
+      color: var(--color-navy);
       font-size: 1rem;
-      line-height: 1.8;
+      margin-bottom: 0.5rem;
     }
 
-    .article-body p { margin-bottom: 1.1rem; }
-    .article-body h2, .article-body h3 { color: var(--color-navy); margin: 1.5rem 0 0.8rem; }
-    .article-body ul, .article-body ol { margin: 0 0 1.1rem 1.4rem; }
-    .article-body img { max-width: 100%; border-radius: 8px; margin: 1rem 0; }
-    .article-body a { color: var(--color-navy); font-weight: 600; text-decoration: underline; }
+    .news-list-card-content p {
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      flex: 1;
+      margin-bottom: 0.8rem;
+    }
 
-    .article-album-wrap {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px dashed #e2e8f0;
-      text-align: center;
+    .news-list-card-date {
+      color: var(--color-gold);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
     }
   </style>
+  <link rel="alternate" type="application/rss+xml" title="Actualités AS Thiais Tennis de Table" href="./rss.xml">
 </head>
 <body>
 <header>
@@ -1083,13 +1132,15 @@
   </header>
 
   <!-- ==========================================
-     HERO ARTICLE (rempli dynamiquement)
+     HERO ACTUALITÉS
      ========================================== -->
-  <section class="page-hero" id="articleHero">
+  <section class="page-hero">
     <div class="container">
-      <span class="badge-gold">Actualité</span>
-      <h1 id="articleTitle">Chargement…</h1>
-      <p class="article-date" id="articleDate"></p>
+      <span class="badge-gold">Actualités</span>
+      <h1>Toutes les Actualités</h1>
+      <p>
+        Retrouvez toutes les news du club, saison par saison.
+      </p>
     </div>
   </section>
 
@@ -1099,21 +1150,14 @@
   <section class="page-content">
     <div class="container">
 
-      <!-- Message si l'article n'existe pas / id manquant -->
-      <div class="article-not-found hidden" id="articleNotFound">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <h2>Article introuvable</h2>
-        <p>Cette actualité n'existe pas ou n'est plus disponible.</p>
+      <div class="rss-link-bar">
+        <a href="./rss.xml" target="_blank" rel="noopener">
+          <i class="fa-solid fa-rss"></i> S'abonner au flux RSS
+        </a>
       </div>
 
-      <div id="articlePageBody" class="hidden">
-        <div class="article-cover" id="articleCover"></div>
-
-        <div class="article-body-wrap">
-          <div class="article-body" id="articleBody"></div>
-
-          <div class="article-album-wrap" id="articleAlbumWrap"></div>
-        </div>
+      <div id="newsListContainer">
+        <p style="text-align:center; color:var(--color-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
       </div>
 
     </div>

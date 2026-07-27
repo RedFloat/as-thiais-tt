@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>AS Thiais Tennis de Table - Actualités</title>
+    <link>https://redfloat.github.io/as-thiais-tt/news.html</link>
+    <description>Les actualités du club AS Thiais Tennis de Table</description>
+    <language>fr-fr</language>
+    <item>
+      <title>Victoire éclatante de l'Équipe 1 en Nationale 3 !</title>
+      <link>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-1</link>
+      <guid>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-1</guid>
+      <description>L'équipe fanion s'impose avec la manière à domicile face à Montreuil lors de la 1ère journée de phase 2. Une magnifique entame de saison.</description>
+      <pubDate>Sun, 20 Sep 2026 00:00:00 -0000</pubDate>
+    </item>
+    <item>
+      <title>Ouverture des Inscriptions : Stage de Toussaint 2026</title>
+      <link>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-2</link>
+      <guid>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-2</guid>
+      <description>Perfectionnez votre jeu pendant les vacances ! Stages ouverts aux jeunes et adultes, encadrés par nos entraîneurs diplômés.</description>
+      <pubDate>Tue, 15 Sep 2026 00:00:00 -0000</pubDate>
+    </item>
+    <item>
+      <title>Retour sur la Fête du Club</title>
+      <link>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-3</link>
+      <guid>https://redfloat.github.io/as-thiais-tt/news-article.html?id=news-3</guid>
+      <description>Plus de 80 adhérents se sont réunis au gymnase pour partager un moment de convivialité après le tournoi de fin d'année.</description>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 -0000</pubDate>
+    </item>
+  </channel>
+</rss>

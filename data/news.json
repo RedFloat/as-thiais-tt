@@ -3,35 +3,35 @@
     {
       "id": "news-1",
       "featured": true,
-      "tag": "À La Une",
       "title": "Victoire éclatante de l'Équipe 1 en Nationale 3 !",
       "excerpt": "L'équipe fanion s'impose avec la manière à domicile face à Montreuil lors de la 1ère journée de phase 2. Une magnifique entame de saison.",
       "body": "<p>L'équipe fanion s'impose avec la manière à domicile face à Montreuil lors de la 1ère journée de phase 2. Une magnifique entame de saison.</p>",
       "image": "https://images.unsplash.com/photo-1611251122616-160359871029?auto=format&fit=crop&w=800&q=80",
       "albumLink": "",
+      "season": "2026-2027",
       "date": "2026-09-20"
     },
     {
       "id": "news-2",
       "featured": true,
-      "tag": "Stage Vacances",
       "title": "Ouverture des Inscriptions : Stage de Toussaint 2026",
       "excerpt": "Perfectionnez votre jeu pendant les vacances ! Stages ouverts aux jeunes et adultes, encadrés par nos entraîneurs diplômés.",
       "body": "<p>Perfectionnez votre jeu pendant les vacances ! Stages ouverts aux jeunes et adultes, encadrés par nos entraîneurs diplômés.</p>",
       "image": "https://images.unsplash.com/photo-1511067007398-7e4b90cfa4bc?auto=format&fit=crop&w=800&q=80",
       "albumLink": "",
+      "season": "2026-2027",
       "date": "2026-09-15"
     },
     {
       "id": "news-3",
       "featured": true,
-      "tag": "Vie du Club",
       "title": "Retour sur la Fête du Club",
       "excerpt": "Plus de 80 adhérents se sont réunis au gymnase pour partager un moment de convivialité après le tournoi de fin d'année.",
       "body": "<p>Plus de 80 adhérents se sont réunis au gymnase pour partager un moment de convivialité après le tournoi de fin d'année.</p>",
       "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
       "albumLink": "",
-      "date": "2026-09-10"
+      "season": "2025-2026",
+      "date": "2026-06-10"
     }
   ]
 }

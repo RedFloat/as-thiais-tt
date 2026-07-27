@@ -514,22 +514,17 @@
           <h2><i class="fa-solid fa-pen"></i> <span id="newsEditorTitle">Écrire une news</span></h2>
           <form id="newsEditorForm">
             <input type="hidden" id="newsEditId">
+            <input type="hidden" id="newsDate">
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="newsTitle">Titre</label>
-                <input type="text" id="newsTitle" placeholder="Victoire de l'Équipe 1 !" required>
-              </div>
-              <div class="form-group">
-                <label for="newsTag">Étiquette</label>
-                <input type="text" id="newsTag" placeholder="À La Une, Vie du Club..." required>
-              </div>
+            <div class="form-group">
+              <label for="newsTitle">Titre</label>
+              <input type="text" id="newsTitle" placeholder="Victoire de l'Équipe 1 !" required>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label for="newsDate">Date</label>
-                <input type="date" id="newsDate" required>
+                <label for="newsSeason">Saison</label>
+                <select id="newsSeason" required></select>
               </div>
               <div class="form-group" style="display:flex; align-items:flex-end;">
                 <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem; margin-bottom:0.65rem;">
@@ -537,6 +532,16 @@
                   Afficher "à la une" sur l'accueil
                 </label>
               </div>
+            </div>
+
+            <div class="form-row" style="align-items:flex-end;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label for="newNewsSeasonInput">Ajouter une nouvelle saison</label>
+                <input type="text" id="newNewsSeasonInput" placeholder="Ex : 2027-2028">
+              </div>
+              <button type="button" class="btn btn-ghost" id="addNewsSeasonBtn">
+                <i class="fa-solid fa-plus"></i> Ajouter
+              </button>
             </div>
 
             <div class="form-group">

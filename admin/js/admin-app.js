@@ -1348,6 +1348,7 @@
   /* ---------- News ---------- */
 
   const NEWS_PATH = 'data/news.json';
+  const NEWS_SEASONS_PATH = 'data/news-seasons.json';
 
   const newsList = document.getElementById('newsList');
   const newsEditorCard = document.getElementById('newsEditorCard');
@@ -1357,16 +1358,53 @@
   const newsCoverPreviewWrap = document.getElementById('newsCoverPreviewWrap');
   const richtextEditor = document.getElementById('richtextEditor');
   const richtextImageInput = document.getElementById('richtextImageInput');
+  const newsSeasonSelect = document.getElementById('newsSeason');
 
   let pendingNewsCoverFile = null;
   let currentNewsCoverPath = '';
   let currentNewsList = [];
 
+  function populateNewsSeasonSelect(seasons, selected) {
+    newsSeasonSelect.innerHTML = seasons
+      .map((s) => `<option value="${s}" ${s === selected ? 'selected' : ''}>${s}</option>`)
+      .join('');
+  }
+
+  document.getElementById('addNewsSeasonBtn').addEventListener('click', async () => {
+    const input = document.getElementById('newNewsSeasonInput');
+    const season = input.value.trim();
+    if (!season) return;
+
+    try {
+      if (!fileState[NEWS_SEASONS_PATH]) await readFile(NEWS_SEASONS_PATH);
+      const seasons = fileState[NEWS_SEASONS_PATH].json.seasons || [];
+      if (seasons.includes(season)) {
+        populateNewsSeasonSelect(seasons, season);
+        input.value = '';
+        return;
+      }
+      const updatedSeasons = seasons.concat(season);
+      const sha = fileState[NEWS_SEASONS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, NEWS_SEASONS_PATH, { seasons: updatedSeasons }, sha, `Admin : ajout de la saison "${season}"`
+      );
+      fileState[NEWS_SEASONS_PATH] = { json: { seasons: updatedSeasons }, sha: result.content.sha };
+      populateNewsSeasonSelect(updatedSeasons, season);
+      input.value = '';
+    } catch (err) {
+      setStatus(newsEditorStatus, 'error', 'Erreur : ' + err.message);
+    }
+  });
+
   async function loadNewsView() {
     newsList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
     try {
-      const data = await readFile(NEWS_PATH);
+      const [data, seasonsData] = await Promise.all([
+        readFile(NEWS_PATH),
+        readFile(NEWS_SEASONS_PATH)
+      ]);
       currentNewsList = data.news || [];
+      populateNewsSeasonSelect(seasonsData.seasons || [], null);
       renderNewsList(currentNewsList);
     } catch (err) {
       newsList.innerHTML = '';
@@ -1390,7 +1428,7 @@
           : `<div class="admin-list-thumb"><i class="fa-solid fa-newspaper" style="color:var(--color-navy);"></i></div>`}
         <div class="admin-list-info">
           <strong>${item.title} ${item.featured !== false ? '<span class="doc-status-badge doc-status-ok">À la une</span>' : ''}</strong>
-          <span>${item.tag || ''} — ${item.date || ''}</span>
+          <span>Saison ${item.season || '—'}</span>
         </div>
         <div class="admin-list-actions">
           <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
@@ -1422,13 +1460,16 @@
     if (item) {
       document.getElementById('newsEditId').value = item.id;
       document.getElementById('newsTitle').value = item.title || '';
-      document.getElementById('newsTag').value = item.tag || '';
-      document.getElementById('newsDate').value = item.date || '';
+      document.getElementById('newsDate').value = item.date || new Date().toISOString().slice(0, 10);
       document.getElementById('newsFeatured').checked = item.featured !== false;
       document.getElementById('newsExcerpt').value = item.excerpt || '';
       document.getElementById('newsAlbumLink').value = item.albumLink || '';
       richtextEditor.innerHTML = item.body || '';
       currentNewsCoverPath = item.image || '';
+      populateNewsSeasonSelect(
+        fileState[NEWS_SEASONS_PATH] ? fileState[NEWS_SEASONS_PATH].json.seasons : [],
+        item.season
+      );
       if (item.image) {
         newsCoverPreviewWrap.innerHTML = `<img class="news-cover-preview" src="${item.image}" alt="">`;
       }
@@ -1437,6 +1478,8 @@
       document.getElementById('newsEditId').value = generateNewsId(currentNewsList);
       document.getElementById('newsDate').value = new Date().toISOString().slice(0, 10);
       currentNewsCoverPath = '';
+      const seasons = fileState[NEWS_SEASONS_PATH] ? fileState[NEWS_SEASONS_PATH].json.seasons : [];
+      populateNewsSeasonSelect(seasons, seasons[seasons.length - 1]);
       document.getElementById('newsEditorTitle').textContent = 'Écrire une news';
     }
 
@@ -1535,7 +1578,7 @@
       const entry = {
         id,
         featured: document.getElementById('newsFeatured').checked,
-        tag: document.getElementById('newsTag').value.trim(),
+        season: newsSeasonSelect.value,
         title: document.getElementById('newsTitle').value.trim(),
         excerpt: document.getElementById('newsExcerpt').value.trim(),
         body: richtextEditor.innerHTML,
@@ -1561,6 +1604,7 @@
       renderNewsList(updatedArray);
       newsEditorCard.classList.add('hidden');
       setStatus(newsEditorStatus, 'success', 'News enregistrée ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
+      updateRSSFeed(updatedArray);
     } catch (err) {
       setStatus(newsEditorStatus, 'error', 'Erreur : ' + err.message);
     } finally {
@@ -1583,8 +1627,62 @@
 
       currentNewsList = updatedArray;
       renderNewsList(updatedArray);
+      updateRSSFeed(updatedArray);
     } catch (err) {
       alert('Erreur lors de la suppression : ' + err.message);
+    }
+  }
+
+  /* --- Flux RSS (régénéré automatiquement à chaque modification) --- */
+
+  function escapeXml(str) {
+    return (str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
+  function toRFC822(dateStr) {
+    if (!dateStr) return new Date().toUTCString();
+    return new Date(dateStr + 'T00:00:00Z').toUTCString();
+  }
+
+  function buildRSSFeed(newsArray) {
+    const baseUrl = `https://${cfg.owner}.github.io/${cfg.repo}`;
+    const sorted = newsArray.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    const items = sorted.map((item) => {
+      const link = `${baseUrl}/news-article.html?id=${item.id}`;
+      return `    <item>
+      <title>${escapeXml(item.title)}</title>
+      <link>${escapeXml(link)}</link>
+      <guid>${escapeXml(link)}</guid>
+      <description>${escapeXml(item.excerpt)}</description>
+      <pubDate>${toRFC822(item.date)}</pubDate>
+    </item>`;
+    }).join('\n');
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>AS Thiais Tennis de Table - Actualités</title>
+    <link>${baseUrl}/news.html</link>
+    <description>Les actualités du club AS Thiais Tennis de Table</description>
+    <language>fr-fr</language>
+${items}
+  </channel>
+</rss>
+`;
+  }
+
+  async function updateRSSFeed(newsArray) {
+    try {
+      const rssContent = buildRSSFeed(newsArray);
+      const blob = new Blob([rssContent], { type: 'application/xml' });
+      await GitHubAPI.uploadFile(cfg, 'rss.xml', blob, 'Admin : mise à jour du flux RSS');
+    } catch (err) {
+      console.error('Erreur lors de la mise à jour du flux RSS :', err);
     }
   }
 

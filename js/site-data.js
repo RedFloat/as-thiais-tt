@@ -495,7 +495,6 @@
       slide.innerHTML =
         '<div class="slide-img" style="background-image: url(\'' + item.image + '\');"></div>' +
         '<div class="slide-content">' +
-        '<div class="slide-tag"><span class="badge-gold">' + (item.tag || '') + '</span></div>' +
         '<h3>' + item.title + '</h3>' +
         '<p>' + (item.excerpt || '') + '</p>' +
         '<div><a href="./news-article.html?id=' + item.id + '" class="btn-primary">Lire l\'article complet</a></div>' +
@@ -641,7 +640,6 @@
   }
 
   function renderNewsArticle(item) {
-    document.getElementById('articleTag').textContent = item.tag || '';
     document.getElementById('articleTitle').textContent = item.title;
     document.getElementById('articleDate').textContent = formatDateFRLong(item.date);
 
@@ -689,6 +687,63 @@
     renderNewsArticle(item);
   }
 
+  /* ---------- Page liste des news par saison (news.html) ---------- */
+
+  function seasonSortKey(season) {
+    const match = (season || '').match(/(\d{4})/);
+    return match ? parseInt(match[1], 10) : 0;
+  }
+
+  function buildNewsListPage(newsArray) {
+    const container = document.getElementById('newsListContainer');
+    if (!container) return;
+
+    if (!newsArray || newsArray.length === 0) {
+      container.innerHTML = '<p class="empty-list-msg" style="text-align:center; padding:2rem; color:var(--color-text-muted);">Aucune actualité pour le moment.</p>';
+      return;
+    }
+
+    const bySeason = {};
+    newsArray.forEach((item) => {
+      const season = item.season || 'Non classé';
+      if (!bySeason[season]) bySeason[season] = [];
+      bySeason[season].push(item);
+    });
+
+    const seasons = Object.keys(bySeason).sort((a, b) => seasonSortKey(b) - seasonSortKey(a));
+
+    container.innerHTML = seasons.map((season) => {
+      const items = bySeason[season].slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+      const cards = items.map((item) => `
+        <a href="./news-article.html?id=${item.id}" class="news-list-card">
+          <div class="news-list-card-img">
+            ${item.image ? `<img src="${item.image}" alt="${item.title}">` : ''}
+          </div>
+          <div class="news-list-card-content">
+            <h3>${item.title}</h3>
+            <p>${item.excerpt || ''}</p>
+            <span class="news-list-card-date">${formatDateFRLong(item.date)}</span>
+          </div>
+        </a>
+      `).join('');
+
+      return `
+        <div class="news-season-block">
+          <h2 class="news-season-title"><i class="fa-solid fa-calendar-days"></i> Saison ${season}</h2>
+          <div class="news-list-grid">${cards}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function initNewsListPage() {
+    const container = document.getElementById('newsListContainer');
+    if (!container) return;
+
+    const newsData = await loadJSON('./data/news.json');
+    buildNewsListPage(newsData ? newsData.news : []);
+  }
+
   /* ---------- Initialisation ---------- */
 
   async function init() {
@@ -710,6 +765,7 @@
     initNews();
     initTeamProfilePage();
     initNewsArticlePage();
+    initNewsListPage();
   }
 
   if (document.readyState === 'loading') {

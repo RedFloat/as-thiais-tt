@@ -15,7 +15,7 @@
       "label": "La vie du Club",
       "type": "dropdown",
       "children": [
-        { "id": "news", "label": "News", "link": "#" },
+        { "id": "news", "label": "News", "link": "./news.html" },
         { "id": "evenements", "label": "Événements", "link": "#" },
         { "id": "albums-photos", "label": "Albums Photos", "link": "#" },
         { "id": "albums-videos", "label": "Albums Vidéos", "link": "#" }
