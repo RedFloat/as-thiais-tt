@@ -2,7 +2,7 @@
   "id": "equipe-1",
   "name": "Équipe 1",
   "division": "Nationale 3",
-  "photo": "./imgs/teams/equipe-1.png",
+  "photo": "./imgs/teams/equipe-1.jpg",
   "description": "Test",
   "players": [
     "Nathan BAUDOUIN",
