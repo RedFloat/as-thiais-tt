@@ -1077,9 +1077,8 @@
     .team-form-d { background: #dc2626; }
 
     .players-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 0.7rem;
+      columns: 2 150px;
+      column-gap: 0.7rem;
     }
 
     .player-chip {
@@ -1093,6 +1092,8 @@
       font-size: 0.85rem;
       font-weight: 600;
       color: var(--color-navy);
+      margin-bottom: 0.7rem;
+      break-inside: avoid;
     }
 
     .player-chip i { color: var(--color-gold); }
@@ -1133,7 +1134,7 @@
     }
 
     @media (max-width: 600px) {
-      .players-grid { grid-template-columns: repeat(2, 1fr); }
+      .players-grid { columns: 1; }
     }
   </style>
 </head>
