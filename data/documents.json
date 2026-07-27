@@ -6,14 +6,6 @@
       "icon": "fa-folder-open",
       "documents": [
         {
-          "id": "mutation-2026",
-          "title": "Mutation 2026",
-          "description": "Mutations ordinaires des joueurs, du 15 mai au 30 juin 2026.<br>Merci de transmettre vos documents à Fabrice Couturas : <a href=\"mailto:asthiaistt94@gmail.com\" style=\"color:var(--color-navy); font-weight:600; text-decoration:underline;\">asthiaistt94@gmail.com</a>",
-          "file": "./docs/mutation.pdf",
-          "icon": "fa-file-arrow-down",
-          "expirationDate": null
-        },
-        {
           "id": "pouvoir-ag-2026",
           "title": "Pouvoir AG 2026",
           "description": "Document de pouvoir pour l'Assemblée Générale de l'association.",
@@ -60,6 +52,14 @@
           "file": "./docs/Certificat_medical.pdf",
           "icon": "fa-stethoscope",
           "expirationDate": null
+        },
+        {
+          "id": "mutation-2026",
+          "title": "Mutation 2026",
+          "description": "Mutations ordinaires des joueurs, du 15 mai au 30 juin 2026.<br>Merci de transmettre vos documents à Fabrice Couturas : <a href=\"mailto:asthiaistt94@gmail.com\" style=\"color:var(--color-navy); font-weight:600; text-decoration:underline;\">asthiaistt94@gmail.com</a>",
+          "file": "./docs/mutation.pdf",
+          "icon": "fa-file-arrow-down",
+          "expirationDate": "2026-06-30"
         }
       ]
     },
