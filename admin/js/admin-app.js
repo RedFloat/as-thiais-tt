@@ -1441,7 +1441,9 @@
       return;
     }
 
-    newsArray.forEach((item) => {
+    const sorted = newsArray.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    sorted.forEach((item) => {
       const row = document.createElement('div');
       row.className = 'admin-list-item';
       row.innerHTML = `
@@ -1449,9 +1451,13 @@
           ? `<img class="team-row-thumb" src="${adminAssetPath(item.image)}" alt="">`
           : `<div class="admin-list-thumb"><i class="fa-solid fa-newspaper" style="color:var(--color-navy);"></i></div>`}
         <div class="admin-list-info">
-          <strong>${item.title} ${item.featured !== false ? '<span class="doc-status-badge doc-status-ok">À la une</span>' : ''}</strong>
-          <span>Saison ${item.season || '—'}</span>
+          <strong>${item.title}</strong>
+          <span>Saison ${item.season || '—'} — ${item.date || ''}</span>
         </div>
+        <label class="news-featured-toggle" title="Afficher à la une sur l'accueil">
+          <input type="checkbox" class="featured-checkbox" ${item.featured !== false ? 'checked' : ''}>
+          À la une
+        </label>
         <div class="admin-list-actions">
           <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
           <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
@@ -1459,8 +1465,31 @@
       `;
       row.querySelector('.edit-btn').addEventListener('click', () => openNewsEditor(item));
       row.querySelector('.delete-btn').addEventListener('click', () => deleteNews(item.id, item.title));
+      row.querySelector('.featured-checkbox').addEventListener('change', (e) => {
+        toggleNewsFeatured(item.id, e.target.checked);
+      });
       newsList.appendChild(row);
     });
+  }
+
+  async function toggleNewsFeatured(id, featured) {
+    try {
+      if (!fileState[NEWS_PATH]) await readFile(NEWS_PATH);
+      const updatedArray = fileState[NEWS_PATH].json.news.map((n) =>
+        n.id === id ? Object.assign({}, n, { featured }) : n
+      );
+      const updated = { news: updatedArray };
+      const sha = fileState[NEWS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, NEWS_PATH, updated, sha,
+        `Admin : ${featured ? 'ajout à' : 'retrait de'} la une pour une news`
+      );
+      fileState[NEWS_PATH] = { json: updated, sha: result.content.sha };
+      currentNewsList = updatedArray;
+    } catch (err) {
+      alert('Erreur : ' + err.message);
+      loadNewsView();
+    }
   }
 
   function generateNewsId(newsArray) {

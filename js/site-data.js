@@ -484,7 +484,9 @@
     const track = document.getElementById('newsTrack');
     if (!track || !newsData || !Array.isArray(newsData.news)) return false;
 
-    const items = newsData.news.filter((n) => n && n.featured !== false);
+    const items = newsData.news
+      .filter((n) => n && n.featured !== false)
+      .sort((a, b) => (a.date < b.date ? 1 : -1));
     if (items.length === 0) return false;
 
     track.innerHTML = '';
