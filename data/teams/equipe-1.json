@@ -10,10 +10,10 @@
     "Samy TOUKAL"
   ],
   "classification": {
-    "pool": "",
-    "rank": null,
-    "totalTeams": null,
-    "status": null
+    "pool": "Poule 4",
+    "rank": 2,
+    "totalTeams": 8,
+    "status": "up"
   },
   "matches": [
     {
