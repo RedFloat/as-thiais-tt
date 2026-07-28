@@ -21,6 +21,17 @@
       "image": "./imgs/news/news-2-cover.jpg",
       "albumId": "",
       "date": "2026-06-05"
+    },
+    {
+      "id": "news-3",
+      "featured": true,
+      "season": "2025-2026",
+      "title": "Test",
+      "excerpt": "test",
+      "body": "test",
+      "image": "",
+      "albumId": "",
+      "date": "2026-07-28"
     }
   ]
 }
