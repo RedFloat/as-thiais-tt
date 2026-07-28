@@ -136,6 +136,14 @@
     return result.json;
   }
 
+  // Les chemins d'images sont stockés en relatif à la racine du site (ex: "./imgs/...")
+  // pour fonctionner correctement sur les pages publiques. Cette page admin étant dans
+  // un sous-dossier /admin/, il faut remonter d'un niveau pour que l'image s'affiche ici.
+  function adminAssetPath(path) {
+    if (!path) return path;
+    return path.replace(/^\.\//, '../');
+  }
+
   /* ---------- Tableau de bord ---------- */
 
   function daysBetween(dateStr) {
@@ -1095,7 +1103,7 @@
       row.className = 'admin-list-item';
       row.innerHTML = `
         ${team.photo
-          ? `<img class="team-row-thumb" src="${team.photo}" alt="">`
+          ? `<img class="team-row-thumb" src="${adminAssetPath(team.photo)}" alt="">`
           : `<div class="admin-list-thumb"><i class="fa-solid fa-people-group" style="color:var(--color-navy);"></i></div>`}
         <div class="admin-list-info">
           <strong>${team.name}</strong>
@@ -1200,11 +1208,10 @@
       document.getElementById('teamDescription').value = team.description || '';
       currentTeamPhotoPath = team.photo || '';
       if (team.photo) {
-        teamPhotoPreviewWrap.innerHTML = `<img class="team-photo-preview" src="${team.photo}" alt="">`;
+        teamPhotoPreviewWrap.innerHTML = `<img class="team-photo-preview" src="${adminAssetPath(team.photo)}" alt="">`;
       }
 
       const c = team.classification || {};
-      document.getElementById('teamPool').value = c.pool || '';
       document.getElementById('teamRank').value = c.rank || '';
       document.getElementById('teamTotalTeams').value = c.totalTeams || '';
       document.getElementById('teamStatus').value = c.status || '';
@@ -1271,7 +1278,6 @@
       const totalTeams = document.getElementById('teamTotalTeams').value;
 
       const classification = {
-        pool: document.getElementById('teamPool').value.trim(),
         rank: rank ? parseInt(rank, 10) : null,
         totalTeams: totalTeams ? parseInt(totalTeams, 10) : null,
         status: document.getElementById('teamStatus').value || null
@@ -1323,13 +1329,19 @@
   /* --- Suppression --- */
 
   async function deleteTeam(id, name) {
-    if (!confirm(`Supprimer l'équipe "${name}" ? Sa fiche et son calendrier seront définitivement supprimés.`)) return;
+    if (!confirm(`Supprimer l'équipe "${name}" ? Sa fiche, son calendrier et sa photo seront définitivement supprimés.`)) return;
 
     try {
       const path = teamPath(id);
       if (!fileState[path]) await readFile(path);
+      const teamPhoto = fileState[path].json.photo;
+
       await GitHubAPI.deleteFile(cfg, path, fileState[path].sha, `Admin : suppression de l'équipe "${name}"`);
       delete fileState[path];
+
+      if (teamPhoto) {
+        await deleteFileIfExists(toRepoPath(teamPhoto));
+      }
 
       if (!fileState[TEAMS_INDEX_PATH]) await readFile(TEAMS_INDEX_PATH);
       const teamIds = (fileState[TEAMS_INDEX_PATH].json.teamIds || []).filter((tid) => tid !== id);
@@ -1349,6 +1361,7 @@
 
   const NEWS_PATH = 'data/news.json';
   const NEWS_SEASONS_PATH = 'data/news-seasons.json';
+  const ALBUMS_PATH = 'data/albums.json';
 
   const newsList = document.getElementById('newsList');
   const newsEditorCard = document.getElementById('newsEditorCard');
@@ -1359,10 +1372,17 @@
   const richtextEditor = document.getElementById('richtextEditor');
   const richtextImageInput = document.getElementById('richtextImageInput');
   const newsSeasonSelect = document.getElementById('newsSeason');
+  const newsAlbumSelect = document.getElementById('newsAlbum');
 
   let pendingNewsCoverFile = null;
   let currentNewsCoverPath = '';
   let currentNewsList = [];
+
+  function populateNewsAlbumSelect(albums, selected) {
+    const options = ['<option value="">Aucun album</option>']
+      .concat((albums || []).map((a) => `<option value="${a.id}" ${a.id === selected ? 'selected' : ''}>${a.title}</option>`));
+    newsAlbumSelect.innerHTML = options.join('');
+  }
 
   function populateNewsSeasonSelect(seasons, selected) {
     newsSeasonSelect.innerHTML = seasons
@@ -1399,12 +1419,14 @@
   async function loadNewsView() {
     newsList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
     try {
-      const [data, seasonsData] = await Promise.all([
+      const [data, seasonsData, albumsData] = await Promise.all([
         readFile(NEWS_PATH),
-        readFile(NEWS_SEASONS_PATH)
+        readFile(NEWS_SEASONS_PATH),
+        readFile(ALBUMS_PATH).catch(() => ({ albums: [] }))
       ]);
       currentNewsList = data.news || [];
       populateNewsSeasonSelect(seasonsData.seasons || [], null);
+      populateNewsAlbumSelect(albumsData.albums || [], null);
       renderNewsList(currentNewsList);
     } catch (err) {
       newsList.innerHTML = '';
@@ -1424,7 +1446,7 @@
       row.className = 'admin-list-item';
       row.innerHTML = `
         ${item.image
-          ? `<img class="team-row-thumb" src="${item.image}" alt="">`
+          ? `<img class="team-row-thumb" src="${adminAssetPath(item.image)}" alt="">`
           : `<div class="admin-list-thumb"><i class="fa-solid fa-newspaper" style="color:var(--color-navy);"></i></div>`}
         <div class="admin-list-info">
           <strong>${item.title} ${item.featured !== false ? '<span class="doc-status-badge doc-status-ok">À la une</span>' : ''}</strong>
@@ -1463,7 +1485,7 @@
       document.getElementById('newsDate').value = item.date || new Date().toISOString().slice(0, 10);
       document.getElementById('newsFeatured').checked = item.featured !== false;
       document.getElementById('newsExcerpt').value = item.excerpt || '';
-      document.getElementById('newsAlbumLink').value = item.albumLink || '';
+      document.getElementById('newsAlbum').value = item.albumId || '';
       richtextEditor.innerHTML = item.body || '';
       currentNewsCoverPath = item.image || '';
       populateNewsSeasonSelect(
@@ -1471,7 +1493,7 @@
         item.season
       );
       if (item.image) {
-        newsCoverPreviewWrap.innerHTML = `<img class="news-cover-preview" src="${item.image}" alt="">`;
+        newsCoverPreviewWrap.innerHTML = `<img class="news-cover-preview" src="${adminAssetPath(item.image)}" alt="">`;
       }
       document.getElementById('newsEditorTitle').textContent = 'Modifier la news';
     } else {
@@ -1583,7 +1605,7 @@
         excerpt: document.getElementById('newsExcerpt').value.trim(),
         body: richtextEditor.innerHTML,
         image,
-        albumLink: document.getElementById('newsAlbumLink').value.trim(),
+        albumId: document.getElementById('newsAlbum').value || '',
         date: document.getElementById('newsDate').value
       };
 
@@ -1612,18 +1634,57 @@
     }
   });
 
+  // Retire le "./" en tête d'un chemin stocké (image.image, image dans le body...)
+  // pour obtenir le chemin brut attendu par l'API GitHub.
+  function toRepoPath(path) {
+    return (path || '').replace(/^\.\//, '');
+  }
+
+  async function deleteFileIfExists(path) {
+    if (!path) return;
+    try {
+      const meta = await GitHubAPI.getFileMeta(cfg, path);
+      await GitHubAPI.deleteFile(cfg, path, meta.sha, `Admin : suppression d'un fichier lié à une news supprimée`);
+    } catch (err) {
+      console.warn('Impossible de supprimer', path, '(peut-être déjà absent) :', err.message);
+    }
+  }
+
+  // Repère toutes les images uploadées (imgs/news/...) référencées dans une news
+  // (couverture + images insérées dans le corps de l'article) pour les nettoyer.
+  function collectNewsImagePaths(item) {
+    const paths = [];
+    if (item.image && item.image.includes('imgs/news/')) {
+      paths.push(toRepoPath(item.image));
+    }
+    const matches = (item.body || '').matchAll(/<img[^>]+src=["']([^"']*imgs\/news\/[^"']+)["']/g);
+    for (const m of matches) {
+      paths.push(toRepoPath(m[1]));
+    }
+    return paths;
+  }
+
   async function deleteNews(id, title) {
-    if (!confirm(`Supprimer la news "${title}" ? Cette action est immédiate.`)) return;
+    if (!confirm(`Supprimer la news "${title}" ? Ses photos associées seront aussi supprimées de GitHub. Cette action est immédiate.`)) return;
 
     setStatus(newsEditorStatus, 'loading', 'Suppression en cours…');
     try {
       if (!fileState[NEWS_PATH]) await readFile(NEWS_PATH);
+      const itemToDelete = fileState[NEWS_PATH].json.news.find((n) => n.id === id);
       const updatedArray = fileState[NEWS_PATH].json.news.filter((n) => n.id !== id);
       const updated = { news: updatedArray };
 
       const sha = fileState[NEWS_PATH].sha;
       const result = await GitHubAPI.saveJSON(cfg, NEWS_PATH, updated, sha, `Admin : suppression de la news "${title}"`);
       fileState[NEWS_PATH] = { json: updated, sha: result.content.sha };
+
+      // Nettoyage des images uploadées qui ne servent plus à rien
+      if (itemToDelete) {
+        const imagePaths = collectNewsImagePaths(itemToDelete);
+        for (const imgPath of imagePaths) {
+          await deleteFileIfExists(imgPath);
+        }
+      }
 
       currentNewsList = updatedArray;
       renderNewsList(updatedArray);

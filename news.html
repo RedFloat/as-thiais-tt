@@ -1015,6 +1015,35 @@
 
     .rss-link-bar a:hover { background: var(--color-gold); }
 
+    .news-season-filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .season-filter-btn {
+      background: var(--color-white);
+      border: 1px solid #e2e8f0;
+      color: var(--color-navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: 50px;
+      transition: var(--transition);
+    }
+
+    .season-filter-btn:hover {
+      border-color: var(--color-gold);
+    }
+
+    .season-filter-btn.is-active {
+      background: var(--color-navy);
+      color: var(--color-white);
+      border-color: var(--color-navy);
+    }
+
     .news-season-block { margin-bottom: 2.5rem; }
     .news-season-block:last-child { margin-bottom: 0; }
 
@@ -1155,6 +1184,8 @@
           <i class="fa-solid fa-rss"></i> S'abonner au flux RSS
         </a>
       </div>
+
+      <div class="news-season-filters" id="newsSeasonFilters"></div>
 
       <div id="newsListContainer">
         <p style="text-align:center; color:var(--color-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>

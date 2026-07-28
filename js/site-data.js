@@ -376,7 +376,6 @@
       row.innerHTML =
         '<td><strong>' + team.name + '</strong></td>' +
         '<td>' + team.division + '</td>' +
-        '<td>' + (c.pool || '—') + '</td>' +
         '<td>' + rankText + '</td>' +
         '<td>' + (statusInfo
           ? '<span class="standings-status ' + statusInfo.cls + '">' + statusInfo.label + '</span>'
@@ -639,7 +638,7 @@
     return `${parseInt(d, 10)} ${mois[parseInt(m, 10) - 1]} ${y}`;
   }
 
-  function renderNewsArticle(item) {
+  async function renderNewsArticle(item) {
     document.getElementById('articleTitle').textContent = item.title;
     document.getElementById('articleDate').textContent = formatDateFRLong(item.date);
 
@@ -651,11 +650,19 @@
     document.getElementById('articleBody').innerHTML = item.body || '<p>' + (item.excerpt || '') + '</p>';
 
     const albumWrap = document.getElementById('articleAlbumWrap');
-    if (item.albumLink) {
-      albumWrap.innerHTML =
-        `<a href="${item.albumLink}" target="_blank" rel="noopener" class="btn-primary">
-          <i class="fa-solid fa-images"></i> Voir l'album photo
-        </a>`;
+    if (item.albumId) {
+      const albumsData = await loadJSON('./data/albums.json');
+      const album = albumsData && Array.isArray(albumsData.albums)
+        ? albumsData.albums.find((a) => a.id === item.albumId)
+        : null;
+
+      if (album && Array.isArray(album.photos) && album.photos.length > 0) {
+        albumWrap.innerHTML =
+          '<h2 style="color:var(--color-navy); margin-bottom:1rem;"><i class="fa-solid fa-images" style="color:var(--color-gold);"></i> ' + album.title + '</h2>' +
+          '<div class="article-album-grid">' +
+          album.photos.map((src) => `<img src="${src}" alt="${album.title}">`).join('') +
+          '</div>';
+      }
     }
 
     document.getElementById('articleNotFound').classList.add('hidden');
@@ -684,7 +691,7 @@
       return;
     }
 
-    renderNewsArticle(item);
+    await renderNewsArticle(item);
   }
 
   /* ---------- Page liste des news par saison (news.html) ---------- */
@@ -696,9 +703,11 @@
 
   function buildNewsListPage(newsArray) {
     const container = document.getElementById('newsListContainer');
+    const filtersEl = document.getElementById('newsSeasonFilters');
     if (!container) return;
 
     if (!newsArray || newsArray.length === 0) {
+      if (filtersEl) filtersEl.innerHTML = '';
       container.innerHTML = '<p class="empty-list-msg" style="text-align:center; padding:2rem; color:var(--color-text-muted);">Aucune actualité pour le moment.</p>';
       return;
     }
@@ -711,6 +720,24 @@
     });
 
     const seasons = Object.keys(bySeason).sort((a, b) => seasonSortKey(b) - seasonSortKey(a));
+
+    // Boutons de filtre : "Toutes les saisons" (sélectionné par défaut) + une par saison
+    if (filtersEl) {
+      const allBtn = '<button type="button" class="season-filter-btn is-active" data-season="">Toutes les saisons</button>';
+      const seasonBtns = seasons.map((s) => `<button type="button" class="season-filter-btn" data-season="${s}">${s}</button>`).join('');
+      filtersEl.innerHTML = allBtn + seasonBtns;
+
+      filtersEl.querySelectorAll('.season-filter-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          filtersEl.querySelectorAll('.season-filter-btn').forEach((b) => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+          const selected = btn.dataset.season;
+          container.querySelectorAll('.news-season-block').forEach((block) => {
+            block.style.display = (!selected || block.dataset.season === selected) ? '' : 'none';
+          });
+        });
+      });
+    }
 
     container.innerHTML = seasons.map((season) => {
       const items = bySeason[season].slice().sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -728,7 +755,7 @@
       `).join('');
 
       return `
-        <div class="news-season-block">
+        <div class="news-season-block" data-season="${season}">
           <h2 class="news-season-title"><i class="fa-solid fa-calendar-days"></i> Saison ${season}</h2>
           <div class="news-list-grid">${cards}</div>
         </div>

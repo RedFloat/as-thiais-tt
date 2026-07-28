@@ -460,18 +460,15 @@
             <div class="form-group">
               <label>Classement (fin de phase)</label>
               <div class="form-row">
-                <input type="text" id="teamPool" placeholder="Poule (ex : Poule A)">
                 <input type="number" id="teamRank" placeholder="Rang (ex : 3)" min="1">
-              </div>
-              <div class="form-row" style="margin-top:0.7rem;">
                 <input type="number" id="teamTotalTeams" placeholder="Nombre d'équipes dans la poule" min="1">
-                <select id="teamStatus">
-                  <option value="">Statut non défini</option>
-                  <option value="up">Monte</option>
-                  <option value="maintien">Se maintient</option>
-                  <option value="down">Descend</option>
-                </select>
               </div>
+              <select id="teamStatus" style="margin-top:0.7rem; width:100%;">
+                <option value="">Statut non défini</option>
+                <option value="up">Monte</option>
+                <option value="maintien">Se maintient</option>
+                <option value="down">Descend</option>
+              </select>
             </div>
 
             <div class="form-group">
@@ -514,7 +511,6 @@
           <h2><i class="fa-solid fa-pen"></i> <span id="newsEditorTitle">Écrire une news</span></h2>
           <form id="newsEditorForm">
             <input type="hidden" id="newsEditId">
-            <input type="hidden" id="newsDate">
 
             <div class="form-group">
               <label for="newsTitle">Titre</label>
@@ -526,12 +522,17 @@
                 <label for="newsSeason">Saison</label>
                 <select id="newsSeason" required></select>
               </div>
-              <div class="form-group" style="display:flex; align-items:flex-end;">
-                <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem; margin-bottom:0.65rem;">
-                  <input type="checkbox" id="newsFeatured" style="width:auto; transform:scale(1.2);" checked>
-                  Afficher "à la une" sur l'accueil
-                </label>
+              <div class="form-group">
+                <label for="newsDate">Date de la news</label>
+                <input type="date" id="newsDate" required>
               </div>
+            </div>
+
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem;">
+                <input type="checkbox" id="newsFeatured" style="width:auto; transform:scale(1.2);" checked>
+                Afficher "à la une" sur l'accueil
+              </label>
             </div>
 
             <div class="form-row" style="align-items:flex-end;">
@@ -557,9 +558,11 @@
             </div>
 
             <div class="form-group">
-              <label for="newsAlbumLink">Lien vers l'album photo (facultatif)</label>
-              <input type="url" id="newsAlbumLink" placeholder="https://...">
-              <span class="form-hint">S'affichera comme un bouton en bas de l'article, une fois l'album créé.</span>
+              <label for="newsAlbum">Album photo lié (facultatif)</label>
+              <select id="newsAlbum">
+                <option value="">Aucun album</option>
+              </select>
+              <span class="form-hint">Les photos de l'album choisi s'afficheront directement dans l'article. Les albums se créent depuis un module dédié à venir.</span>
             </div>
 
             <div class="form-group">

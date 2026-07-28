@@ -158,5 +158,17 @@ const GitHubAPI = (function () {
     return res.json();
   }
 
-  return { testConnection, getJSON, saveJSON, uploadFile, deleteFile, utf8ToBase64, base64ToUtf8 };
+  /* ---------- Métadonnées d'un fichier (sha), sans parser le contenu ---------- */
+  // Utile pour supprimer une image ou tout autre fichier non-JSON.
+
+  async function getFileMeta(cfg, path) {
+    const url = apiUrl(cfg, path) + `?ref=${encodeURIComponent(cfg.branch)}&t=${Date.now()}`;
+    const res = await fetch(url, { headers: authHeaders(cfg.token) });
+    if (!res.ok) {
+      throw new Error(`Fichier introuvable "${path}" : ` + (await parseError(res)));
+    }
+    return res.json();
+  }
+
+  return { testConnection, getJSON, saveJSON, uploadFile, deleteFile, getFileMeta, utf8ToBase64, base64ToUtf8 };
 })();

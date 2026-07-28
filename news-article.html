@@ -1043,7 +1043,27 @@
       margin-top: 2rem;
       padding-top: 1.5rem;
       border-top: 1px dashed #e2e8f0;
-      text-align: center;
+    }
+
+    .article-album-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .article-album-grid img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    @media (max-width: 500px) {
+      .article-album-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
