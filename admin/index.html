@@ -25,25 +25,9 @@
 
       <form id="loginForm">
         <div class="form-group">
-          <label for="ghToken">Token d'accès GitHub</label>
-          <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" required>
-          <span class="form-hint">Token à créer une seule fois dans GitHub (voir l'aide en bas de page).</span>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="ghOwner">Propriétaire</label>
-            <input type="text" id="ghOwner" value="redfloat" required>
-          </div>
-          <div class="form-group">
-            <label for="ghRepo">Dépôt</label>
-            <input type="text" id="ghRepo" value="as-thiais-tt" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="ghBranch">Branche</label>
-          <input type="text" id="ghBranch" value="main" required>
+          <label for="ghToken">Code d'accès administrateur</label>
+          <input type="password" id="ghToken" placeholder="Colle ton code d'accès ici" autocomplete="off" required>
+          <span class="form-hint">Ce code t'a été transmis par le webmaster du site.</span>
         </div>
 
         <div class="form-group">
@@ -57,19 +41,6 @@
           <i class="fa-solid fa-right-to-bracket"></i> Se connecter
         </button>
       </form>
-
-      <div class="login-help">
-        <strong style="color:var(--color-navy);">Pas encore de token ?</strong><br>
-        Sur GitHub : Photo de profil → <em>Settings</em> → <em>Developer settings</em> →
-        <em>Personal access tokens</em> → <em>Fine-grained tokens</em> → <em>Generate new token</em>.
-        Limite-le au dépôt <strong>as-thiais-tt</strong> avec la permission
-        <strong>Contents: Read and write</strong> uniquement.<br><br>
-        Garde ce token secret, comme un mot de passe — ne le partage jamais et ne le colle nulle part ailleurs.
-        <br><br>
-        <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">
-          Créer un token sur GitHub <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
-      </div>
     </div>
   </div>
 
@@ -81,7 +52,7 @@
     <header class="admin-topbar">
       <div class="topbar-title">
         Espace Admin
-        <span id="topbarRepoInfo">—</span>
+        <span>AS Thiais Tennis de Table</span>
       </div>
       <button class="btn btn-ghost" id="logoutBtn">
         <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
@@ -137,9 +108,8 @@
         <div class="admin-card">
           <h2><i class="fa-solid fa-circle-info"></i> À propos de cet espace admin</h2>
           <p style="color:var(--color-text-muted); font-size:0.88rem; line-height:1.7;">
-            Toutes les modifications faites ici sont enregistrées directement dans le dépôt GitHub
-            du site (<span id="aboutRepoInfo">—</span>), sous forme de commits. Le site se met à jour
-            automatiquement entre 30 secondes et 1-2 minutes après chaque sauvegarde.
+            Toutes les modifications faites ici sont enregistrées automatiquement. Le site se met à jour
+            tout seul entre 30 secondes et 1-2 minutes après chaque sauvegarde.
           </p>
         </div>
       </section>
@@ -440,7 +410,7 @@
             <div class="form-group">
               <label for="teamPhotoInput">Photo de l'équipe</label>
               <input type="file" id="teamPhotoInput" accept="image/*">
-              <span class="form-hint">Facultatif. Envoyée directement dans le dépôt GitHub au moment de l'enregistrement.</span>
+              <span class="form-hint">Facultatif. Envoyée automatiquement au moment de l'enregistrement.</span>
               <div id="teamPhotoPreviewWrap" style="margin-top:0.6rem;"></div>
             </div>
 
@@ -583,7 +553,7 @@
               </div>
               <div class="richtext-editor" id="richtextEditor" contenteditable="true"></div>
               <input type="file" id="richtextImageInput" accept="image/*" class="hidden">
-              <span class="form-hint">Sélectionne du texte puis clique sur un bouton pour le mettre en forme. Les images insérées sont envoyées automatiquement sur GitHub.</span>
+              <span class="form-hint">Sélectionne du texte puis clique sur un bouton pour le mettre en forme. Les images insérées sont envoyées automatiquement.</span>
             </div>
 
             <div style="display:flex; gap:0.7rem; align-items:center; margin-top:1rem;">

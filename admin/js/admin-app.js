@@ -7,6 +7,11 @@
 
   const STORAGE_KEY = 'asthiaistt_admin_cfg';
 
+  // Paramètres techniques fixes (transparents pour l'utilisateur de l'admin)
+  const REPO_OWNER = 'redfloat';
+  const REPO_NAME = 'as-thiais-tt';
+  const REPO_BRANCH = 'main';
+
   let cfg = null; // { token, owner, repo, branch }
   const fileState = {}; // cache { path: { json, sha } } des fichiers déjà lus
 
@@ -19,8 +24,6 @@
 
   const adminApp = document.getElementById('adminApp');
   const logoutBtn = document.getElementById('logoutBtn');
-  const topbarRepoInfo = document.getElementById('topbarRepoInfo');
-  const aboutRepoInfo = document.getElementById('aboutRepoInfo');
 
   /* ---------- Stockage local de la config (facultatif) ---------- */
 
@@ -81,9 +84,9 @@
     e.preventDefault();
     const config = {
       token: document.getElementById('ghToken').value.trim(),
-      owner: document.getElementById('ghOwner').value.trim(),
-      repo: document.getElementById('ghRepo').value.trim(),
-      branch: document.getElementById('ghBranch').value.trim() || 'main'
+      owner: REPO_OWNER,
+      repo: REPO_NAME,
+      branch: REPO_BRANCH
     };
     const remember = document.getElementById('rememberMe').checked;
     attemptLogin(config, remember);
@@ -102,9 +105,6 @@
   function enterAdminApp() {
     loginScreen.classList.add('hidden');
     adminApp.classList.remove('hidden');
-    const repoLabel = `${cfg.owner}/${cfg.repo} (${cfg.branch})`;
-    topbarRepoInfo.textContent = repoLabel;
-    aboutRepoInfo.textContent = repoLabel;
     loadDashboard();
   }
 
@@ -182,7 +182,7 @@
           if (!doc.expirationDate) return;
           const diff = daysBetween(doc.expirationDate);
           if (diff < 0) expired.push(doc);
-          else if (diff <= 30) soon.push(doc);
+          else if (diff <= 30) soon.push({ doc, diff });
         });
       });
 
@@ -217,8 +217,8 @@
       if (soon.length > 0) {
         alertsEl.appendChild(
           buildAlert('alert-warning', 'fa-clock',
-            `${soon.length} document${soon.length > 1 ? 's' : ''} bientôt à renouveler (30 jours)`,
-            soon.map((d) => d.title))
+            `${soon.length} document${soon.length > 1 ? 's' : ''} bientôt à renouveler`,
+            soon.map(({ doc, diff }) => `${doc.title} (dans ${diff} jour${diff > 1 ? 's' : ''})`))
         );
       }
 
@@ -1694,7 +1694,7 @@
   }
 
   async function deleteNews(id, title) {
-    if (!confirm(`Supprimer la news "${title}" ? Ses photos associées seront aussi supprimées de GitHub. Cette action est immédiate.`)) return;
+    if (!confirm(`Supprimer la news "${title}" ? Ses photos associées seront aussi supprimées. Cette action est immédiate.`)) return;
 
     setStatus(newsEditorStatus, 'loading', 'Suppression en cours…');
     try {
@@ -1781,9 +1781,9 @@ ${items}
   const stored = loadStoredConfig();
   if (stored) {
     document.getElementById('ghToken').value = stored.token || '';
-    document.getElementById('ghOwner').value = stored.owner || 'redfloat';
-    document.getElementById('ghRepo').value = stored.repo || 'as-thiais-tt';
-    document.getElementById('ghBranch').value = stored.branch || 'main';
-    attemptLogin(stored, !!localStorage.getItem(STORAGE_KEY));
+    attemptLogin(
+      { token: stored.token, owner: REPO_OWNER, repo: REPO_NAME, branch: REPO_BRANCH },
+      !!localStorage.getItem(STORAGE_KEY)
+    );
   }
 })();
