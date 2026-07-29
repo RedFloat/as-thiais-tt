@@ -76,6 +76,12 @@
           "icon": "fa-store"
         }
       ]
+    },
+    {
+      "id": "arbitrage",
+      "label": "Arbitrage",
+      "icon": "fa-link",
+      "links": []
     }
   ]
 }
