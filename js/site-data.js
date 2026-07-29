@@ -246,6 +246,46 @@
     });
   }
 
+  function buildLinks(data) {
+    const container = document.getElementById('linksContainer');
+    if (!container || !data || !Array.isArray(data.categories)) return;
+
+    container.innerHTML = '';
+
+    data.categories.forEach((category) => {
+      if (!Array.isArray(category.links) || category.links.length === 0) return;
+
+      const section = document.createElement('div');
+      section.className = 'links-category';
+
+      const title = document.createElement('div');
+      title.className = 'links-category-title';
+      title.innerHTML =
+        '<i class="fa-solid ' + (category.icon || 'fa-link') + '"></i> <h2>' + category.label + '</h2>';
+      section.appendChild(title);
+
+      const grid = document.createElement('div');
+      grid.className = 'links-grid';
+
+      category.links.forEach((link) => {
+        const displayUrl = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        const card = document.createElement('div');
+        card.className = 'link-card';
+        card.innerHTML =
+          '<div class="link-card-icon"><i class="fa-solid ' + (link.icon || 'fa-link') + '"></i></div>' +
+          '<h3>' + link.title + '</h3>' +
+          '<p>' + (link.description || '') + '</p>' +
+          '<span class="link-card-url">' + displayUrl + '</span>' +
+          '<a href="' + link.url + '" target="_blank" rel="noopener" class="link-card-btn">' +
+          '<i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site</a>';
+        grid.appendChild(card);
+      });
+
+      section.appendChild(grid);
+      container.appendChild(section);
+    });
+  }
+
   /* ---------- Embed calendrier ---------- */
 
   function applyCalendarEmbed(config) {
@@ -773,6 +813,13 @@
     buildNewsListPage(newsData ? newsData.news : []);
   }
 
+  async function initLinks() {
+    const container = document.getElementById('linksContainer');
+    if (!container) return;
+    const data = await loadJSON('./data/liens-utiles.json');
+    buildLinks(data);
+  }
+
   /* ---------- Initialisation ---------- */
 
   async function init() {
@@ -790,6 +837,7 @@
     buildNavigation(nav);
     buildSponsors(sponsors);
     buildDocuments(documents);
+    initLinks();
     initTeamsSection(homepageSettings);
     initNews();
     initTeamProfilePage();

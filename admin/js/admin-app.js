@@ -125,6 +125,7 @@
       if (btn.dataset.view === 'navigation') loadNavigationView();
       if (btn.dataset.view === 'teams') loadTeamsView();
       if (btn.dataset.view === 'news') loadNewsView();
+      if (btn.dataset.view === 'links') loadLinksView();
     });
   });
 
@@ -1773,6 +1774,288 @@ ${items}
       await GitHubAPI.uploadFile(cfg, 'rss.xml', blob, 'Admin : mise à jour du flux RSS');
     } catch (err) {
       console.error('Erreur lors de la mise à jour du flux RSS :', err);
+    }
+  }
+
+  /* ---------- Liens Utiles ---------- */
+
+  const LINKS_PATH = 'data/liens-utiles.json';
+
+  const linkCategoriesList = document.getElementById('linkCategoriesList');
+  const linksList = document.getElementById('linksList');
+  const linkCategoryStatus = document.getElementById('linkCategoryStatus');
+  const linkStatus = document.getElementById('linkStatus');
+  const linkEditorForm = document.getElementById('linkEditorForm');
+  const linkCancelBtn = document.getElementById('linkCancelBtn');
+  const linkSaveLabel = document.getElementById('linkSaveLabel');
+  const linkCategorySelect = document.getElementById('linkCategory');
+
+  async function loadLinksView() {
+    linkCategoriesList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.85rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    linksList.innerHTML = '';
+    try {
+      const data = await readFile(LINKS_PATH);
+      renderLinksAdmin(data.categories || []);
+    } catch (err) {
+      linkCategoriesList.innerHTML = '';
+      linksList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les liens', [err.message]));
+    }
+  }
+
+  function renderLinksAdmin(categories) {
+    /* --- Catégories --- */
+    linkCategoriesList.innerHTML = '';
+    if (categories.length === 0) {
+      linkCategoriesList.innerHTML = '<p class="empty-list-msg">Aucune catégorie pour le moment.</p>';
+    } else {
+      categories.forEach((cat) => {
+        const row = document.createElement('div');
+        row.className = 'nav-category-row';
+        row.innerHTML = `
+          <i class="fa-solid fa-folder folder-icon"></i>
+          <strong>${cat.label} (${(cat.links || []).length})</strong>
+          <div class="admin-list-actions">
+            <button type="button" class="rename-btn" title="Renommer"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        row.querySelector('.rename-btn').addEventListener('click', () => renameLinkCategory(cat.id, cat.label));
+        row.querySelector('.delete-btn').addEventListener('click', () => deleteLinkCategory(cat.id, cat.label, (cat.links || []).length));
+        linkCategoriesList.appendChild(row);
+      });
+    }
+
+    /* --- Select du formulaire --- */
+    linkCategorySelect.innerHTML = categories.map((cat) => `<option value="${cat.id}">${cat.label}</option>`).join('');
+
+    /* --- Liste des liens --- */
+    linksList.innerHTML = '';
+    let total = 0;
+
+    categories.forEach((cat) => {
+      const links = cat.links || [];
+      total += links.length;
+
+      const title = document.createElement('div');
+      title.className = 'admin-list-category-title';
+      title.textContent = `${cat.label} (${links.length})`;
+      linksList.appendChild(title);
+
+      if (links.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'empty-list-msg';
+        empty.textContent = 'Aucun lien dans cette catégorie.';
+        linksList.appendChild(empty);
+        return;
+      }
+
+      links.forEach((link) => {
+        const row = document.createElement('div');
+        row.className = 'admin-list-item';
+        row.innerHTML = `
+          <div class="admin-list-thumb"><i class="fa-solid ${link.icon || 'fa-link'}" style="color:var(--color-navy);"></i></div>
+          <div class="admin-list-info">
+            <strong>${link.title}</strong>
+            <span>${link.url}</span>
+          </div>
+          <div class="admin-list-actions">
+            <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        row.querySelector('.edit-btn').addEventListener('click', () => startEditLink(cat.id, link));
+        row.querySelector('.delete-btn').addEventListener('click', () => deleteLink(cat.id, link.id, link.title));
+        linksList.appendChild(row);
+      });
+    });
+
+    if (total === 0) {
+      linksList.innerHTML += '<p class="empty-list-msg">Aucun lien pour le moment.</p>';
+    }
+  }
+
+  function startEditLink(categoryId, link) {
+    document.getElementById('linkEditId').value = link.id;
+    document.getElementById('linkTitle').value = link.title || '';
+    linkCategorySelect.value = categoryId;
+    document.getElementById('linkUrl').value = link.url || '';
+    document.getElementById('linkDescription').value = link.description || '';
+    document.getElementById('linkIcon').value = link.icon || 'fa-link';
+    linkSaveLabel.textContent = 'Enregistrer les modifications';
+    linkCancelBtn.classList.remove('hidden');
+    document.getElementById('linkFormTitle').textContent = 'Modifier le lien';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetLinkForm() {
+    linkEditorForm.reset();
+    document.getElementById('linkEditId').value = '';
+    document.getElementById('linkIcon').value = 'fa-link';
+    linkSaveLabel.textContent = 'Ajouter le lien';
+    linkCancelBtn.classList.add('hidden');
+    document.getElementById('linkFormTitle').textContent = 'Ajouter un lien';
+  }
+
+  linkCancelBtn.addEventListener('click', resetLinkForm);
+
+  function generateLinkId(title, categories) {
+    const base = slugify(title) || 'lien';
+    const allIds = categories.flatMap((c) => (c.links || []).map((l) => l.id));
+    let id = base;
+    let counter = 2;
+    while (allIds.includes(id)) {
+      id = `${base}-${counter}`;
+      counter++;
+    }
+    return id;
+  }
+
+  linkEditorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('linkSaveBtn');
+    saveBtn.disabled = true;
+    setStatus(linkStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      if (!fileState[LINKS_PATH]) await readFile(LINKS_PATH);
+      const categories = fileState[LINKS_PATH].json.categories.map((c) =>
+        Object.assign({}, c, { links: (c.links || []).slice() })
+      );
+
+      const editingId = document.getElementById('linkEditId').value;
+      const targetCategoryId = linkCategorySelect.value;
+      const title = document.getElementById('linkTitle').value.trim();
+      const url = document.getElementById('linkUrl').value.trim();
+      const description = document.getElementById('linkDescription').value.trim();
+      const icon = document.getElementById('linkIcon').value.trim() || 'fa-link';
+
+      if (editingId) {
+        categories.forEach((c) => {
+          c.links = c.links.filter((l) => l.id !== editingId);
+        });
+      }
+
+      const id = editingId || generateLinkId(title, categories);
+      const linkEntry = { id, title, url, description, icon };
+
+      const targetCategory = categories.find((c) => c.id === targetCategoryId);
+      if (!targetCategory) throw new Error('Catégorie introuvable.');
+      targetCategory.links.push(linkEntry);
+
+      const updated = { categories };
+      const sha = fileState[LINKS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, LINKS_PATH, updated, sha,
+        editingId ? `Admin : modification du lien "${title}"` : `Admin : ajout du lien "${title}"`
+      );
+
+      fileState[LINKS_PATH] = { json: updated, sha: result.content.sha };
+      renderLinksAdmin(categories);
+      resetLinkForm();
+      setStatus(linkStatus, 'success', 'Enregistré ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
+    } catch (err) {
+      setStatus(linkStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  async function deleteLink(categoryId, linkId, title) {
+    if (!confirm(`Supprimer le lien "${title}" ?`)) return;
+
+    setStatus(linkStatus, 'loading', 'Suppression en cours…');
+    try {
+      if (!fileState[LINKS_PATH]) await readFile(LINKS_PATH);
+      const categories = fileState[LINKS_PATH].json.categories.map((c) => {
+        if (c.id !== categoryId) return c;
+        return Object.assign({}, c, { links: (c.links || []).filter((l) => l.id !== linkId) });
+      });
+
+      const updated = { categories };
+      const sha = fileState[LINKS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, LINKS_PATH, updated, sha, `Admin : suppression du lien "${title}"`);
+
+      fileState[LINKS_PATH] = { json: updated, sha: result.content.sha };
+      renderLinksAdmin(categories);
+      setStatus(linkStatus, 'success', 'Lien supprimé.');
+    } catch (err) {
+      setStatus(linkStatus, 'error', 'Erreur : ' + err.message);
+    }
+  }
+
+  /* --- Catégories --- */
+
+  document.getElementById('addLinkCategoryBtn').addEventListener('click', async () => {
+    const input = document.getElementById('newLinkCategoryLabel');
+    const label = input.value.trim();
+    if (!label) {
+      setStatus(linkCategoryStatus, 'error', 'Donne un nom à la catégorie avant de la créer.');
+      return;
+    }
+
+    setStatus(linkCategoryStatus, 'loading', 'Création en cours…');
+    try {
+      if (!fileState[LINKS_PATH]) await readFile(LINKS_PATH);
+      const categories = fileState[LINKS_PATH].json.categories.slice();
+      const id = generateLinkId(label, categories.map((c) => ({ links: [{ id: c.id }] })));
+      categories.push({ id, label, icon: 'fa-link', links: [] });
+
+      const updated = { categories };
+      const sha = fileState[LINKS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, LINKS_PATH, updated, sha, `Admin : création de la catégorie de liens "${label}"`);
+
+      fileState[LINKS_PATH] = { json: updated, sha: result.content.sha };
+      renderLinksAdmin(categories);
+      input.value = '';
+      setStatus(linkCategoryStatus, 'success', 'Catégorie créée !');
+    } catch (err) {
+      setStatus(linkCategoryStatus, 'error', 'Erreur : ' + err.message);
+    }
+  });
+
+  async function renameLinkCategory(id, currentLabel) {
+    const newLabel = prompt('Nouveau nom de la catégorie :', currentLabel);
+    if (!newLabel || !newLabel.trim() || newLabel.trim() === currentLabel) return;
+
+    setStatus(linkCategoryStatus, 'loading', 'Renommage en cours…');
+    try {
+      if (!fileState[LINKS_PATH]) await readFile(LINKS_PATH);
+      const categories = fileState[LINKS_PATH].json.categories.map((c) =>
+        c.id === id ? Object.assign({}, c, { label: newLabel.trim() }) : c
+      );
+
+      const updated = { categories };
+      const sha = fileState[LINKS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, LINKS_PATH, updated, sha, `Admin : renommage d'une catégorie de liens en "${newLabel.trim()}"`);
+
+      fileState[LINKS_PATH] = { json: updated, sha: result.content.sha };
+      renderLinksAdmin(categories);
+      setStatus(linkCategoryStatus, 'success', 'Catégorie renommée.');
+    } catch (err) {
+      setStatus(linkCategoryStatus, 'error', 'Erreur : ' + err.message);
+    }
+  }
+
+  async function deleteLinkCategory(id, label, linkCount) {
+    const message = linkCount > 0
+      ? `Supprimer la catégorie "${label}" ? Les ${linkCount} lien(s) qu'elle contient seront supprimés aussi.`
+      : `Supprimer la catégorie "${label}" ?`;
+    if (!confirm(message)) return;
+
+    setStatus(linkCategoryStatus, 'loading', 'Suppression en cours…');
+    try {
+      if (!fileState[LINKS_PATH]) await readFile(LINKS_PATH);
+      const categories = fileState[LINKS_PATH].json.categories.filter((c) => c.id !== id);
+
+      const updated = { categories };
+      const sha = fileState[LINKS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, LINKS_PATH, updated, sha, `Admin : suppression de la catégorie de liens "${label}"`);
+
+      fileState[LINKS_PATH] = { json: updated, sha: result.content.sha };
+      renderLinksAdmin(categories);
+      setStatus(linkCategoryStatus, 'success', 'Catégorie supprimée.');
+    } catch (err) {
+      setStatus(linkCategoryStatus, 'error', 'Erreur : ' + err.message);
     }
   }
 

@@ -87,6 +87,9 @@
         <li><button type="button" class="nav-btn" data-view="news">
           <i class="fa-solid fa-newspaper"></i> News
         </button></li>
+        <li><button type="button" class="nav-btn" data-view="links">
+          <i class="fa-solid fa-link"></i> Liens Utiles
+        </button></li>
       </ul>
     </nav>
 
@@ -565,6 +568,79 @@
 
             <div class="status-msg" id="newsEditorStatus"></div>
           </form>
+        </div>
+      </section>
+
+      <section class="admin-view" id="view-links">
+        <div class="view-header">
+          <h1>Liens Utiles</h1>
+          <p>Gère les liens affichés sur la page "Liens Utiles" du site, classés par catégorie.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-folder-plus"></i> Catégories</h2>
+          <div id="linkCategoriesList"></div>
+
+          <div class="form-row" style="margin-top:1.2rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="newLinkCategoryLabel">Nom de la nouvelle catégorie</label>
+              <input type="text" id="newLinkCategoryLabel" placeholder="Ex : Arbitrage">
+            </div>
+          </div>
+          <button type="button" class="btn btn-ghost" id="addLinkCategoryBtn" style="margin-top:0.8rem;">
+            <i class="fa-solid fa-plus"></i> Créer la catégorie
+          </button>
+          <div class="status-msg" id="linkCategoryStatus"></div>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-plus"></i> <span id="linkFormTitle">Ajouter un lien</span></h2>
+          <form id="linkEditorForm">
+            <input type="hidden" id="linkEditId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="linkTitle">Titre</label>
+                <input type="text" id="linkTitle" placeholder="Nom du site" required>
+              </div>
+              <div class="form-group">
+                <label for="linkCategory">Catégorie</label>
+                <select id="linkCategory" required></select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="linkUrl">Lien du site</label>
+              <input type="url" id="linkUrl" placeholder="https://..." required>
+            </div>
+
+            <div class="form-group">
+              <label for="linkDescription">Description</label>
+              <textarea id="linkDescription" rows="2" placeholder="Courte description du site"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="linkIcon">Icône (Font Awesome)</label>
+              <input type="text" id="linkIcon" placeholder="fa-link" value="fa-link">
+              <span class="form-hint">Nom de classe Font Awesome, sans le préfixe "fa-solid".</span>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center;">
+              <button type="submit" class="btn btn-primary" id="linkSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> <span id="linkSaveLabel">Ajouter le lien</span>
+              </button>
+              <button type="button" class="btn btn-ghost hidden" id="linkCancelBtn">Annuler la modification</button>
+            </div>
+
+            <div class="status-msg" id="linkStatus"></div>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Liens actuels</h2>
+          <div id="linksList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
         </div>
       </section>
 

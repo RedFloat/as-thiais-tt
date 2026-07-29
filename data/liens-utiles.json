@@ -1,0 +1,81 @@
+{
+  "categories": [
+    {
+      "id": "instances-officielles",
+      "label": "Instances officielles",
+      "icon": "fa-landmark",
+      "links": [
+        {
+          "id": "ville-thiais",
+          "title": "Ville de Thiais",
+          "description": "Le site officiel de la ville de Thiais, partenaire historique du club.",
+          "url": "https://www.ville-thiais.fr",
+          "icon": "fa-city"
+        },
+        {
+          "id": "cd94tt",
+          "title": "Comité du Val-de-Marne",
+          "description": "Le comité départemental de tennis de table du Val-de-Marne (CD94).",
+          "url": "https://www.cd94tt.com",
+          "icon": "fa-map"
+        },
+        {
+          "id": "fftt-idf",
+          "title": "Ligue Île-de-France",
+          "description": "Le site de la ligue régionale d'Île-de-France de tennis de table.",
+          "url": "https://www.fftt-idf.com",
+          "icon": "fa-flag"
+        },
+        {
+          "id": "fftt",
+          "title": "Fédération Française (FFTT)",
+          "description": "Le site officiel de la Fédération Française de Tennis de Table.",
+          "url": "https://www.fftt.com",
+          "icon": "fa-trophy"
+        }
+      ]
+    },
+    {
+      "id": "competition-resultats",
+      "label": "Compétition & résultats",
+      "icon": "fa-chart-line",
+      "links": [
+        {
+          "id": "tournois-tt",
+          "title": "Tournois en France",
+          "description": "Retrouvez tous les tournois de tennis de table organisés en France.",
+          "url": "https://tournois-tt.fr/",
+          "icon": "fa-table-tennis-paddle-ball"
+        },
+        {
+          "id": "pingpocket",
+          "title": "PingPocket",
+          "description": "Suivez vos résultats et statistiques de compétition en temps réel.",
+          "url": "https://www.pingpocket.fr",
+          "icon": "fa-chart-simple"
+        }
+      ]
+    },
+    {
+      "id": "materiel",
+      "label": "Matériel",
+      "icon": "fa-bag-shopping",
+      "links": [
+        {
+          "id": "revspin",
+          "title": "Revspin (Revues Plaques & Bois)",
+          "description": "Une revue complète en anglais des revêtements et bois de raquette.",
+          "url": "https://revspin.net/rubber/",
+          "icon": "fa-magnifying-glass"
+        },
+        {
+          "id": "friendship",
+          "title": "Friendship",
+          "description": "Achat de matériel de tennis de table chez Friendship.",
+          "url": "http://theo384.free.fr/",
+          "icon": "fa-store"
+        }
+      ]
+    }
+  ]
+}
