@@ -81,7 +81,15 @@
       "id": "arbitrage",
       "label": "Arbitrage",
       "icon": "fa-link",
-      "links": []
+      "links": [
+        {
+          "id": "sucy-ping",
+          "title": "Sucy Ping",
+          "url": "https://sucy-ping.fr",
+          "description": "Pour rejoindre le club de tennis de table de sucy",
+          "icon": "fa-link"
+        }
+      ]
     }
   ]
 }
