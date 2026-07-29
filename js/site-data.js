@@ -155,28 +155,24 @@
       img.src = sponsor.logo;
       img.alt = sponsor.name || '';
 
-      if (sponsor.link) {
-        const link = document.createElement('a');
-        link.href = sponsor.link;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.style.display = 'contents';
-        link.appendChild(img);
-        item.appendChild(link);
-      } else {
-        item.appendChild(img);
-      }
+      const link = document.createElement('a');
+      link.href = './sponsor.html?id=' + sponsor.id;
+      link.style.display = 'contents';
+      link.appendChild(img);
+      item.appendChild(link);
 
       mosaic.appendChild(item);
     });
 
     // Logo mis en avant, en rotation toutes les 3 secondes
+    const featuredName = document.getElementById('featuredPartnerName');
     if (featured && sponsors.length > 0) {
       let index = 0;
       const showSponsor = (i) => {
         featured.src = sponsors[i].logo;
         featured.alt = sponsors[i].name || '';
         featured.style.display = '';
+        if (featuredName) featuredName.textContent = sponsors[i].name || '';
       };
       showSponsor(index);
 
@@ -449,6 +445,73 @@
     const teams = await fetchAllTeams();
     if (showTeams) buildTeams(teams);
     if (showStandings) buildStandingsTable(teams);
+  }
+
+  /* ---------- Fiche sponsor individuelle (sponsor.html?id=...) ---------- */
+
+  function renderSponsorProfile(sponsor) {
+    document.getElementById('sponsorHeroTitle').textContent = sponsor.name;
+    document.getElementById('sponsorLogo').src = sponsor.logo;
+    document.getElementById('sponsorLogo').alt = sponsor.name;
+    document.getElementById('sponsorName').textContent = sponsor.name;
+    document.getElementById('sponsorDescription').textContent =
+      sponsor.description || 'Merci à ce partenaire pour son soutien au club !';
+
+    const linkWrap = document.getElementById('sponsorLinkWrap');
+    if (sponsor.link) {
+      linkWrap.innerHTML =
+        `<a href="${sponsor.link}" target="_blank" rel="noopener" class="btn-primary">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+        </a>`;
+    }
+
+    document.getElementById('sponsorNotFound').classList.add('hidden');
+    document.getElementById('sponsorCard').classList.remove('hidden');
+  }
+
+  async function initSponsorProfilePage() {
+    const title = document.getElementById('sponsorHeroTitle');
+    if (!title || !document.getElementById('sponsorCard')) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const sponsorId = params.get('id');
+
+    if (!sponsorId) {
+      document.getElementById('sponsorNotFound').classList.remove('hidden');
+      return;
+    }
+
+    const data = await loadJSON('./data/sponsors.json');
+    const sponsor = data && Array.isArray(data.sponsors)
+      ? data.sponsors.find((s) => s.id === sponsorId)
+      : null;
+
+    if (!sponsor) {
+      document.getElementById('sponsorNotFound').classList.remove('hidden');
+      return;
+    }
+
+    renderSponsorProfile(sponsor);
+  }
+
+  /* ---------- Rappel sponsors en pied de page (toutes pages sauf accueil) ---------- */
+
+  function buildSponsorsFooterReminder(data) {
+    const container = document.getElementById('sponsorsFooterReminder');
+    if (!container || !data || !Array.isArray(data.sponsors)) return;
+
+    container.innerHTML = data.sponsors.map((s) => `
+      <a href="./sponsor.html?id=${s.id}" class="sponsor-reminder-item" title="${s.name}">
+        <img src="${s.logo}" alt="${s.name}">
+      </a>
+    `).join('');
+  }
+
+  async function initSponsorsFooterReminder() {
+    const container = document.getElementById('sponsorsFooterReminder');
+    if (!container) return;
+    const data = await loadJSON('./data/sponsors.json');
+    buildSponsorsFooterReminder(data);
   }
 
   /* ---------- Fiche équipe individuelle (equipe.html?id=...) ---------- */
@@ -843,6 +906,8 @@
     initTeamProfilePage();
     initNewsArticlePage();
     initNewsListPage();
+    initSponsorProfilePage();
+    initSponsorsFooterReminder();
   }
 
   if (document.readyState === 'loading') {

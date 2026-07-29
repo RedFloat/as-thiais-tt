@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Actualités — AS Thiais Tennis de Table</title>
+  <title>Partenaire — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -750,6 +750,7 @@
       border: 1px solid #e2e8f0;
       border-radius: var(--radius-card);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 1.75rem;
@@ -781,6 +782,14 @@
     .partners-featured img.is-fading {
       opacity: 0;
       transform: scale(0.96);
+    }
+
+    .partners-featured-name {
+      margin-top: 0.9rem;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--color-navy);
+      text-align: center;
     }
 
     .partners-mosaic {
@@ -964,163 +973,79 @@
     }
 
     /* ==========================================================================
-       7. PAGE LISTE DES NEWS
+       7. PAGE FICHE SPONSOR
        ========================================================================== */
+    .hidden { display: none !important; }
+
     .page-hero {
       background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
       color: var(--color-white);
-      padding: 3rem 0;
+      padding: 2.5rem 0;
       text-align: center;
     }
 
     .page-hero .badge-gold {
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.12);
       border-color: var(--color-gold);
       color: var(--color-gold);
     }
 
     .page-hero h1 {
-      font-size: 2.2rem;
-      margin: 0.8rem 0 1rem;
-    }
-
-    .page-hero p {
-      max-width: 700px;
-      margin: 0 auto;
-      color: #cbd5e1;
-      font-size: 1rem;
-      line-height: 1.7;
+      font-size: 1.9rem;
+      margin: 0.7rem 0 0;
     }
 
     .page-content { padding: 3rem 0 3.5rem; }
 
-    .rss-link-bar {
+    .sponsor-not-found {
       text-align: center;
-      margin-bottom: 2rem;
+      padding: 4rem 1.5rem;
+      color: var(--color-text-muted);
     }
 
-    .rss-link-bar a {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
-      border: 1px solid var(--color-gold);
-      font-weight: 700;
-      font-size: 0.85rem;
-      padding: 0.5rem 1rem;
-      border-radius: 50px;
-      transition: var(--transition);
-    }
+    .sponsor-not-found i { font-size: 2.5rem; color: var(--color-gold); margin-bottom: 1rem; }
+    .sponsor-not-found h2 { color: var(--color-navy); margin-bottom: 0.6rem; }
 
-    .rss-link-bar a:hover { background: var(--color-gold); }
-
-    .news-season-filters {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.6rem;
-      margin-bottom: 2rem;
-    }
-
-    .season-filter-btn {
-      background: var(--color-white);
-      border: 1px solid #e2e8f0;
-      color: var(--color-navy);
-      font-weight: 700;
-      font-size: 0.82rem;
-      padding: 0.5rem 1.1rem;
-      border-radius: 50px;
-      transition: var(--transition);
-    }
-
-    .season-filter-btn:hover {
-      border-color: var(--color-gold);
-    }
-
-    .season-filter-btn.is-active {
-      background: var(--color-navy);
-      color: var(--color-white);
-      border-color: var(--color-navy);
-    }
-
-    .news-season-block { margin-bottom: 2.5rem; }
-    .news-season-block:last-child { margin-bottom: 0; }
-
-    .news-season-title {
-      color: var(--color-navy);
-      font-size: 1.15rem;
-      margin-bottom: 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding-bottom: 0.6rem;
-      border-bottom: 2px solid var(--color-gold-light);
-    }
-
-    .news-season-title i { color: var(--color-gold); }
-
-    .news-list-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
-    }
-
-    .news-list-card {
-      display: flex;
-      flex-direction: column;
+    .sponsor-card {
+      max-width: 560px;
+      margin: 0 auto;
       background: var(--color-white);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-subtle);
       border: 1px solid rgba(4, 74, 110, 0.06);
-      overflow: hidden;
-      transition: var(--transition);
+      padding: 2.5rem;
+      text-align: center;
     }
 
-    .news-list-card:hover {
-      box-shadow: var(--shadow-hover);
-      transform: translateY(-3px);
-    }
-
-    .news-list-card-img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
+    .sponsor-logo-wrap {
       background: var(--color-bg-light);
-      overflow: hidden;
-    }
-
-    .news-list-card-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .news-list-card-content {
-      padding: 1.1rem 1.25rem 1.25rem;
-      flex: 1;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-card);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 160px;
     }
 
-    .news-list-card-content h3 {
+    .sponsor-logo-wrap img {
+      max-width: 100%;
+      max-height: 160px;
+      object-fit: contain;
+    }
+
+    .sponsor-card h2 {
       color: var(--color-navy);
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+      margin-bottom: 0.9rem;
     }
 
-    .news-list-card-content p {
+    .sponsor-card p {
       color: var(--color-text-muted);
-      font-size: 0.85rem;
-      line-height: 1.5;
-      flex: 1;
-      margin-bottom: 0.8rem;
-    }
-
-    .news-list-card-date {
-      color: var(--color-gold);
-      font-size: 0.76rem;
-      font-weight: 700;
-      text-transform: uppercase;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
     }
 
     /* ---------- Rappel des partenaires (pied de page, ordinateur uniquement) ---------- */
@@ -1167,7 +1092,6 @@
       opacity: 1;
     }
   </style>
-  <link rel="alternate" type="application/rss+xml" title="Actualités AS Thiais Tennis de Table" href="./rss.xml">
 </head>
 <body>
 <header>
@@ -1205,15 +1129,12 @@
   </header>
 
   <!-- ==========================================
-     HERO ACTUALITÉS
+     HERO SPONSOR (rempli dynamiquement)
      ========================================== -->
   <section class="page-hero">
     <div class="container">
-      <span class="badge-gold">Actualités</span>
-      <h1>Toutes les Actualités</h1>
-      <p>
-        Retrouvez toutes les news du club, saison par saison.
-      </p>
+      <span class="badge-gold">Nos Partenaires</span>
+      <h1 id="sponsorHeroTitle">Chargement…</h1>
     </div>
   </section>
 
@@ -1223,16 +1144,19 @@
   <section class="page-content">
     <div class="container">
 
-      <div class="rss-link-bar">
-        <a href="./rss.xml" target="_blank" rel="noopener">
-          <i class="fa-solid fa-rss"></i> S'abonner au flux RSS
-        </a>
+      <div class="sponsor-not-found hidden" id="sponsorNotFound">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <h2>Partenaire introuvable</h2>
+        <p>Cette fiche partenaire n'existe pas ou n'est plus disponible.</p>
       </div>
 
-      <div class="news-season-filters" id="newsSeasonFilters"></div>
-
-      <div id="newsListContainer">
-        <p style="text-align:center; color:var(--color-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+      <div class="sponsor-card hidden" id="sponsorCard">
+        <div class="sponsor-logo-wrap">
+          <img id="sponsorLogo" src="" alt="">
+        </div>
+        <h2 id="sponsorName"></h2>
+        <p id="sponsorDescription"></p>
+        <div id="sponsorLinkWrap"></div>
       </div>
 
     </div>

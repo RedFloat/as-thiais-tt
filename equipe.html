@@ -1119,6 +1119,50 @@
     @media (max-width: 600px) {
       .players-grid { columns: 1; }
     }
+
+    /* ---------- Rappel des partenaires (pied de page, ordinateur uniquement) ---------- */
+    .sponsors-reminder-section {
+      display: none;
+      padding: 2rem 0;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    @media (min-width: 992px) {
+      .sponsors-reminder-section {
+        display: block;
+      }
+    }
+
+    .sponsors-reminder-title {
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .sponsors-reminder-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    .sponsor-reminder-item { display: block; }
+
+    .sponsor-reminder-item img {
+      height: 40px;
+      max-width: 110px;
+      object-fit: contain;
+      filter: grayscale(35%);
+      opacity: 0.8;
+      transition: var(--transition);
+    }
+
+    .sponsor-reminder-item:hover img {
+      filter: grayscale(0%);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -1222,7 +1266,14 @@
   </section>
 
 
-<footer>
+  <section class="sponsors-reminder-section container">
+    <p class="sponsors-reminder-title">Merci à nos partenaires, sans qui le club ne pourrait pas vivre :</p>
+    <div class="sponsors-reminder-strip" id="sponsorsFooterReminder">
+      <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
+    </div>
+  </section>
+
+  <footer>
     <div class="container">
       <div class="footer-flex">
         

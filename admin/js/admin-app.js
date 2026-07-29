@@ -402,6 +402,7 @@
           <span>${sponsor.link || 'Pas de lien renseigné'}</span>
         </div>
         <div class="admin-list-actions">
+          <a href="../sponsor.html?id=${sponsor.id}" target="_blank" rel="noopener" class="view-link-btn" title="Voir sa fiche"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
           <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
           <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
         </div>
@@ -439,6 +440,7 @@
     document.getElementById('sponsorName').value = sponsor.name || '';
     document.getElementById('sponsorLogo').value = sponsor.logo || '';
     document.getElementById('sponsorLink').value = sponsor.link || '';
+    document.getElementById('sponsorDescription').value = sponsor.description || '';
     sponsorSaveLabel.textContent = 'Enregistrer les modifications';
     sponsorCancelBtn.classList.remove('hidden');
     document.getElementById('sponsorFormTitle').textContent = 'Modifier le sponsor';
@@ -470,13 +472,14 @@
       const name = document.getElementById('sponsorName').value.trim();
       const logo = document.getElementById('sponsorLogo').value.trim();
       const link = document.getElementById('sponsorLink').value.trim();
+      const description = document.getElementById('sponsorDescription').value.trim();
 
       if (editingId) {
         const idx = sponsors.findIndex((s) => s.id === editingId);
-        if (idx !== -1) sponsors[idx] = { id: editingId, name, logo, link };
+        if (idx !== -1) sponsors[idx] = { id: editingId, name, logo, link, description };
       } else {
         const id = generateSponsorId(name, sponsors);
-        sponsors.push({ id, name, logo, link });
+        sponsors.push({ id, name, logo, link, description });
       }
 
       const updated = { sponsors };

@@ -518,7 +518,8 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   flex-shrink: 0;
 }
 
-.admin-list-actions button {
+.admin-list-actions button,
+.admin-list-actions .view-link-btn {
   width: 34px;
   height: 34px;
   border-radius: 8px;
@@ -526,9 +527,13 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   background: var(--color-white);
   color: var(--color-text-muted);
   transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.admin-list-actions button:hover { border-color: var(--color-navy); color: var(--color-navy); }
+.admin-list-actions button:hover,
+.admin-list-actions .view-link-btn:hover { border-color: var(--color-navy); color: var(--color-navy); }
 .admin-list-actions button.delete-btn:hover { border-color: var(--color-danger); color: var(--color-danger); }
 
 .empty-list-msg {
