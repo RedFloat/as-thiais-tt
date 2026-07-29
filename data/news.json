@@ -21,17 +21,6 @@
       "image": "./imgs/news/news-2-cover.jpg",
       "albumId": "",
       "date": "2026-05-05"
-    },
-    {
-      "id": "news-3",
-      "featured": true,
-      "season": "2026-2027",
-      "title": "TEST",
-      "excerpt": "TEST PHOTO",
-      "body": "TEST DATE ET PHOTO",
-      "image": "./imgs/news/news-3-cover.jpeg",
-      "albumId": "",
-      "date": "2026-07-28"
     }
   ]
 }
