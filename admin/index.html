@@ -270,9 +270,15 @@
                 <span class="form-hint">Chemin local (ex : ./docs/fichier.pdf) ou lien complet.</span>
               </div>
               <div class="form-group">
-                <label for="docIcon">Icône (Font Awesome)</label>
-                <input type="text" id="docIcon" placeholder="fa-file-lines" value="fa-file">
-                <span class="form-hint">Nom de classe Font Awesome, sans le préfixe "fa-solid".</span>
+                <label>Icône</label>
+                <div class="icon-picker" id="docIconPickerWrap">
+                  <button type="button" class="icon-picker-trigger" id="docIconTrigger">
+                    <i class="fa-solid fa-file" id="docIconPreview"></i>
+                    <span>Choisir une icône</span>
+                  </button>
+                  <input type="hidden" id="docIcon" value="fa-file">
+                  <div class="icon-picker-panel hidden" id="docIconPanel"></div>
+                </div>
               </div>
             </div>
 
@@ -626,9 +632,15 @@
             </div>
 
             <div class="form-group">
-              <label for="linkIcon">Icône (Font Awesome)</label>
-              <input type="text" id="linkIcon" placeholder="fa-link" value="fa-link">
-              <span class="form-hint">Nom de classe Font Awesome, sans le préfixe "fa-solid".</span>
+              <label>Icône</label>
+              <div class="icon-picker" id="linkIconPickerWrap">
+                <button type="button" class="icon-picker-trigger" id="linkIconTrigger">
+                  <i class="fa-solid fa-link" id="linkIconPreview"></i>
+                  <span>Choisir une icône</span>
+                </button>
+                <input type="hidden" id="linkIcon" value="fa-link">
+                <div class="icon-picker-panel hidden" id="linkIconPanel"></div>
+              </div>
             </div>
 
             <div style="display:flex; gap:0.7rem; align-items:center;">

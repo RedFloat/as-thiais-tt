@@ -129,6 +129,68 @@
     });
   });
 
+  /* ---------- Sélecteur d'icônes visuel (réutilisable) ---------- */
+
+  const ICON_CHOICES = [
+    'fa-file', 'fa-file-lines', 'fa-file-pdf', 'fa-file-word', 'fa-file-arrow-down',
+    'fa-folder', 'fa-folder-open', 'fa-calendar-days', 'fa-calendar-check', 'fa-file-medical',
+    'fa-stethoscope', 'fa-id-card', 'fa-link', 'fa-globe', 'fa-city',
+    'fa-map', 'fa-flag', 'fa-trophy', 'fa-chart-line', 'fa-chart-simple',
+    'fa-table-tennis-paddle-ball', 'fa-bag-shopping', 'fa-store', 'fa-magnifying-glass', 'fa-house',
+    'fa-users', 'fa-people-group', 'fa-envelope', 'fa-phone', 'fa-newspaper',
+    'fa-book', 'fa-graduation-cap', 'fa-heart', 'fa-star', 'fa-gear',
+    'fa-circle-info', 'fa-triangle-exclamation', 'fa-download', 'fa-upload', 'fa-image',
+    'fa-video', 'fa-music', 'fa-handshake', 'fa-gavel', 'fa-scale-balanced',
+    'fa-clipboard', 'fa-clipboard-list', 'fa-list', 'fa-location-dot'
+  ];
+
+  function setupIconPicker(inputId, triggerId, previewId, panelId) {
+    const input = document.getElementById(inputId);
+    const trigger = document.getElementById(triggerId);
+    const preview = document.getElementById(previewId);
+    const panel = document.getElementById(panelId);
+
+    panel.innerHTML = ICON_CHOICES.map((ic) =>
+      `<button type="button" class="icon-choice" data-icon="${ic}" title="${ic}"><i class="fa-solid ${ic}"></i></button>`
+    ).join('');
+
+    function refresh() {
+      const current = input.value || ICON_CHOICES[0];
+      preview.className = 'fa-solid ' + current;
+      panel.querySelectorAll('.icon-choice').forEach((btn) => {
+        btn.classList.toggle('is-selected', btn.dataset.icon === current);
+      });
+    }
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.icon-picker-panel').forEach((p) => {
+        if (p !== panel) p.classList.add('hidden');
+      });
+      panel.classList.toggle('hidden');
+    });
+
+    panel.querySelectorAll('.icon-choice').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        input.value = btn.dataset.icon;
+        refresh();
+        panel.classList.add('hidden');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!panel.contains(e.target) && e.target !== trigger && !trigger.contains(e.target)) {
+        panel.classList.add('hidden');
+      }
+    });
+
+    refresh();
+    return refresh;
+  }
+
+  const refreshDocIconPreview = setupIconPicker('docIcon', 'docIconTrigger', 'docIconPreview', 'docIconPanel');
+  const refreshLinkIconPreview = setupIconPicker('linkIcon', 'linkIconTrigger', 'linkIconPreview', 'linkIconPanel');
+
   /* ---------- Aide : lecture avec cache ---------- */
 
   async function readFile(path) {
@@ -609,6 +671,7 @@
     document.getElementById('docDescription').value = doc.description || '';
     document.getElementById('docFile').value = doc.file || '';
     document.getElementById('docIcon').value = doc.icon || 'fa-file';
+    refreshDocIconPreview();
     document.getElementById('docExpiration').value = doc.expirationDate || '';
     docSaveLabel.textContent = 'Enregistrer les modifications';
     docCancelBtn.classList.remove('hidden');
@@ -620,6 +683,7 @@
     docForm.reset();
     document.getElementById('docId').value = '';
     document.getElementById('docIcon').value = 'fa-file';
+    refreshDocIconPreview();
     docSaveLabel.textContent = 'Ajouter le document';
     docCancelBtn.classList.add('hidden');
     document.getElementById('docFormTitle').textContent = 'Ajouter un document';
@@ -1884,6 +1948,7 @@ ${items}
     document.getElementById('linkUrl').value = link.url || '';
     document.getElementById('linkDescription').value = link.description || '';
     document.getElementById('linkIcon').value = link.icon || 'fa-link';
+    refreshLinkIconPreview();
     linkSaveLabel.textContent = 'Enregistrer les modifications';
     linkCancelBtn.classList.remove('hidden');
     document.getElementById('linkFormTitle').textContent = 'Modifier le lien';
@@ -1894,6 +1959,7 @@ ${items}
     linkEditorForm.reset();
     document.getElementById('linkEditId').value = '';
     document.getElementById('linkIcon').value = 'fa-link';
+    refreshLinkIconPreview();
     linkSaveLabel.textContent = 'Ajouter le lien';
     linkCancelBtn.classList.add('hidden');
     document.getElementById('linkFormTitle').textContent = 'Ajouter un lien';
