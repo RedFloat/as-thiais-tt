@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AS Thiais Tennis de Table — Site Officiel</title>
+  <title>Album Photo — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -971,14 +971,186 @@
       .footer-contact-block { text-align: center; }
       .footer-contact-block h4 { justify-content: center; }
     }
+
+    /* ==========================================================================
+       7. PAGE ALBUM (détail)
+       ========================================================================== */
+    .hidden { display: none !important; }
+
+    .page-hero {
+      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
+      color: var(--color-white);
+      padding: 2.5rem 0;
+      text-align: center;
+    }
+
+    .page-hero .badge-gold {
+      background: rgba(255,255,255,0.12);
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+
+    .page-hero h1 {
+      font-size: 1.9rem;
+      margin: 0.7rem 0 0.4rem;
+    }
+
+    .page-hero .album-date {
+      color: #cbd5e1;
+      font-size: 0.9rem;
+    }
+
+    .page-content { padding: 3rem 0 3.5rem; }
+
+    .album-not-found {
+      text-align: center;
+      padding: 4rem 1.5rem;
+      color: var(--color-text-muted);
+    }
+
+    .album-not-found i { font-size: 2.5rem; color: var(--color-gold); margin-bottom: 1rem; }
+    .album-not-found h2 { color: var(--color-navy); margin-bottom: 0.6rem; }
+
+    .album-description {
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .album-photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.9rem;
+    }
+
+    .album-photo-grid img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      cursor: zoom-in;
+      transition: var(--transition);
+    }
+
+    .album-photo-grid img:hover {
+      box-shadow: var(--shadow-hover);
+      transform: scale(1.02);
+    }
+
+    /* ---------- Visionneuse plein écran ---------- */
+
+    .photo-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 12, 20, 0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .photo-lightbox.is-open { display: flex; }
+
+    .photo-lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .photo-lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: var(--color-white);
+      font-size: 1.3rem;
+      transition: var(--transition);
+    }
+
+    .photo-lightbox-close:hover {
+      background: var(--color-gold);
+      color: var(--color-navy-dark);
+    }
+
+    .photo-lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: var(--color-white);
+      font-size: 1.2rem;
+      transition: var(--transition);
+    }
+
+    .photo-lightbox-nav:hover { background: var(--color-gold); color: var(--color-navy-dark); }
+    .photo-lightbox-prev { left: 1.5rem; }
+    .photo-lightbox-next { right: 1.5rem; }
+
+    @media (max-width: 600px) {
+      .photo-lightbox-nav { display: none; }
+    }
+
+    /* ---------- Rappel des partenaires (pied de page, ordinateur uniquement) ---------- */
+    .sponsors-reminder-section {
+      display: none;
+      padding: 2rem 0;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    @media (min-width: 992px) {
+      .sponsors-reminder-section {
+        display: block;
+      }
+    }
+
+    .sponsors-reminder-title {
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .sponsors-reminder-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    .sponsor-reminder-item { display: block; }
+
+    .sponsor-reminder-item img {
+      height: 40px;
+      max-width: 110px;
+      object-fit: contain;
+      filter: grayscale(35%);
+      opacity: 0.8;
+      transition: var(--transition);
+    }
+
+    .sponsor-reminder-item:hover img {
+      filter: grayscale(0%);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
-
-  <!-- ==========================================
-     HEADER : LOGO + BANDEAU DE NAVIGATION PC
-     ========================================== -->
-  <header>
+<header>
     <!-- Niveau 1 : Logo & Titre -->
     <div class="header-top container">
       <a href="./index.html" class="logo">
@@ -1013,154 +1185,60 @@
   </header>
 
   <!-- ==========================================
-     1. CARROUSEL NEWS
+     HERO ALBUM (rempli dynamiquement)
      ========================================== -->
-  <section class="featured-news-section container">
-    <div class="news-wrapper">
-      <div class="news-carousel-container" id="carouselContainer">
-        <div class="news-track" id="newsTrack">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/news.json -->
-        </div>
-      </div>
-
-      <div class="carousel-dots" id="carouselDots"></div>
-
-      <div class="all-news-btn-container">
-        <a href="#" class="btn-primary" style="background: transparent; border: 2px solid var(--color-navy); color: var(--color-navy);">
-          Voir tous les articles <i class="fa-solid fa-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================
-     2. LES 12 ÉQUIPES DU CLUB
-     ========================================== -->
-  <section class="teams-section container" id="teamsSection">
-    <div class="section-title">
-      <span class="badge-gold" data-season-badge>Saison 2026-2027</span>
-      <h2 id="teamsSectionTitle">Les <span id="teamsCount">12</span> Équipes du Club</h2>
-    </div>
-
-    <div class="teams-grid" id="teamsGrid">
-      <!-- Généré dynamiquement par js/site-data.js depuis data/teams/*.json -->
-    </div>
-  </section>
-
-  <!-- ==========================================
-     2bis. CLASSEMENT DE FIN DE PHASE
-     ========================================== -->
-  <section class="standings-section container" id="standingsSection">
-    <div class="section-title">
-      <span class="badge-gold">Fin de phase</span>
-      <h2>Classement des Équipes</h2>
-    </div>
-    <div class="standings-table-wrap">
-      <table class="standings-table">
-        <thead>
-          <tr>
-            <th>Équipe</th>
-            <th>Division</th>
-            <th>Classement</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody id="standingsTableBody">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/teams/*.json -->
-        </tbody>
-      </table>
-    </div>
-  </section>
-  <!-- ==========================================
-     3. WIDGETS
-     ========================================== -->
-  <section class="widgets-section container">
-    <div class="widgets-grid">
-      
-      <!-- Galerie Photos -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-camera"></i> Galerie Photos</h3>
-        <div class="photo-mini-grid" id="photoGalleryWidget">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/albums.json -->
-        </div>
-      </div>
-
-      <!-- Calendrier -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-calendar-days"></i> Prochains Événements</h3>
-        <ul class="event-list-mini">
-          <li>
-            <div class="event-date-badge">
-              <div class="day">25</div>
-              <div class="month">Sep</div>
-            </div>
-            <div>
-              <strong>J1 Championnat de Paris</strong>
-              <div style="font-size:0.8rem; color:var(--color-text-muted);">Toutes équipes</div>
-            </div>
-          </li>
-          <li>
-            <div class="event-date-badge">
-              <div class="day">10</div>
-              <div class="month">Oct</div>
-            </div>
-            <div>
-              <strong>Critérium Fédéral (Tour 1)</strong>
-              <div style="font-size:0.8rem; color:var(--color-text-muted);">Individuels</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Anniversaires -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-cake-candles"></i> Anniversaires du Mois</h3>
-        <div class="birthday-card">
-          <div class="birthday-avatar">LM</div>
-          <div>
-            <strong>Lucas Martin</strong>
-            <div style="font-size:0.8rem; color:var(--color-text-muted);">Aujourd'hui ! 🎂</div>
-          </div>
-        </div>
-        <div class="birthday-card">
-          <div class="birthday-avatar">SD</div>
-          <div>
-            <strong>Sophie Dubois</strong>
-            <div style="font-size:0.8rem; color:var(--color-text-muted);">28 Septembre</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ==========================================
-     PARTENAIRES
-     ========================================== -->
-  <section class="partners-section">
+  <section class="page-hero" id="albumHero">
     <div class="container">
-      <div class="section-title">
-        <span class="badge-gold">Merci à eux</span>
-        <h2>Nos Partenaires</h2>
-      </div>
-      <div class="partners-content">
-        <!-- Logo mis en avant, change automatiquement toutes les 3 secondes -->
-        <div class="partners-featured">
-          <img id="featuredPartnerLogo" src="" alt="" style="display:none;">
-          <div class="partners-featured-name" id="featuredPartnerName"></div>
-        </div>
-
-        <!-- Mosaïque avec l'ensemble des partenaires -->
-        <div class="partners-mosaic" id="partnersMosaic">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
-        </div>
-      </div>
+      <span class="badge-gold">Album Photo</span>
+      <h1 id="albumHeroTitle">Chargement…</h1>
+      <p class="album-date" id="albumHeroDate"></p>
     </div>
   </section>
 
   <!-- ==========================================
-     FOOTER RÉAGENCÉ AVEC BLOC CONTACT
+     CONTENU PRINCIPAL
      ========================================== -->
+  <section class="page-content">
+    <div class="container">
+
+      <div class="album-not-found hidden" id="albumNotFound">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <h2>Album introuvable</h2>
+        <p>Cet album n'existe pas ou n'est plus disponible.</p>
+      </div>
+
+      <div id="albumPageBody" class="hidden">
+        <p class="album-description hidden" id="albumDescriptionText"></p>
+        <div class="album-photo-grid" id="albumPhotoGrid"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+     VISIONNEUSE PLEIN ÉCRAN
+     ========================================== -->
+  <div class="photo-lightbox" id="photoLightbox">
+    <button type="button" class="photo-lightbox-close" id="photoLightboxClose" aria-label="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <button type="button" class="photo-lightbox-nav photo-lightbox-prev" id="photoLightboxPrev" aria-label="Photo précédente">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <img id="photoLightboxImg" src="" alt="">
+    <button type="button" class="photo-lightbox-nav photo-lightbox-next" id="photoLightboxNext" aria-label="Photo suivante">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
+
+
+  <section class="sponsors-reminder-section container">
+    <p class="sponsors-reminder-title">Merci à nos partenaires, sans qui le club ne pourrait pas vivre :</p>
+    <div class="sponsors-reminder-strip" id="sponsorsFooterReminder">
+      <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
+    </div>
+  </section>
+
   <footer>
     <div class="container">
       <div class="footer-flex">
@@ -1207,10 +1285,7 @@
     </div>
   </footer>
 
-  <!-- ==========================================
-     SCRIPTS : NAVIGATION & CARROUSEL
-     ========================================== -->
-  <script src="./js/site-data.js"></script>
+<script src="./js/site-data.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Note : les sponsors (mosaïque + logo mis en avant) sont gérés par

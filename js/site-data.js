@@ -447,6 +447,179 @@
     if (showStandings) buildStandingsTable(teams);
   }
 
+  /* ---------- Widget "Galerie Photos" (accueil) — 4 photos aléatoires ---------- */
+
+  function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function buildPhotoGalleryWidget(albums) {
+    const widget = document.getElementById('photoGalleryWidget');
+    if (!widget) return;
+
+    const allPhotos = [];
+    (albums || []).forEach((album) => {
+      (album.photos || []).forEach((src) => {
+        allPhotos.push({ src, albumId: album.id });
+      });
+    });
+
+    if (allPhotos.length === 0) {
+      widget.innerHTML = '<p style="grid-column:1/-1; color:var(--color-text-muted); font-size:0.85rem;">Aucune photo pour le moment.</p>';
+      return;
+    }
+
+    const picked = shuffleArray(allPhotos).slice(0, 4);
+    widget.innerHTML = picked.map((p) =>
+      `<a href="./album.html?id=${p.albumId}" class="photo-item" style="display:block; background-image:url('${p.src}');"></a>`
+    ).join('');
+  }
+
+  async function initPhotoGalleryWidget() {
+    const widget = document.getElementById('photoGalleryWidget');
+    if (!widget) return;
+    const data = await loadJSON('./data/albums.json');
+    buildPhotoGalleryWidget(data ? data.albums : []);
+  }
+
+  /* ---------- Liste des albums (albums.html) ---------- */
+
+  function buildAlbumsListPage(albums) {
+    const grid = document.getElementById('albumsGrid');
+    if (!grid) return;
+
+    if (!albums || albums.length === 0) {
+      grid.innerHTML = '<p style="text-align:center; color:var(--color-text-muted); grid-column:1/-1;">Aucun album pour le moment.</p>';
+      return;
+    }
+
+    const sorted = albums.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    grid.innerHTML = sorted.map((album) => {
+      const cover = (album.photos || [])[0];
+      const count = (album.photos || []).length;
+      return `
+        <a href="./album.html?id=${album.id}" class="album-card">
+          <div class="album-card-cover">
+            ${cover ? `<img src="${cover}" alt="${album.title}">` : '<i class="fa-solid fa-images"></i>'}
+          </div>
+          <div class="album-card-content">
+            <h3>${album.title}</h3>
+            <div class="album-card-meta">
+              <span>${formatDateFRLong(album.date)}</span>
+              <span class="photo-count">${count} photo${count > 1 ? 's' : ''}</span>
+            </div>
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  async function initAlbumsListPage() {
+    const grid = document.getElementById('albumsGrid');
+    if (!grid) return;
+    const data = await loadJSON('./data/albums.json');
+    buildAlbumsListPage(data ? data.albums : []);
+  }
+
+  /* ---------- Détail d'un album (album.html?id=...) + visionneuse ---------- */
+
+  let lightboxPhotos = [];
+  let lightboxIndex = 0;
+
+  function openLightbox(photos, index) {
+    lightboxPhotos = photos;
+    lightboxIndex = index;
+    const lightbox = document.getElementById('photoLightbox');
+    document.getElementById('photoLightboxImg').src = lightboxPhotos[lightboxIndex];
+    lightbox.classList.add('is-open');
+  }
+
+  function closeLightbox() {
+    document.getElementById('photoLightbox').classList.remove('is-open');
+  }
+
+  function showLightboxPhoto(delta) {
+    lightboxIndex = (lightboxIndex + delta + lightboxPhotos.length) % lightboxPhotos.length;
+    document.getElementById('photoLightboxImg').src = lightboxPhotos[lightboxIndex];
+  }
+
+  function setupLightbox() {
+    const lightbox = document.getElementById('photoLightbox');
+    if (!lightbox) return;
+
+    document.getElementById('photoLightboxClose').addEventListener('click', closeLightbox);
+    document.getElementById('photoLightboxPrev').addEventListener('click', () => showLightboxPhoto(-1));
+    document.getElementById('photoLightboxNext').addEventListener('click', () => showLightboxPhoto(1));
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') showLightboxPhoto(-1);
+      if (e.key === 'ArrowRight') showLightboxPhoto(1);
+    });
+  }
+
+  function renderAlbumProfile(album) {
+    document.getElementById('albumHeroTitle').textContent = album.title;
+    document.getElementById('albumHeroDate').textContent = formatDateFRLong(album.date);
+
+    const descEl = document.getElementById('albumDescriptionText');
+    if (album.description) {
+      descEl.textContent = album.description;
+      descEl.classList.remove('hidden');
+    }
+
+    const photos = album.photos || [];
+    const photoGrid = document.getElementById('albumPhotoGrid');
+    photoGrid.innerHTML = photos.length > 0
+      ? photos.map((src, i) => `<img src="${src}" alt="${album.title}" data-index="${i}">`).join('')
+      : '<p style="color:var(--color-text-muted); grid-column:1/-1; text-align:center;">Aucune photo dans cet album pour le moment.</p>';
+
+    photoGrid.querySelectorAll('img').forEach((img) => {
+      img.addEventListener('click', () => openLightbox(photos, parseInt(img.dataset.index, 10)));
+    });
+
+    document.getElementById('albumNotFound').classList.add('hidden');
+    document.getElementById('albumPageBody').classList.remove('hidden');
+  }
+
+  async function initAlbumProfilePage() {
+    const hero = document.getElementById('albumHero');
+    if (!hero || !document.getElementById('albumPageBody')) return;
+
+    setupLightbox();
+
+    const params = new URLSearchParams(window.location.search);
+    const albumId = params.get('id');
+
+    if (!albumId) {
+      document.getElementById('albumNotFound').classList.remove('hidden');
+      return;
+    }
+
+    const data = await loadJSON('./data/albums.json');
+    const album = data && Array.isArray(data.albums)
+      ? data.albums.find((a) => a.id === albumId)
+      : null;
+
+    if (!album) {
+      document.getElementById('albumNotFound').classList.remove('hidden');
+      return;
+    }
+
+    renderAlbumProfile(album);
+  }
+
   /* ---------- Fiche sponsor individuelle (sponsor.html?id=...) ---------- */
 
   function renderSponsorProfile(sponsor) {
@@ -766,6 +939,9 @@
           '<h2 style="color:var(--color-navy); margin-bottom:1rem;"><i class="fa-solid fa-images" style="color:var(--color-gold);"></i> ' + album.title + '</h2>' +
           '<div class="article-album-grid">' +
           album.photos.map((src) => `<img src="${src}" alt="${album.title}">`).join('') +
+          '</div>' +
+          '<div style="text-align:center; margin-top:1.2rem;">' +
+          '<a href="./album.html?id=' + album.id + '" class="btn-primary"><i class="fa-solid fa-up-right-and-down-left-from-center"></i> Voir l\'album complet</a>' +
           '</div>';
       }
     }
@@ -908,6 +1084,9 @@
     initNewsListPage();
     initSponsorProfilePage();
     initSponsorsFooterReminder();
+    initAlbumsListPage();
+    initAlbumProfilePage();
+    initPhotoGalleryWidget();
   }
 
   if (document.readyState === 'loading') {

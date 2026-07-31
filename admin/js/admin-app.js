@@ -126,6 +126,7 @@
       if (btn.dataset.view === 'teams') loadTeamsView();
       if (btn.dataset.view === 'news') loadNewsView();
       if (btn.dataset.view === 'links') loadLinksView();
+      if (btn.dataset.view === 'albums') loadAlbumsView();
     });
   });
 
@@ -2125,6 +2126,311 @@ ${items}
       setStatus(linkCategoryStatus, 'success', 'Catégorie supprimée.');
     } catch (err) {
       setStatus(linkCategoryStatus, 'error', 'Erreur : ' + err.message);
+    }
+  }
+
+  /* ---------- Albums photo ---------- */
+
+  const albumsList = document.getElementById('albumsList');
+  const albumEditorCard = document.getElementById('albumEditorCard');
+  const albumEditorForm = document.getElementById('albumEditorForm');
+  const albumEditorStatus = document.getElementById('albumEditorStatus');
+  const albumPhotosSection = document.getElementById('albumPhotosSection');
+  const albumPhotosInput = document.getElementById('albumPhotosInput');
+  const albumPhotosStatus = document.getElementById('albumPhotosStatus');
+  const albumPhotosGrid = document.getElementById('albumPhotosGrid');
+  const albumSaveLabel = document.getElementById('albumSaveLabel');
+
+  let currentAlbumsList = [];
+
+  async function loadAlbumsView() {
+    albumsList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(ALBUMS_PATH);
+      currentAlbumsList = data.albums || [];
+      renderAlbumsList(currentAlbumsList);
+    } catch (err) {
+      albumsList.innerHTML = '';
+      albumsList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les albums', [err.message]));
+    }
+  }
+
+  function renderAlbumsList(albums) {
+    albumsList.innerHTML = '';
+    if (albums.length === 0) {
+      albumsList.innerHTML = '<p class="empty-list-msg">Aucun album pour le moment.</p>';
+      return;
+    }
+
+    const sorted = albums.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    sorted.forEach((album) => {
+      const cover = (album.photos || [])[0];
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      row.innerHTML = `
+        ${cover
+          ? `<img class="album-cover-thumb" src="${adminAssetPath(cover)}" alt="">`
+          : `<div class="admin-list-thumb"><i class="fa-solid fa-images" style="color:var(--color-navy);"></i></div>`}
+        <div class="admin-list-info">
+          <strong>${album.title}</strong>
+          <span>${(album.photos || []).length} photo(s) — ${album.date || ''}</span>
+        </div>
+        <div class="admin-list-actions">
+          <a href="../albums.html" target="_blank" rel="noopener" class="view-link-btn" title="Voir la page albums"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+      row.querySelector('.edit-btn').addEventListener('click', () => openAlbumEditor(album));
+      row.querySelector('.delete-btn').addEventListener('click', () => deleteAlbum(album.id, album.title));
+      albumsList.appendChild(row);
+    });
+  }
+
+  function generateAlbumId(title, albums) {
+    const base = slugify(title) || 'album';
+    const allIds = albums.map((a) => a.id);
+    let id = base;
+    let counter = 2;
+    while (allIds.includes(id)) {
+      id = `${base}-${counter}`;
+      counter++;
+    }
+    return id;
+  }
+
+  function renderAlbumPhotosGrid(photos) {
+    albumPhotosGrid.innerHTML = '';
+    (photos || []).forEach((photoPath, index) => {
+      const item = document.createElement('div');
+      item.className = 'album-photo-item';
+      item.innerHTML = `
+        <img src="${adminAssetPath(photoPath)}" alt="">
+        <button type="button" class="remove-photo-btn" title="Supprimer cette photo"><i class="fa-solid fa-xmark"></i></button>
+      `;
+      item.querySelector('.remove-photo-btn').addEventListener('click', () => removeAlbumPhoto(index));
+      albumPhotosGrid.appendChild(item);
+    });
+  }
+
+  function openAlbumEditor(album) {
+    albumEditorForm.reset();
+    albumPhotosGrid.innerHTML = '';
+    hideStatus(albumEditorStatus);
+    hideStatus(albumPhotosStatus);
+
+    if (album) {
+      document.getElementById('albumEditId').value = album.id;
+      document.getElementById('albumTitle').value = album.title || '';
+      document.getElementById('albumDate').value = album.date || '';
+      document.getElementById('albumDescription').value = album.description || '';
+      albumSaveLabel.textContent = 'Enregistrer les modifications';
+      document.getElementById('albumEditorTitle').textContent = 'Modifier l\'album';
+      albumPhotosSection.classList.remove('hidden');
+      renderAlbumPhotosGrid(album.photos || []);
+    } else {
+      document.getElementById('albumEditId').value = '';
+      document.getElementById('albumDate').value = new Date().toISOString().slice(0, 10);
+      albumSaveLabel.textContent = 'Créer l\'album';
+      document.getElementById('albumEditorTitle').textContent = 'Créer un album';
+      albumPhotosSection.classList.add('hidden');
+    }
+
+    albumEditorCard.classList.remove('hidden');
+    albumEditorCard.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  document.getElementById('addAlbumBtn').addEventListener('click', () => openAlbumEditor(null));
+  document.getElementById('albumEditorCancelBtn').addEventListener('click', () => {
+    albumEditorCard.classList.add('hidden');
+  });
+
+  albumEditorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('albumSaveBtn');
+    saveBtn.disabled = true;
+    setStatus(albumEditorStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      if (!fileState[ALBUMS_PATH]) await readFile(ALBUMS_PATH);
+      const albums = fileState[ALBUMS_PATH].json.albums.slice();
+
+      const editingId = document.getElementById('albumEditId').value;
+      const title = document.getElementById('albumTitle').value.trim();
+      const date = document.getElementById('albumDate').value;
+      const description = document.getElementById('albumDescription').value.trim();
+
+      let updatedAlbums;
+      let savedAlbum;
+
+      if (editingId) {
+        updatedAlbums = albums.map((a) => {
+          if (a.id !== editingId) return a;
+          savedAlbum = Object.assign({}, a, { title, date, description });
+          return savedAlbum;
+        });
+      } else {
+        const id = generateAlbumId(title, albums);
+        savedAlbum = { id, title, date, description, photos: [] };
+        updatedAlbums = albums.concat(savedAlbum);
+      }
+
+      const updated = { albums: updatedAlbums };
+      const sha = fileState[ALBUMS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, ALBUMS_PATH, updated, sha,
+        editingId ? `Admin : modification de l'album "${title}"` : `Admin : création de l'album "${title}"`
+      );
+
+      fileState[ALBUMS_PATH] = { json: updated, sha: result.content.sha };
+      currentAlbumsList = updatedAlbums;
+      renderAlbumsList(updatedAlbums);
+
+      // Révèle / met à jour la section photos une fois l'album créé
+      document.getElementById('albumEditId').value = savedAlbum.id;
+      albumSaveLabel.textContent = 'Enregistrer les modifications';
+      document.getElementById('albumEditorTitle').textContent = 'Modifier l\'album';
+      albumPhotosSection.classList.remove('hidden');
+      renderAlbumPhotosGrid(savedAlbum.photos || []);
+
+      setStatus(albumEditorStatus, 'success', 'Album enregistré ! Tu peux maintenant ajouter des photos ci-dessous.');
+    } catch (err) {
+      setStatus(albumEditorStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  /* --- Upload de photos (plusieurs à la fois) --- */
+
+  albumPhotosInput.addEventListener('change', async () => {
+    const files = Array.from(albumPhotosInput.files || []);
+    if (files.length === 0) return;
+
+    const albumId = document.getElementById('albumEditId').value;
+    if (!albumId) return;
+
+    setStatus(albumPhotosStatus, 'loading', `Envoi de ${files.length} photo(s)…`);
+
+    try {
+      if (!fileState[ALBUMS_PATH]) await readFile(ALBUMS_PATH);
+      const albums = fileState[ALBUMS_PATH].json.albums.slice();
+      const albumIndex = albums.findIndex((a) => a.id === albumId);
+      if (albumIndex === -1) throw new Error('Album introuvable.');
+
+      const newPhotoPaths = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        const path = `imgs/albums/${albumId}/${Date.now()}-${i}.${ext}`;
+        setStatus(albumPhotosStatus, 'loading', `Envoi de la photo ${i + 1} / ${files.length}…`);
+        await GitHubAPI.uploadFile(cfg, path, file, `Admin : ajout d'une photo à l'album "${albums[albumIndex].title}"`);
+        newPhotoPaths.push('./' + path);
+      }
+
+      const updatedAlbum = Object.assign({}, albums[albumIndex], {
+        photos: (albums[albumIndex].photos || []).concat(newPhotoPaths)
+      });
+      albums[albumIndex] = updatedAlbum;
+
+      const updated = { albums };
+      const sha = fileState[ALBUMS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, ALBUMS_PATH, updated, sha, `Admin : ajout de photos à l'album "${updatedAlbum.title}"`);
+      fileState[ALBUMS_PATH] = { json: updated, sha: result.content.sha };
+
+      currentAlbumsList = albums;
+      renderAlbumsList(albums);
+      renderAlbumPhotosGrid(updatedAlbum.photos);
+      setStatus(albumPhotosStatus, 'success', `${files.length} photo(s) ajoutée(s) !`);
+    } catch (err) {
+      setStatus(albumPhotosStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      albumPhotosInput.value = '';
+    }
+  });
+
+  /* --- Suppression d'une photo individuelle --- */
+
+  async function removeAlbumPhoto(index) {
+    if (!confirm('Supprimer cette photo ? Elle sera aussi retirée de GitHub.')) return;
+
+    const albumId = document.getElementById('albumEditId').value;
+    setStatus(albumPhotosStatus, 'loading', 'Suppression en cours…');
+
+    try {
+      if (!fileState[ALBUMS_PATH]) await readFile(ALBUMS_PATH);
+      const albums = fileState[ALBUMS_PATH].json.albums.slice();
+      const albumIndex = albums.findIndex((a) => a.id === albumId);
+      if (albumIndex === -1) throw new Error('Album introuvable.');
+
+      const photoToRemove = (albums[albumIndex].photos || [])[index];
+      const updatedPhotos = (albums[albumIndex].photos || []).filter((_, i) => i !== index);
+      albums[albumIndex] = Object.assign({}, albums[albumIndex], { photos: updatedPhotos });
+
+      const updated = { albums };
+      const sha = fileState[ALBUMS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, ALBUMS_PATH, updated, sha, `Admin : suppression d'une photo d'album`);
+      fileState[ALBUMS_PATH] = { json: updated, sha: result.content.sha };
+
+      if (photoToRemove) {
+        await deleteFileIfExists(toRepoPath(photoToRemove));
+      }
+
+      currentAlbumsList = albums;
+      renderAlbumsList(albums);
+      renderAlbumPhotosGrid(updatedPhotos);
+      setStatus(albumPhotosStatus, 'success', 'Photo supprimée.');
+    } catch (err) {
+      setStatus(albumPhotosStatus, 'error', 'Erreur : ' + err.message);
+    }
+  }
+
+  /* --- Suppression d'un album entier --- */
+
+  async function deleteAlbum(id, title) {
+    if (!confirm(`Supprimer l'album "${title}" ? Toutes ses photos seront aussi supprimées de GitHub. Cette action est immédiate.`)) return;
+
+    try {
+      if (!fileState[ALBUMS_PATH]) await readFile(ALBUMS_PATH);
+      const albumToDelete = fileState[ALBUMS_PATH].json.albums.find((a) => a.id === id);
+      const updatedAlbums = fileState[ALBUMS_PATH].json.albums.filter((a) => a.id !== id);
+
+      const updated = { albums: updatedAlbums };
+      const sha = fileState[ALBUMS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, ALBUMS_PATH, updated, sha, `Admin : suppression de l'album "${title}"`);
+      fileState[ALBUMS_PATH] = { json: updated, sha: result.content.sha };
+
+      // Nettoyage de toutes les photos de l'album
+      if (albumToDelete) {
+        for (const photoPath of (albumToDelete.photos || [])) {
+          await deleteFileIfExists(toRepoPath(photoPath));
+        }
+      }
+
+      // Retire la référence à cet album dans les news qui le pointaient
+      try {
+        if (!fileState[NEWS_PATH]) await readFile(NEWS_PATH);
+        const affectedNews = fileState[NEWS_PATH].json.news.filter((n) => n.albumId === id);
+        if (affectedNews.length > 0) {
+          const updatedNews = fileState[NEWS_PATH].json.news.map((n) =>
+            n.albumId === id ? Object.assign({}, n, { albumId: '' }) : n
+          );
+          const newsSha = fileState[NEWS_PATH].sha;
+          const newsResult = await GitHubAPI.saveJSON(
+            cfg, NEWS_PATH, { news: updatedNews }, newsSha, `Admin : retrait des références à l'album supprimé "${title}"`
+          );
+          fileState[NEWS_PATH] = { json: { news: updatedNews }, sha: newsResult.content.sha };
+        }
+      } catch (e) {
+        console.warn('Impossible de nettoyer les références news à cet album :', e.message);
+      }
+
+      currentAlbumsList = updatedAlbums;
+      renderAlbumsList(updatedAlbums);
+      albumEditorCard.classList.add('hidden');
+    } catch (err) {
+      alert('Erreur lors de la suppression : ' + err.message);
     }
   }
 

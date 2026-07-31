@@ -829,6 +829,52 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   background: var(--color-gold-light);
 }
 
+/* ---------- Albums photo ---------- */
+
+.album-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.7rem;
+}
+
+.album-photo-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  aspect-ratio: 1 / 1;
+}
+
+.album-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.album-photo-item .remove-photo-btn {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.9);
+  color: var(--color-white);
+  border: none;
+  font-size: 0.8rem;
+}
+
+.album-photo-item .remove-photo-btn:hover { background: var(--color-danger); }
+
+.album-cover-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--color-bg-light);
+  border: 1px solid #e2e8f0;
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {

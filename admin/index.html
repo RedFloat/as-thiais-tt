@@ -90,6 +90,9 @@
         <li><button type="button" class="nav-btn" data-view="links">
           <i class="fa-solid fa-link"></i> Liens Utiles
         </button></li>
+        <li><button type="button" class="nav-btn" data-view="albums">
+          <i class="fa-solid fa-images"></i> Albums Photo
+        </button></li>
       </ul>
     </nav>
 
@@ -658,6 +661,65 @@
           <h2><i class="fa-solid fa-list"></i> Liens actuels</h2>
           <div id="linksList">
             <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-view" id="view-albums">
+        <div class="view-header">
+          <h1>Albums Photo</h1>
+          <p>Crée des albums et uploade des photos, directement affichés sur la page "Albums Photos" du site.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Albums</h2>
+          <button type="button" class="btn btn-primary" id="addAlbumBtn" style="margin-bottom:1rem;">
+            <i class="fa-solid fa-plus"></i> Créer un album
+          </button>
+          <div id="albumsList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+
+        <div class="admin-card hidden" id="albumEditorCard">
+          <h2><i class="fa-solid fa-pen"></i> <span id="albumEditorTitle">Créer un album</span></h2>
+          <form id="albumEditorForm">
+            <input type="hidden" id="albumEditId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="albumTitle">Titre de l'album</label>
+                <input type="text" id="albumTitle" placeholder="Fête du club 2026" required>
+              </div>
+              <div class="form-group">
+                <label for="albumDate">Date</label>
+                <input type="date" id="albumDate" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="albumDescription">Description (facultatif)</label>
+              <textarea id="albumDescription" rows="2" placeholder="Quelques mots sur cet album"></textarea>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center;">
+              <button type="submit" class="btn btn-primary" id="albumSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> <span id="albumSaveLabel">Créer l'album</span>
+              </button>
+              <button type="button" class="btn btn-ghost" id="albumEditorCancelBtn">Annuler</button>
+            </div>
+
+            <div class="status-msg" id="albumEditorStatus"></div>
+          </form>
+
+          <div id="albumPhotosSection" class="hidden" style="margin-top:1.75rem; padding-top:1.5rem; border-top:1px dashed #e2e8f0;">
+            <h2 style="color:var(--color-navy); font-size:1.05rem; margin-bottom:1rem;">
+              <i class="fa-solid fa-images" style="color:var(--color-gold);"></i> Photos de l'album
+            </h2>
+            <input type="file" id="albumPhotosInput" accept="image/*" multiple>
+            <span class="form-hint">Tu peux sélectionner plusieurs photos à la fois.</span>
+            <div class="status-msg" id="albumPhotosStatus"></div>
+            <div class="album-photos-grid" id="albumPhotosGrid" style="margin-top:1rem;"></div>
           </div>
         </div>
       </section>
