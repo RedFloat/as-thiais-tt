@@ -1,3 +1,36 @@
 {
-  "albums": []
+  "albums": [
+    {
+      "id": "championnat-du-monde-veterans-2026",
+      "title": "Championnat du monde Vétérans 2026",
+      "date": "2026-06-26",
+      "description": "",
+      "photos": [
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482028032-0.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482030251-1.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482032310-2.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482034241-3.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482036190-4.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482038038-5.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482039877-6.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482041813-7.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482043625-8.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482045406-9.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482047485-10.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482049578-11.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482051666-12.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482053388-13.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482055952-14.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482058209-15.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482060664-16.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482062713-17.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482065169-18.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482067221-19.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482069366-20.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482071312-21.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482073228-22.jpg",
+        "./imgs/albums/championnat-du-monde-veterans-2026/1785482075254-23.jpg"
+      ]
+    }
+  ]
 }
