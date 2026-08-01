@@ -127,6 +127,7 @@
       if (btn.dataset.view === 'news') loadNewsView();
       if (btn.dataset.view === 'links') loadLinksView();
       if (btn.dataset.view === 'albums') loadAlbumsView();
+      if (btn.dataset.view === 'videos') loadVideosView();
     });
   });
 
@@ -337,6 +338,24 @@
   const settingsStatus = document.getElementById('settingsStatus');
   const socialsForm = document.getElementById('socialsForm');
   const socialsStatus = document.getElementById('socialsStatus');
+  const logoForm = document.getElementById('logoForm');
+  const logoStatus = document.getElementById('logoStatus');
+  const logoInput = document.getElementById('logoInput');
+  const logoPreviewWrap = document.getElementById('logoPreviewWrap');
+
+  let pendingLogoFile = null;
+  let currentLogoPath = '';
+
+  logoInput.addEventListener('change', () => {
+    const file = logoInput.files[0];
+    if (!file) return;
+    pendingLogoFile = file;
+    const reader = new FileReader();
+    reader.onload = () => {
+      logoPreviewWrap.innerHTML = `<img class="logo-preview" src="${reader.result}" alt="">`;
+    };
+    reader.readAsDataURL(file);
+  });
 
   async function loadSettingsView() {
     setStatus(settingsStatus, 'loading', 'Chargement…');
@@ -346,12 +365,57 @@
       document.getElementById('settingsCalendarUrl').value = config.calendarEmbedUrl || '';
       document.getElementById('settingsFacebook').value = config.facebookUrl || '';
       document.getElementById('settingsInstagram').value = config.instagramUrl || '';
+      currentLogoPath = config.logoUrl || '';
+      if (currentLogoPath) {
+        logoPreviewWrap.innerHTML = `<img class="logo-preview" src="${adminAssetPath(currentLogoPath)}" alt="">`;
+      }
       hideStatus(settingsStatus);
       hideStatus(socialsStatus);
+      hideStatus(logoStatus);
     } catch (err) {
       setStatus(settingsStatus, 'error', 'Erreur de chargement : ' + err.message);
     }
   }
+
+  logoForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!pendingLogoFile) {
+      setStatus(logoStatus, 'error', 'Choisis d\'abord une image avant d\'enregistrer.');
+      return;
+    }
+
+    const saveBtn = document.getElementById('logoSaveBtn');
+    saveBtn.disabled = true;
+    setStatus(logoStatus, 'loading', 'Envoi du logo en cours…');
+
+    try {
+      const ext = (pendingLogoFile.name.split('.').pop() || 'png').toLowerCase();
+      const path = `imgs/logo.${ext}`;
+      await GitHubAPI.uploadFile(cfg, path, pendingLogoFile, 'Admin : mise à jour du logo du club');
+      const logoUrl = './' + path;
+
+      // Si l'ancien logo avait une extension différente, on nettoie le fichier devenu inutile
+      if (currentLogoPath && currentLogoPath.includes('imgs/logo.') && toRepoPath(currentLogoPath) !== path) {
+        await deleteFileIfExists(toRepoPath(currentLogoPath));
+      }
+
+      const settingsPath = 'data/site-config.json';
+      if (!fileState[settingsPath]) await readFile(settingsPath);
+      const current = fileState[settingsPath].json;
+      const updated = Object.assign({}, current, { logoUrl });
+      const sha = fileState[settingsPath].sha;
+      const result = await GitHubAPI.saveJSON(cfg, settingsPath, updated, sha, 'Admin : mise à jour du logo du club');
+      fileState[settingsPath] = { json: updated, sha: result.content.sha };
+
+      currentLogoPath = logoUrl;
+      pendingLogoFile = null;
+      setStatus(logoStatus, 'success', 'Logo mis à jour ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
+    } catch (err) {
+      setStatus(logoStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
 
   settingsForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -2431,6 +2495,180 @@ ${items}
       albumEditorCard.classList.add('hidden');
     } catch (err) {
       alert('Erreur lors de la suppression : ' + err.message);
+    }
+  }
+
+  /* ---------- Galerie Vidéo ---------- */
+
+  const VIDEOS_PATH = 'data/videos.json';
+
+  const videosList = document.getElementById('videosList');
+  const videoStatus = document.getElementById('videoStatus');
+  const videoEditorForm = document.getElementById('videoEditorForm');
+  const videoCancelBtn = document.getElementById('videoCancelBtn');
+  const videoSaveLabel = document.getElementById('videoSaveLabel');
+
+  function parseVideoUrl(url) {
+    if (!url) return null;
+    let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{6,})/);
+    if (m) {
+      return {
+        provider: 'youtube',
+        thumbnail: `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg`,
+        embedUrl: `https://www.youtube.com/embed/${m[1]}`
+      };
+    }
+    m = url.match(/vimeo\.com\/(\d+)/);
+    if (m) {
+      return {
+        provider: 'vimeo',
+        thumbnail: '',
+        embedUrl: `https://player.vimeo.com/video/${m[1]}`
+      };
+    }
+    return null;
+  }
+
+  async function loadVideosView() {
+    videosList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(VIDEOS_PATH);
+      renderVideosList(data.videos || []);
+    } catch (err) {
+      videosList.innerHTML = '';
+      videosList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les vidéos', [err.message]));
+    }
+  }
+
+  function renderVideosList(videos) {
+    videosList.innerHTML = '';
+    if (videos.length === 0) {
+      videosList.innerHTML = '<p class="empty-list-msg">Aucune vidéo pour le moment.</p>';
+      return;
+    }
+
+    const sorted = videos.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    sorted.forEach((video) => {
+      const parsed = parseVideoUrl(video.url);
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      row.innerHTML = `
+        ${parsed && parsed.thumbnail
+          ? `<img class="team-row-thumb" src="${parsed.thumbnail}" alt="">`
+          : `<div class="admin-list-thumb"><i class="fa-solid fa-video" style="color:var(--color-navy);"></i></div>`}
+        <div class="admin-list-info">
+          <strong>${video.title}</strong>
+          <span>${video.date || ''}</span>
+        </div>
+        <div class="admin-list-actions">
+          <a href="${video.url}" target="_blank" rel="noopener" class="view-link-btn" title="Voir sur YouTube/Vimeo"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+      row.querySelector('.edit-btn').addEventListener('click', () => startEditVideo(video));
+      row.querySelector('.delete-btn').addEventListener('click', () => deleteVideo(video.id, video.title));
+      videosList.appendChild(row);
+    });
+  }
+
+  function generateVideoId(title, videos) {
+    const base = slugify(title) || 'video';
+    const allIds = videos.map((v) => v.id);
+    let id = base;
+    let counter = 2;
+    while (allIds.includes(id)) {
+      id = `${base}-${counter}`;
+      counter++;
+    }
+    return id;
+  }
+
+  function startEditVideo(video) {
+    document.getElementById('videoEditId').value = video.id;
+    document.getElementById('videoTitle').value = video.title || '';
+    document.getElementById('videoDate').value = video.date || '';
+    document.getElementById('videoUrl').value = video.url || '';
+    videoSaveLabel.textContent = 'Enregistrer les modifications';
+    videoCancelBtn.classList.remove('hidden');
+    document.getElementById('videoFormTitle').textContent = 'Modifier la vidéo';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetVideoForm() {
+    videoEditorForm.reset();
+    document.getElementById('videoEditId').value = '';
+    document.getElementById('videoDate').value = new Date().toISOString().slice(0, 10);
+    videoSaveLabel.textContent = 'Ajouter la vidéo';
+    videoCancelBtn.classList.add('hidden');
+    document.getElementById('videoFormTitle').textContent = 'Ajouter une vidéo';
+  }
+
+  videoCancelBtn.addEventListener('click', resetVideoForm);
+  resetVideoForm();
+
+  videoEditorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('videoSaveBtn');
+    const url = document.getElementById('videoUrl').value.trim();
+
+    if (!parseVideoUrl(url)) {
+      setStatus(videoStatus, 'error', 'Ce lien ne semble pas être une vidéo YouTube ou Vimeo valide.');
+      return;
+    }
+
+    saveBtn.disabled = true;
+    setStatus(videoStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      if (!fileState[VIDEOS_PATH]) await readFile(VIDEOS_PATH);
+      const videos = fileState[VIDEOS_PATH].json.videos.slice();
+
+      const editingId = document.getElementById('videoEditId').value;
+      const title = document.getElementById('videoTitle').value.trim();
+      const date = document.getElementById('videoDate').value;
+
+      const entry = { id: editingId || generateVideoId(title, videos), title, date, url };
+      const updatedVideos = editingId
+        ? videos.map((v) => (v.id === editingId ? entry : v))
+        : videos.concat(entry);
+
+      const updated = { videos: updatedVideos };
+      const sha = fileState[VIDEOS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, VIDEOS_PATH, updated, sha,
+        editingId ? `Admin : modification de la vidéo "${title}"` : `Admin : ajout de la vidéo "${title}"`
+      );
+
+      fileState[VIDEOS_PATH] = { json: updated, sha: result.content.sha };
+      renderVideosList(updatedVideos);
+      resetVideoForm();
+      setStatus(videoStatus, 'success', 'Enregistré ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
+    } catch (err) {
+      setStatus(videoStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  async function deleteVideo(id, title) {
+    if (!confirm(`Supprimer la vidéo "${title}" ?`)) return;
+
+    setStatus(videoStatus, 'loading', 'Suppression en cours…');
+    try {
+      if (!fileState[VIDEOS_PATH]) await readFile(VIDEOS_PATH);
+      const updatedVideos = fileState[VIDEOS_PATH].json.videos.filter((v) => v.id !== id);
+
+      const updated = { videos: updatedVideos };
+      const sha = fileState[VIDEOS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, VIDEOS_PATH, updated, sha, `Admin : suppression de la vidéo "${title}"`);
+
+      fileState[VIDEOS_PATH] = { json: updated, sha: result.content.sha };
+      renderVideosList(updatedVideos);
+      setStatus(videoStatus, 'success', 'Vidéo supprimée.');
+    } catch (err) {
+      setStatus(videoStatus, 'error', 'Erreur : ' + err.message);
     }
   }
 

@@ -49,6 +49,18 @@
     });
   }
 
+  /* ---------- Logo du club (en-tête + favicon) ---------- */
+
+  function applyLogo(config) {
+    if (!config || !config.logoUrl) return;
+
+    const logoImg = document.getElementById('siteLogoImg');
+    if (logoImg) logoImg.src = config.logoUrl;
+
+    const favicon = document.getElementById('faviconLink');
+    if (favicon) favicon.href = config.logoUrl;
+  }
+
   /* ---------- Réseaux sociaux ---------- */
 
   function applySocialLinks(config) {
@@ -445,6 +457,127 @@
     const teams = await fetchAllTeams();
     if (showTeams) buildTeams(teams);
     if (showStandings) buildStandingsTable(teams);
+  }
+
+  /* ---------- Vidéos : utilitaire commun ---------- */
+
+  function parseVideoUrl(url) {
+    if (!url) return null;
+    let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{6,})/);
+    if (m) {
+      return {
+        provider: 'youtube',
+        thumbnail: `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg`,
+        embedUrl: `https://www.youtube.com/embed/${m[1]}`
+      };
+    }
+    m = url.match(/vimeo\.com\/(\d+)/);
+    if (m) {
+      return {
+        provider: 'vimeo',
+        thumbnail: '',
+        embedUrl: `https://player.vimeo.com/video/${m[1]}`
+      };
+    }
+    return null;
+  }
+
+  /* ---------- Widget "Galerie Vidéo" (accueil) — 4 vidéos aléatoires ---------- */
+
+  function buildVideoGalleryWidget(videos) {
+    const widget = document.getElementById('videoGalleryWidget');
+    if (!widget) return;
+
+    if (!videos || videos.length === 0) {
+      widget.innerHTML = '<p style="grid-column:1/-1; color:var(--color-text-muted); font-size:0.85rem;">Aucune vidéo pour le moment.</p>';
+      return;
+    }
+
+    const picked = shuffleArray(videos).slice(0, 4);
+    widget.innerHTML = picked.map((v) => {
+      const parsed = parseVideoUrl(v.url);
+      const thumb = parsed && parsed.thumbnail ? parsed.thumbnail : '';
+      return `<a href="./videos.html" class="photo-item video-mini-item" style="display:flex; background-image:url('${thumb}');">
+        <i class="fa-solid fa-play"></i>
+      </a>`;
+    }).join('');
+  }
+
+  async function initVideoGalleryWidget() {
+    const widget = document.getElementById('videoGalleryWidget');
+    if (!widget) return;
+    const data = await loadJSON('./data/videos.json');
+    buildVideoGalleryWidget(data ? data.videos : []);
+  }
+
+  /* ---------- Liste des vidéos (videos.html) + lecteur plein écran ---------- */
+
+  function setupVideoLightbox() {
+    const lightbox = document.getElementById('videoLightbox');
+    if (!lightbox) return;
+
+    document.getElementById('videoLightboxClose').addEventListener('click', closeVideoLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeVideoLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (lightbox.classList.contains('is-open') && e.key === 'Escape') closeVideoLightbox();
+    });
+  }
+
+  function openVideoLightbox(embedUrl) {
+    const lightbox = document.getElementById('videoLightbox');
+    document.getElementById('videoLightboxFrame').src = embedUrl + '?autoplay=1';
+    lightbox.classList.add('is-open');
+  }
+
+  function closeVideoLightbox() {
+    const lightbox = document.getElementById('videoLightbox');
+    lightbox.classList.remove('is-open');
+    document.getElementById('videoLightboxFrame').src = '';
+  }
+
+  function buildVideosListPage(videos) {
+    const grid = document.getElementById('videosGrid');
+    if (!grid) return;
+
+    if (!videos || videos.length === 0) {
+      grid.innerHTML = '<p style="text-align:center; color:var(--color-text-muted); grid-column:1/-1;">Aucune vidéo pour le moment.</p>';
+      return;
+    }
+
+    const sorted = videos.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    grid.innerHTML = sorted.map((video) => {
+      const parsed = parseVideoUrl(video.url);
+      return `
+        <div class="video-card" data-embed="${parsed ? parsed.embedUrl : ''}">
+          <div class="video-card-thumb">
+            ${parsed && parsed.thumbnail ? `<img src="${parsed.thumbnail}" alt="${video.title}">` : ''}
+            <div class="play-icon"><i class="fa-solid fa-play"></i></div>
+          </div>
+          <div class="video-card-content">
+            <h3>${video.title}</h3>
+            <span>${formatDateFRLong(video.date)}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    grid.querySelectorAll('.video-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const embedUrl = card.dataset.embed;
+        if (embedUrl) openVideoLightbox(embedUrl);
+      });
+    });
+  }
+
+  async function initVideosListPage() {
+    const grid = document.getElementById('videosGrid');
+    if (!grid) return;
+    setupVideoLightbox();
+    const data = await loadJSON('./data/videos.json');
+    buildVideosListPage(data ? data.videos : []);
   }
 
   /* ---------- Widget "Galerie Photos" (accueil) — 4 photos aléatoires ---------- */
@@ -1072,6 +1205,7 @@
 
     applySeason(config);
     applyCalendarEmbed(config);
+    applyLogo(config);
     applySocialLinks(config);
     buildNavigation(nav);
     buildSponsors(sponsors);
@@ -1087,6 +1221,8 @@
     initAlbumsListPage();
     initAlbumProfilePage();
     initPhotoGalleryWidget();
+    initVideoGalleryWidget();
+    initVideosListPage();
   }
 
   if (document.readyState === 'loading') {

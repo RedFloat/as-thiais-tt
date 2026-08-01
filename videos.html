@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AS Thiais Tennis de Table — Site Officiel</title>
+  <title>Albums Vidéos — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -685,24 +685,6 @@
       background-position: center;
     }
 
-    .video-mini-item {
-      background-color: var(--color-navy-dark);
-      align-items: center;
-      justify-content: center;
-    }
-
-    .video-mini-item i {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.9);
-      color: var(--color-navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-    }
-
     .event-list-mini li {
       padding: 0.6rem 0;
       border-bottom: 1px dashed #e2e8f0;
@@ -989,15 +971,218 @@
       .footer-contact-block { text-align: center; }
       .footer-contact-block h4 { justify-content: center; }
     }
+
+    /* ==========================================================================
+       7. PAGE ALBUMS VIDÉOS
+       ========================================================================== */
+    .hidden { display: none !important; }
+
+    .page-hero {
+      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
+      color: var(--color-white);
+      padding: 3rem 0;
+      text-align: center;
+    }
+
+    .page-hero .badge-gold {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+
+    .page-hero h1 {
+      font-size: 2.2rem;
+      margin: 0.8rem 0 1rem;
+    }
+
+    .page-hero p {
+      max-width: 700px;
+      margin: 0 auto;
+      color: #cbd5e1;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .page-content { padding: 3rem 0 3.5rem; }
+
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .video-card {
+      background: var(--color-white);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(4, 74, 110, 0.06);
+      overflow: hidden;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .video-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+    }
+
+    .video-card-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--color-navy-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-card-thumb .play-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 44, 67, 0.25);
+    }
+
+    .video-card-thumb .play-icon i {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      color: var(--color-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      transition: var(--transition);
+    }
+
+    .video-card:hover .play-icon i {
+      background: var(--color-gold);
+      color: var(--color-navy-dark);
+    }
+
+    .video-card-content {
+      padding: 1.1rem 1.25rem 1.25rem;
+    }
+
+    .video-card-content h3 {
+      color: var(--color-navy);
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .video-card-content span {
+      color: var(--color-text-muted);
+      font-size: 0.78rem;
+    }
+
+    /* ---------- Lecteur plein écran ---------- */
+
+    .video-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 12, 20, 0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .video-lightbox.is-open { display: flex; }
+
+    .video-lightbox-frame-wrap {
+      width: 100%;
+      max-width: 900px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .video-lightbox-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: var(--color-white);
+      font-size: 1.3rem;
+      transition: var(--transition);
+    }
+
+    .video-lightbox-close:hover {
+      background: var(--color-gold);
+      color: var(--color-navy-dark);
+    }
+
+    /* ---------- Rappel des partenaires (pied de page, ordinateur uniquement) ---------- */
+    .sponsors-reminder-section {
+      display: none;
+      padding: 2rem 0;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    @media (min-width: 992px) {
+      .sponsors-reminder-section {
+        display: block;
+      }
+    }
+
+    .sponsors-reminder-title {
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .sponsors-reminder-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    .sponsor-reminder-item { display: block; }
+
+    .sponsor-reminder-item img {
+      height: 40px;
+      max-width: 110px;
+      object-fit: contain;
+      filter: grayscale(35%);
+      opacity: 0.8;
+      transition: var(--transition);
+    }
+
+    .sponsor-reminder-item:hover img {
+      filter: grayscale(0%);
+      opacity: 1;
+    }
   </style>
   <link rel="icon" id="faviconLink" href="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg">
 </head>
 <body>
-
-  <!-- ==========================================
-     HEADER : LOGO + BANDEAU DE NAVIGATION PC
-     ========================================== -->
-  <header>
+<header>
     <!-- Niveau 1 : Logo & Titre -->
     <div class="header-top container">
       <a href="./index.html" class="logo">
@@ -1032,162 +1217,51 @@
   </header>
 
   <!-- ==========================================
-     1. CARROUSEL NEWS
+     HERO ALBUMS VIDÉOS
      ========================================== -->
-  <section class="featured-news-section container">
-    <div class="news-wrapper">
-      <div class="news-carousel-container" id="carouselContainer">
-        <div class="news-track" id="newsTrack">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/news.json -->
-        </div>
-      </div>
-
-      <div class="carousel-dots" id="carouselDots"></div>
-
-      <div class="all-news-btn-container">
-        <a href="#" class="btn-primary" style="background: transparent; border: 2px solid var(--color-navy); color: var(--color-navy);">
-          Voir tous les articles <i class="fa-solid fa-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================
-     2. LES 12 ÉQUIPES DU CLUB
-     ========================================== -->
-  <section class="teams-section container" id="teamsSection">
-    <div class="section-title">
-      <span class="badge-gold" data-season-badge>Saison 2026-2027</span>
-      <h2 id="teamsSectionTitle">Les <span id="teamsCount">12</span> Équipes du Club</h2>
-    </div>
-
-    <div class="teams-grid" id="teamsGrid">
-      <!-- Généré dynamiquement par js/site-data.js depuis data/teams/*.json -->
-    </div>
-  </section>
-
-  <!-- ==========================================
-     2bis. CLASSEMENT DE FIN DE PHASE
-     ========================================== -->
-  <section class="standings-section container" id="standingsSection">
-    <div class="section-title">
-      <span class="badge-gold">Fin de phase</span>
-      <h2>Classement des Équipes</h2>
-    </div>
-    <div class="standings-table-wrap">
-      <table class="standings-table">
-        <thead>
-          <tr>
-            <th>Équipe</th>
-            <th>Division</th>
-            <th>Classement</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody id="standingsTableBody">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/teams/*.json -->
-        </tbody>
-      </table>
-    </div>
-  </section>
-  <!-- ==========================================
-     3. WIDGETS
-     ========================================== -->
-  <section class="widgets-section container">
-    <div class="widgets-grid">
-      
-      <!-- Galerie Photos -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-camera"></i> Galerie Photos</h3>
-        <div class="photo-mini-grid" id="photoGalleryWidget">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/albums.json -->
-        </div>
-      </div>
-
-      <!-- Galerie Vidéo -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-video"></i> Galerie Vidéo</h3>
-        <div class="photo-mini-grid" id="videoGalleryWidget">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/videos.json -->
-        </div>
-      </div>
-
-      <!-- Calendrier -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-calendar-days"></i> Prochains Événements</h3>
-        <ul class="event-list-mini">
-          <li>
-            <div class="event-date-badge">
-              <div class="day">25</div>
-              <div class="month">Sep</div>
-            </div>
-            <div>
-              <strong>J1 Championnat de Paris</strong>
-              <div style="font-size:0.8rem; color:var(--color-text-muted);">Toutes équipes</div>
-            </div>
-          </li>
-          <li>
-            <div class="event-date-badge">
-              <div class="day">10</div>
-              <div class="month">Oct</div>
-            </div>
-            <div>
-              <strong>Critérium Fédéral (Tour 1)</strong>
-              <div style="font-size:0.8rem; color:var(--color-text-muted);">Individuels</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Anniversaires -->
-      <div class="widget-box">
-        <h3><i class="fa-solid fa-cake-candles"></i> Anniversaires du Mois</h3>
-        <div class="birthday-card">
-          <div class="birthday-avatar">LM</div>
-          <div>
-            <strong>Lucas Martin</strong>
-            <div style="font-size:0.8rem; color:var(--color-text-muted);">Aujourd'hui ! 🎂</div>
-          </div>
-        </div>
-        <div class="birthday-card">
-          <div class="birthday-avatar">SD</div>
-          <div>
-            <strong>Sophie Dubois</strong>
-            <div style="font-size:0.8rem; color:var(--color-text-muted);">28 Septembre</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ==========================================
-     PARTENAIRES
-     ========================================== -->
-  <section class="partners-section">
+  <section class="page-hero">
     <div class="container">
-      <div class="section-title">
-        <span class="badge-gold">Merci à eux</span>
-        <h2>Nos Partenaires</h2>
-      </div>
-      <div class="partners-content">
-        <!-- Logo mis en avant, change automatiquement toutes les 3 secondes -->
-        <div class="partners-featured">
-          <img id="featuredPartnerLogo" src="" alt="" style="display:none;">
-          <div class="partners-featured-name" id="featuredPartnerName"></div>
-        </div>
-
-        <!-- Mosaïque avec l'ensemble des partenaires -->
-        <div class="partners-mosaic" id="partnersMosaic">
-          <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
-        </div>
-      </div>
+      <span class="badge-gold">Vie du Club</span>
+      <h1>Albums Vidéos</h1>
+      <p>
+        Retrouvez les vidéos des matchs, tournois et moments forts du club.
+      </p>
     </div>
   </section>
 
   <!-- ==========================================
-     FOOTER RÉAGENCÉ AVEC BLOC CONTACT
+     CONTENU PRINCIPAL
      ========================================== -->
+  <section class="page-content">
+    <div class="container">
+
+      <div class="videos-grid" id="videosGrid">
+        <p style="text-align:center; color:var(--color-text-muted); grid-column:1/-1;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+     LECTEUR PLEIN ÉCRAN
+     ========================================== -->
+  <div class="video-lightbox" id="videoLightbox">
+    <button type="button" class="video-lightbox-close" id="videoLightboxClose" aria-label="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="video-lightbox-frame-wrap">
+      <iframe id="videoLightboxFrame" src="" title="Lecteur vidéo" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+
+  <section class="sponsors-reminder-section container">
+    <p class="sponsors-reminder-title">Merci à nos partenaires, sans qui le club ne pourrait pas vivre :</p>
+    <div class="sponsors-reminder-strip" id="sponsorsFooterReminder">
+      <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
+    </div>
+  </section>
+
   <footer>
     <div class="container">
       <div class="footer-flex">
@@ -1234,10 +1308,7 @@
     </div>
   </footer>
 
-  <!-- ==========================================
-     SCRIPTS : NAVIGATION & CARROUSEL
-     ========================================== -->
-  <script src="./js/site-data.js"></script>
+<script src="./js/site-data.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Note : les sponsors (mosaïque + logo mis en avant) sont gérés par

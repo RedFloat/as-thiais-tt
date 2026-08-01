@@ -18,7 +18,7 @@
         { "id": "news", "label": "News", "link": "./news.html" },
         { "id": "evenements", "label": "Événements", "link": "#" },
         { "id": "albums-photos", "label": "Albums Photos", "link": "./albums.html" },
-        { "id": "albums-videos", "label": "Albums Vidéos", "link": "#" }
+        { "id": "albums-videos", "label": "Albums Vidéos", "link": "./videos.html" }
       ]
     },
     {

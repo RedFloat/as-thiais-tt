@@ -93,6 +93,9 @@
         <li><button type="button" class="nav-btn" data-view="albums">
           <i class="fa-solid fa-images"></i> Albums Photo
         </button></li>
+        <li><button type="button" class="nav-btn" data-view="videos">
+          <i class="fa-solid fa-video"></i> Galerie Vidéo
+        </button></li>
       </ul>
     </nav>
 
@@ -125,6 +128,27 @@
         <div class="view-header">
           <h1>Réglages globaux</h1>
           <p>Ces valeurs sont utilisées automatiquement sur toutes les pages du site.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-image"></i> Logo du club</h2>
+          <p style="color:var(--color-text-muted); font-size:0.85rem; margin-bottom:1rem;">
+            Utilisé dans l'en-tête de toutes les pages et comme icône d'onglet du navigateur.
+          </p>
+          <form id="logoForm">
+            <div class="form-group">
+              <label for="logoInput">Nouveau logo (facultatif)</label>
+              <input type="file" id="logoInput" accept="image/*">
+              <span class="form-hint">Envoyé automatiquement lors de l'enregistrement.</span>
+              <div id="logoPreviewWrap" style="margin-top:0.6rem;"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="logoSaveBtn">
+              <i class="fa-solid fa-floppy-disk"></i> Enregistrer le logo
+            </button>
+
+            <div class="status-msg" id="logoStatus"></div>
+          </form>
         </div>
 
         <div class="admin-card">
@@ -720,6 +744,53 @@
             <span class="form-hint">Tu peux sélectionner plusieurs photos à la fois.</span>
             <div class="status-msg" id="albumPhotosStatus"></div>
             <div class="album-photos-grid" id="albumPhotosGrid" style="margin-top:1rem;"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-view" id="view-videos">
+        <div class="view-header">
+          <h1>Galerie Vidéo</h1>
+          <p>Ajoute des vidéos YouTube ou Vimeo, affichées sur la page "Albums Vidéos" du site (lues directement sur place).</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-plus"></i> <span id="videoFormTitle">Ajouter une vidéo</span></h2>
+          <form id="videoEditorForm">
+            <input type="hidden" id="videoEditId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="videoTitle">Titre</label>
+                <input type="text" id="videoTitle" placeholder="Finale du tournoi interne 2026" required>
+              </div>
+              <div class="form-group">
+                <label for="videoDate">Date</label>
+                <input type="date" id="videoDate" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="videoUrl">Lien YouTube ou Vimeo</label>
+              <input type="url" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+              <span class="form-hint">La miniature et le lecteur sont générés automatiquement à partir de ce lien.</span>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center;">
+              <button type="submit" class="btn btn-primary" id="videoSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> <span id="videoSaveLabel">Ajouter la vidéo</span>
+              </button>
+              <button type="button" class="btn btn-ghost hidden" id="videoCancelBtn">Annuler la modification</button>
+            </div>
+
+            <div class="status-msg" id="videoStatus"></div>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Vidéos actuelles</h2>
+          <div id="videosList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
           </div>
         </div>
       </section>
