@@ -191,9 +191,41 @@
       border-color: var(--color-gold);
     }
 
+    .header-socials-desktop a.header-login-btn {
+      width: auto;
+      border-radius: 50px;
+      padding: 0 0.9rem;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-left: 0.4rem;
+      padding-left: 1rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
     @media (min-width: 992px) {
       .header-socials-desktop {
         display: flex;
+      }
+    }
+
+    .mobile-login-link {
+      display: none;
+    }
+
+    @media (max-width: 991px) {
+      .mobile-login-link {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 0.6rem 1.25rem 0.8rem;
+        padding: 0.7rem 1rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--color-gold);
+        border-radius: 8px;
+        color: var(--color-gold);
+        font-weight: 700;
+        font-size: 0.9rem;
       }
     }
 
@@ -1164,6 +1196,7 @@
       opacity: 1;
     }
   </style>
+  <link rel="icon" id="faviconLink" href="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg">
 </head>
 <body>
 <header>
@@ -1171,7 +1204,7 @@
     <div class="header-top container">
       <a href="./index.html" class="logo">
         <div class="logo-badge">
-          <img src="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg" alt="Logo Officiel AS Thiais TT">
+          <img id="siteLogoImg" src="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg" alt="Logo Officiel AS Thiais TT">
         </div>
         <span>AS THIAIS TENNIS DE TABLE</span>
       </a>
@@ -1180,6 +1213,9 @@
       <div class="header-socials-desktop">
         <a href="#" data-social="facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
         <a href="#" data-social="instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
+        <a href="./admin/index.html" class="header-login-btn" aria-label="Connexion">
+          <i class="fa-solid fa-user-lock"></i> Connexion
+        </a>
       </div>
 
       <!-- Bouton 3 points (Visible Uniquement sur Mobile) -->
@@ -1195,6 +1231,9 @@
           <ul class="nav-menu" id="navMenu">
             <!-- Menu généré dynamiquement par js/site-data.js depuis data/navigation.json -->
           </ul>
+          <a href="./admin/index.html" class="mobile-login-link">
+            <i class="fa-solid fa-user-lock"></i> Connexion
+          </a>
         </nav>
       </div>
     </div>
@@ -1267,7 +1306,7 @@
 
 
   <section class="sponsors-reminder-section container">
-    <p class="sponsors-reminder-title">Merci à nos partenaires, sans qui le club ne pourrait pas vivre :</p>
+    <p class="sponsors-reminder-title">Merci à nos partenaires, qui nous soutiennent dans nos projets :</p>
     <div class="sponsors-reminder-strip" id="sponsorsFooterReminder">
       <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
     </div>

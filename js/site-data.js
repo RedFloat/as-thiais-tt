@@ -463,7 +463,9 @@
 
   function parseVideoUrl(url) {
     if (!url) return null;
-    let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{6,})/);
+
+    // YouTube (liens classiques, courts, Shorts, Live, embed...)
+    let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{6,})/);
     if (m) {
       return {
         provider: 'youtube',
@@ -471,6 +473,8 @@
         embedUrl: `https://www.youtube.com/embed/${m[1]}`
       };
     }
+
+    // Vimeo
     m = url.match(/vimeo\.com\/(\d+)/);
     if (m) {
       return {
@@ -479,6 +483,19 @@
         embedUrl: `https://player.vimeo.com/video/${m[1]}`
       };
     }
+
+    // Google Drive (lien de partage classique ou lien "open?id=")
+    m = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (!m) m = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+    if (!m) m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m) {
+      return {
+        provider: 'gdrive',
+        thumbnail: `https://drive.google.com/thumbnail?id=${m[1]}&sz=w640`,
+        embedUrl: `https://drive.google.com/file/d/${m[1]}/preview`
+      };
+    }
+
     return null;
   }
 
