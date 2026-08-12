@@ -1143,6 +1143,47 @@
       filter: grayscale(0%);
       opacity: 1;
     }
+
+    .season-filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .season-filter-btn {
+      background: var(--color-white);
+      border: 1px solid #e2e8f0;
+      color: var(--color-navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: 50px;
+      transition: var(--transition);
+    }
+
+    .season-filter-btn:hover { border-color: var(--color-gold); }
+
+    .season-filter-btn.is-active {
+      background: var(--color-navy);
+      color: var(--color-white);
+      border-color: var(--color-navy);
+    }
+
+    .news-season-title {
+      color: var(--color-navy);
+      font-size: 1.15rem;
+      margin-bottom: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--color-gold-light);
+      grid-column: 1/-1;
+    }
+
+    .news-season-title i { color: var(--color-gold); }
   </style>
   <link rel="icon" id="faviconLink" href="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg">
 </head>
@@ -1206,7 +1247,9 @@
   <section class="page-content">
     <div class="container">
 
-      <div class="albums-grid" id="albumsGrid">
+      <div class="season-filters" id="albumSeasonFilters"></div>
+
+      <div class="albums-grid" id="albumsGrid" style="display:block;">
         <p style="text-align:center; color:var(--color-text-muted); grid-column:1/-1;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
       </div>
 

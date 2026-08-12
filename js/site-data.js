@@ -556,27 +556,61 @@
 
   function buildVideosListPage(videos) {
     const grid = document.getElementById('videosGrid');
+    const filtersEl = document.getElementById('videoSeasonFilters');
     if (!grid) return;
 
     if (!videos || videos.length === 0) {
+      if (filtersEl) filtersEl.innerHTML = '';
       grid.innerHTML = '<p style="text-align:center; color:var(--color-text-muted); grid-column:1/-1;">Aucune vidéo pour le moment.</p>';
       return;
     }
 
-    const sorted = videos.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    const bySeason = {};
+    videos.forEach((v) => {
+      const season = v.season || 'Non classé';
+      if (!bySeason[season]) bySeason[season] = [];
+      bySeason[season].push(v);
+    });
+    const seasons = Object.keys(bySeason).sort((a, b) => seasonSortKey(b) - seasonSortKey(a));
 
-    grid.innerHTML = sorted.map((video) => {
-      const parsed = parseVideoUrl(video.url);
+    if (filtersEl) {
+      const allBtn = '<button type="button" class="season-filter-btn is-active" data-season="">Toutes les saisons</button>';
+      const seasonBtns = seasons.map((s) => `<button type="button" class="season-filter-btn" data-season="${s}">${s}</button>`).join('');
+      filtersEl.innerHTML = allBtn + seasonBtns;
+      filtersEl.querySelectorAll('.season-filter-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          filtersEl.querySelectorAll('.season-filter-btn').forEach((b) => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+          const selected = btn.dataset.season;
+          grid.querySelectorAll('.video-season-block').forEach((block) => {
+            block.style.display = (!selected || block.dataset.season === selected) ? '' : 'none';
+          });
+        });
+      });
+    }
+
+    grid.innerHTML = seasons.map((season) => {
+      const items = bySeason[season].slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+      const cards = items.map((video) => {
+        const parsed = parseVideoUrl(video.url);
+        return `
+          <div class="video-card" data-embed="${parsed ? parsed.embedUrl : ''}">
+            <div class="video-card-thumb">
+              ${parsed && parsed.thumbnail ? `<img src="${parsed.thumbnail}" alt="${video.title}">` : ''}
+              <div class="play-icon"><i class="fa-solid fa-play"></i></div>
+            </div>
+            <div class="video-card-content">
+              <h3>${video.title}</h3>
+              <span>${formatDateFRLong(video.date)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
       return `
-        <div class="video-card" data-embed="${parsed ? parsed.embedUrl : ''}">
-          <div class="video-card-thumb">
-            ${parsed && parsed.thumbnail ? `<img src="${parsed.thumbnail}" alt="${video.title}">` : ''}
-            <div class="play-icon"><i class="fa-solid fa-play"></i></div>
-          </div>
-          <div class="video-card-content">
-            <h3>${video.title}</h3>
-            <span>${formatDateFRLong(video.date)}</span>
-          </div>
+        <div class="video-season-block" data-season="${season}" style="grid-column:1/-1;">
+          <h2 class="news-season-title"><i class="fa-solid fa-calendar-days"></i> Saison ${season}</h2>
+          <div class="videos-grid">${cards}</div>
         </div>
       `;
     }).join('');
@@ -641,31 +675,65 @@
 
   function buildAlbumsListPage(albums) {
     const grid = document.getElementById('albumsGrid');
+    const filtersEl = document.getElementById('albumSeasonFilters');
     if (!grid) return;
 
     if (!albums || albums.length === 0) {
+      if (filtersEl) filtersEl.innerHTML = '';
       grid.innerHTML = '<p style="text-align:center; color:var(--color-text-muted); grid-column:1/-1;">Aucun album pour le moment.</p>';
       return;
     }
 
-    const sorted = albums.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    const bySeason = {};
+    albums.forEach((a) => {
+      const season = a.season || 'Non classé';
+      if (!bySeason[season]) bySeason[season] = [];
+      bySeason[season].push(a);
+    });
+    const seasons = Object.keys(bySeason).sort((a, b) => seasonSortKey(b) - seasonSortKey(a));
 
-    grid.innerHTML = sorted.map((album) => {
-      const cover = (album.photos || [])[0];
-      const count = (album.photos || []).length;
-      return `
-        <a href="./album.html?id=${album.id}" class="album-card">
-          <div class="album-card-cover">
-            ${cover ? `<img src="${cover}" alt="${album.title}">` : '<i class="fa-solid fa-images"></i>'}
-          </div>
-          <div class="album-card-content">
-            <h3>${album.title}</h3>
-            <div class="album-card-meta">
-              <span>${formatDateFRLong(album.date)}</span>
-              <span class="photo-count">${count} photo${count > 1 ? 's' : ''}</span>
+    if (filtersEl) {
+      const allBtn = '<button type="button" class="season-filter-btn is-active" data-season="">Toutes les saisons</button>';
+      const seasonBtns = seasons.map((s) => `<button type="button" class="season-filter-btn" data-season="${s}">${s}</button>`).join('');
+      filtersEl.innerHTML = allBtn + seasonBtns;
+      filtersEl.querySelectorAll('.season-filter-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          filtersEl.querySelectorAll('.season-filter-btn').forEach((b) => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+          const selected = btn.dataset.season;
+          grid.querySelectorAll('.album-season-block').forEach((block) => {
+            block.style.display = (!selected || block.dataset.season === selected) ? '' : 'none';
+          });
+        });
+      });
+    }
+
+    grid.innerHTML = seasons.map((season) => {
+      const items = bySeason[season].slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+      const cards = items.map((album) => {
+        const cover = (album.photos || [])[0];
+        const count = (album.photos || []).length;
+        return `
+          <a href="./album.html?id=${album.id}" class="album-card">
+            <div class="album-card-cover">
+              ${cover ? `<img src="${cover}" alt="${album.title}">` : '<i class="fa-solid fa-images"></i>'}
             </div>
-          </div>
-        </a>
+            <div class="album-card-content">
+              <h3>${album.title}</h3>
+              <div class="album-card-meta">
+                <span>${formatDateFRLong(album.date)}</span>
+                <span class="photo-count">${count} photo${count > 1 ? 's' : ''}</span>
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('');
+
+      return `
+        <div class="album-season-block" data-season="${season}" style="grid-column:1/-1;">
+          <h2 class="news-season-title"><i class="fa-solid fa-calendar-days"></i> Saison ${season}</h2>
+          <div class="albums-grid">${cards}</div>
+        </div>
       `;
     }).join('');
   }

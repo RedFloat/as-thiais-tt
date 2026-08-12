@@ -7,6 +7,7 @@
   <title>Espace Admin — AS Thiais Tennis de Table</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="./css/admin.css">
+  <link rel="icon" id="faviconLink" href="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg">
 </head>
 <body>
 
@@ -721,6 +722,17 @@
               </div>
             </div>
 
+            <div class="form-row">
+              <div class="form-group">
+                <label for="albumSeason">Saison</label>
+                <select id="albumSeason" required></select>
+              </div>
+              <div class="form-group" style="display:flex; align-items:flex-end; gap:0.6rem;">
+                <input type="text" id="newAlbumSeasonInput" placeholder="Nouvelle saison">
+                <button type="button" class="btn btn-ghost" id="addAlbumSeasonBtn"><i class="fa-solid fa-plus"></i></button>
+              </div>
+            </div>
+
             <div class="form-group">
               <label for="albumDescription">Description (facultatif)</label>
               <textarea id="albumDescription" rows="2" placeholder="Quelques mots sur cet album"></textarea>
@@ -767,6 +779,17 @@
               <div class="form-group">
                 <label for="videoDate">Date</label>
                 <input type="date" id="videoDate" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="videoSeason">Saison</label>
+                <select id="videoSeason" required></select>
+              </div>
+              <div class="form-group" style="display:flex; align-items:flex-end; gap:0.6rem;">
+                <input type="text" id="newVideoSeasonInput" placeholder="Nouvelle saison">
+                <button type="button" class="btn btn-ghost" id="addVideoSeasonBtn"><i class="fa-solid fa-plus"></i></button>
               </div>
             </div>
 

@@ -193,6 +193,33 @@
   const refreshDocIconPreview = setupIconPicker('docIcon', 'docIconTrigger', 'docIconPreview', 'docIconPanel');
   const refreshLinkIconPreview = setupIconPicker('linkIcon', 'linkIconTrigger', 'linkIconPreview', 'linkIconPanel');
 
+  function populateSeasonSelect(selectEl, seasons, selected) {
+    selectEl.innerHTML = (seasons || [])
+      .map((s) => `<option value="${s}" ${s === selected ? 'selected' : ''}>${s}</option>`)
+      .join('');
+  }
+
+  async function addNewSeason(inputEl, statusEl, onSuccess) {
+    const season = inputEl.value.trim();
+    if (!season) { setStatus(statusEl, 'error', 'Donne un nom à la saison avant de l\'ajouter.'); return; }
+    setStatus(statusEl, 'loading', 'Ajout en cours…');
+    try {
+      if (!fileState[SEASONS_PATH]) await readFile(SEASONS_PATH);
+      const seasons = fileState[SEASONS_PATH].json.seasons || [];
+      if (!seasons.includes(season)) {
+        const updatedSeasons = seasons.concat(season);
+        const sha = fileState[SEASONS_PATH].sha;
+        const result = await GitHubAPI.saveJSON(cfg, SEASONS_PATH, { seasons: updatedSeasons }, sha, `Admin : ajout de la saison "${season}"`);
+        fileState[SEASONS_PATH] = { json: { seasons: updatedSeasons }, sha: result.content.sha };
+      }
+      onSuccess(fileState[SEASONS_PATH].json.seasons, season);
+      inputEl.value = '';
+      setStatus(statusEl, 'success', 'Saison disponible !');
+    } catch (err) {
+      setStatus(statusEl, 'error', 'Erreur : ' + err.message);
+    }
+  }
+
   /* ---------- Aide : lecture avec cache ---------- */
 
   async function readFile(path) {
@@ -1493,7 +1520,7 @@
   /* ---------- News ---------- */
 
   const NEWS_PATH = 'data/news.json';
-  const NEWS_SEASONS_PATH = 'data/news-seasons.json';
+  const SEASONS_PATH = 'data/seasons.json'; // Partagé News/Vidéos/Albums
   const ALBUMS_PATH = 'data/albums.json';
 
   const newsList = document.getElementById('newsList');
@@ -1529,19 +1556,19 @@
     if (!season) return;
 
     try {
-      if (!fileState[NEWS_SEASONS_PATH]) await readFile(NEWS_SEASONS_PATH);
-      const seasons = fileState[NEWS_SEASONS_PATH].json.seasons || [];
+      if (!fileState[SEASONS_PATH]) await readFile(SEASONS_PATH);
+      const seasons = fileState[SEASONS_PATH].json.seasons || [];
       if (seasons.includes(season)) {
         populateNewsSeasonSelect(seasons, season);
         input.value = '';
         return;
       }
       const updatedSeasons = seasons.concat(season);
-      const sha = fileState[NEWS_SEASONS_PATH].sha;
+      const sha = fileState[SEASONS_PATH].sha;
       const result = await GitHubAPI.saveJSON(
-        cfg, NEWS_SEASONS_PATH, { seasons: updatedSeasons }, sha, `Admin : ajout de la saison "${season}"`
+        cfg, SEASONS_PATH, { seasons: updatedSeasons }, sha, `Admin : ajout de la saison "${season}"`
       );
-      fileState[NEWS_SEASONS_PATH] = { json: { seasons: updatedSeasons }, sha: result.content.sha };
+      fileState[SEASONS_PATH] = { json: { seasons: updatedSeasons }, sha: result.content.sha };
       populateNewsSeasonSelect(updatedSeasons, season);
       input.value = '';
     } catch (err) {
@@ -1554,7 +1581,7 @@
     try {
       const [data, seasonsData, albumsData] = await Promise.all([
         readFile(NEWS_PATH),
-        readFile(NEWS_SEASONS_PATH),
+        readFile(SEASONS_PATH),
         readFile(ALBUMS_PATH).catch(() => ({ albums: [] }))
       ]);
       currentNewsList = data.news || [];
@@ -1651,7 +1678,7 @@
       richtextEditor.innerHTML = item.body || '';
       currentNewsCoverPath = item.image || '';
       populateNewsSeasonSelect(
-        fileState[NEWS_SEASONS_PATH] ? fileState[NEWS_SEASONS_PATH].json.seasons : [],
+        fileState[SEASONS_PATH] ? fileState[SEASONS_PATH].json.seasons : [],
         item.season
       );
       if (item.image) {
@@ -1662,7 +1689,7 @@
       document.getElementById('newsEditId').value = generateNewsId(currentNewsList);
       document.getElementById('newsDate').value = new Date().toISOString().slice(0, 10);
       currentNewsCoverPath = '';
-      const seasons = fileState[NEWS_SEASONS_PATH] ? fileState[NEWS_SEASONS_PATH].json.seasons : [];
+      const seasons = fileState[SEASONS_PATH] ? fileState[SEASONS_PATH].json.seasons : [];
       populateNewsSeasonSelect(seasons, seasons[seasons.length - 1]);
       document.getElementById('newsEditorTitle').textContent = 'Écrire une news';
     }
@@ -2210,7 +2237,8 @@ ${items}
   async function loadAlbumsView() {
     albumsList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
     try {
-      const data = await readFile(ALBUMS_PATH);
+      const [data, seasonsData] = await Promise.all([readFile(ALBUMS_PATH), readFile(SEASONS_PATH)]);
+      populateSeasonSelect(document.getElementById('albumSeason'), seasonsData.seasons || [], null);
       currentAlbumsList = data.albums || [];
       renderAlbumsList(currentAlbumsList);
     } catch (err) {
@@ -2289,6 +2317,7 @@ ${items}
       document.getElementById('albumTitle').value = album.title || '';
       document.getElementById('albumDate').value = album.date || '';
       document.getElementById('albumDescription').value = album.description || '';
+      document.getElementById('albumSeason').value = album.season || '';
       albumSaveLabel.textContent = 'Enregistrer les modifications';
       document.getElementById('albumEditorTitle').textContent = 'Modifier l\'album';
       albumPhotosSection.classList.remove('hidden');
@@ -2306,6 +2335,13 @@ ${items}
   }
 
   document.getElementById('addAlbumBtn').addEventListener('click', () => openAlbumEditor(null));
+  document.getElementById('addAlbumSeasonBtn').addEventListener('click', () => {
+    addNewSeason(
+      document.getElementById('newAlbumSeasonInput'),
+      albumEditorStatus,
+      (seasons, justAdded) => populateSeasonSelect(document.getElementById('albumSeason'), seasons, justAdded)
+    );
+  });
   document.getElementById('albumEditorCancelBtn').addEventListener('click', () => {
     albumEditorCard.classList.add('hidden');
   });
@@ -2328,15 +2364,17 @@ ${items}
       let updatedAlbums;
       let savedAlbum;
 
+      const season = document.getElementById('albumSeason').value;
+
       if (editingId) {
         updatedAlbums = albums.map((a) => {
           if (a.id !== editingId) return a;
-          savedAlbum = Object.assign({}, a, { title, date, description });
+          savedAlbum = Object.assign({}, a, { title, date, season, description });
           return savedAlbum;
         });
       } else {
         const id = generateAlbumId(title, albums);
-        savedAlbum = { id, title, date, description, photos: [] };
+        savedAlbum = { id, title, date, season, description, photos: [] };
         updatedAlbums = albums.concat(savedAlbum);
       }
 
@@ -2549,7 +2587,8 @@ ${items}
   async function loadVideosView() {
     videosList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
     try {
-      const data = await readFile(VIDEOS_PATH);
+      const [data, seasonsData] = await Promise.all([readFile(VIDEOS_PATH), readFile(SEASONS_PATH)]);
+      populateSeasonSelect(document.getElementById('videoSeason'), seasonsData.seasons || [], null);
       renderVideosList(data.videos || []);
     } catch (err) {
       videosList.innerHTML = '';
@@ -2607,6 +2646,7 @@ ${items}
     document.getElementById('videoTitle').value = video.title || '';
     document.getElementById('videoDate').value = video.date || '';
     document.getElementById('videoUrl').value = video.url || '';
+    document.getElementById('videoSeason').value = video.season || '';
     videoSaveLabel.textContent = 'Enregistrer les modifications';
     videoCancelBtn.classList.remove('hidden');
     document.getElementById('videoFormTitle').textContent = 'Modifier la vidéo';
@@ -2623,6 +2663,13 @@ ${items}
   }
 
   videoCancelBtn.addEventListener('click', resetVideoForm);
+  document.getElementById('addVideoSeasonBtn').addEventListener('click', () => {
+    addNewSeason(
+      document.getElementById('newVideoSeasonInput'),
+      videoStatus,
+      (seasons, justAdded) => populateSeasonSelect(document.getElementById('videoSeason'), seasons, justAdded)
+    );
+  });
   resetVideoForm();
 
   videoEditorForm.addEventListener('submit', async (e) => {
@@ -2646,7 +2693,8 @@ ${items}
       const title = document.getElementById('videoTitle').value.trim();
       const date = document.getElementById('videoDate').value;
 
-      const entry = { id: editingId || generateVideoId(title, videos), title, date, url };
+      const season = document.getElementById('videoSeason').value;
+      const entry = { id: editingId || generateVideoId(title, videos), title, date, season, url };
       const updatedVideos = editingId
         ? videos.map((v) => (v.id === editingId ? entry : v))
         : videos.concat(entry);
