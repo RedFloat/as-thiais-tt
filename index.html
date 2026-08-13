@@ -1021,6 +1021,7 @@
       .footer-contact-block { text-align: center; }
       .footer-contact-block h4 { justify-content: center; }
     }
+    .hidden { display: none !important; }
   </style>
   <link rel="icon" id="faviconLink" href="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg">
 </head>
@@ -1178,21 +1179,10 @@
       </div>
 
       <!-- Anniversaires -->
-      <div class="widget-box">
+      <div class="widget-box hidden" id="birthdaysWidgetBox">
         <h3><i class="fa-solid fa-cake-candles"></i> Anniversaires du Mois</h3>
-        <div class="birthday-card">
-          <div class="birthday-avatar">LM</div>
-          <div>
-            <strong>Lucas Martin</strong>
-            <div style="font-size:0.8rem; color:var(--color-text-muted);">Aujourd'hui ! 🎂</div>
-          </div>
-        </div>
-        <div class="birthday-card">
-          <div class="birthday-avatar">SD</div>
-          <div>
-            <strong>Sophie Dubois</strong>
-            <div style="font-size:0.8rem; color:var(--color-text-muted);">28 Septembre</div>
-          </div>
+        <div id="birthdaysWidget">
+          <!-- Généré dynamiquement par js/site-data.js depuis data/birthdays.json -->
         </div>
       </div>
 

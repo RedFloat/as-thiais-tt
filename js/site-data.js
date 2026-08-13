@@ -631,6 +631,58 @@
     buildVideosListPage(data ? data.videos : []);
   }
 
+  /* ---------- Widget "Anniversaires du Mois" (accueil) ---------- */
+
+  const MONTH_NAMES_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+  function initials(name) {
+    return (name || '').split(' ').map((w) => w[0] || '').join('').toUpperCase().slice(0, 2);
+  }
+
+  function buildBirthdaysWidget(data) {
+    const box = document.getElementById('birthdaysWidgetBox');
+    const widget = document.getElementById('birthdaysWidget');
+    if (!box || !widget) return;
+
+    if (!data || data.enabled === false) {
+      box.classList.add('hidden');
+      return;
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const today = now.getDate();
+
+    const thisMonth = (data.birthdays || [])
+      .filter((b) => b.month === currentMonth)
+      .sort((a, b) => a.day - b.day);
+
+    if (thisMonth.length === 0) {
+      box.classList.add('hidden');
+      return;
+    }
+
+    box.classList.remove('hidden');
+    widget.innerHTML = thisMonth.map((b) => `
+      <div class="birthday-card">
+        <div class="birthday-avatar">${initials(b.name)}</div>
+        <div>
+          <strong>${b.name}</strong>
+          <div style="font-size:0.8rem; color:var(--color-text-muted);">
+            ${b.day === today ? 'Aujourd\'hui ! 🎂' : b.day + ' ' + MONTH_NAMES_FR[b.month - 1]}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function initBirthdaysWidget() {
+    const box = document.getElementById('birthdaysWidgetBox');
+    if (!box) return;
+    const data = await loadJSON('./data/birthdays.json');
+    buildBirthdaysWidget(data);
+  }
+
   /* ---------- Widget "Galerie Photos" (accueil) — 4 photos aléatoires ---------- */
 
   function shuffleArray(arr) {
@@ -927,11 +979,17 @@
       ? form.map((m) => '<span class="team-form-badge team-form-' + m.result.toLowerCase() + '">' + m.result + '</span>').join('')
       : '<span style="color:var(--color-text-muted); font-size:0.85rem;">Pas encore de match joué.</span>';
 
-    const playersGrid = document.getElementById('teamPlayersGrid');
-    const players = team.players || [];
-    playersGrid.innerHTML = players.length > 0
-      ? players.map((p) => '<div class="player-chip"><i class="fa-solid fa-user"></i>' + p + '</div>').join('')
-      : '<p style="color:var(--color-text-muted); font-size:0.85rem;">Effectif à venir.</p>';
+    const playersSection = document.getElementById('teamPlayersSection');
+    if (team.showPlayers === false) {
+      playersSection.classList.add('hidden');
+    } else {
+      playersSection.classList.remove('hidden');
+      const playersGrid = document.getElementById('teamPlayersGrid');
+      const players = team.players || [];
+      playersGrid.innerHTML = players.length > 0
+        ? players.map((p) => '<div class="player-chip"><i class="fa-solid fa-user"></i>' + p + '</div>').join('')
+        : '<p style="color:var(--color-text-muted); font-size:0.85rem;">Effectif à venir.</p>';
+    }
 
     const calendarBody = document.getElementById('teamCalendarBody');
     const allMatches = (team.matches || []).slice().sort((a, b) => (a.date > b.date ? 1 : -1));
@@ -1312,6 +1370,7 @@
     initAlbumsListPage();
     initAlbumProfilePage();
     initPhotoGalleryWidget();
+    initBirthdaysWidget();
     initVideoGalleryWidget();
     initVideosListPage();
   }

@@ -97,6 +97,9 @@
         <li><button type="button" class="nav-btn" data-view="videos">
           <i class="fa-solid fa-video"></i> Galerie Vidéo
         </button></li>
+        <li><button type="button" class="nav-btn" data-view="birthdays">
+          <i class="fa-solid fa-cake-candles"></i> Anniversaires
+        </button></li>
       </ul>
     </nav>
 
@@ -454,12 +457,20 @@
               <label for="teamPhotoInput">Photo de l'équipe</label>
               <input type="file" id="teamPhotoInput" accept="image/*">
               <span class="form-hint">Facultatif. Envoyée automatiquement au moment de l'enregistrement.</span>
-              <div id="teamPhotoPreviewWrap" style="margin-top:0.6rem;"></div>
+              <div id="teamPhotoPreviewWrap" style="margin-top:0.6rem; display:flex; align-items:center; gap:0.8rem;"></div>
             </div>
 
             <div class="form-group">
               <label for="teamDescription">Présentation de l'équipe</label>
               <textarea id="teamDescription" rows="3" placeholder="Quelques mots sur l'équipe..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem;">
+                <input type="checkbox" id="teamShowPlayers" style="width:auto; transform:scale(1.2);" checked>
+                Afficher l'effectif sur la fiche publique de cette équipe
+              </label>
+              <span class="form-hint">Décoche pour garder l'effectif secret (effet de surprise), sans toucher aux autres équipes.</span>
             </div>
 
             <div class="form-group">
@@ -813,6 +824,74 @@
         <div class="admin-card">
           <h2><i class="fa-solid fa-list"></i> Vidéos actuelles</h2>
           <div id="videosList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-view" id="view-birthdays">
+        <div class="view-header">
+          <h1>Anniversaires</h1>
+          <p>Gère l'encadré "Anniversaires du Mois" affiché sur l'accueil.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-eye"></i> Visibilité</h2>
+          <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem;">
+            <input type="checkbox" id="birthdaysEnabled" style="width:auto; transform:scale(1.2);" checked>
+            Afficher l'encadré anniversaires sur l'accueil
+          </label>
+          <span class="form-hint">Décoche pour masquer complètement l'encadré, sans perdre la liste enregistrée.</span>
+          <div class="status-msg" id="birthdaysEnabledStatus"></div>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-plus"></i> <span id="birthdayFormTitle">Ajouter un anniversaire</span></h2>
+          <form id="birthdayEditorForm">
+            <input type="hidden" id="birthdayEditId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="birthdayName">Nom</label>
+                <input type="text" id="birthdayName" placeholder="Lucas Martin" required>
+              </div>
+              <div class="form-group">
+                <label for="birthdayDay">Jour</label>
+                <input type="number" id="birthdayDay" min="1" max="31" placeholder="15" required>
+              </div>
+              <div class="form-group">
+                <label for="birthdayMonth">Mois</label>
+                <select id="birthdayMonth" required>
+                  <option value="1">Janvier</option>
+                  <option value="2">Février</option>
+                  <option value="3">Mars</option>
+                  <option value="4">Avril</option>
+                  <option value="5">Mai</option>
+                  <option value="6">Juin</option>
+                  <option value="7">Juillet</option>
+                  <option value="8">Août</option>
+                  <option value="9">Septembre</option>
+                  <option value="10">Octobre</option>
+                  <option value="11">Novembre</option>
+                  <option value="12">Décembre</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center;">
+              <button type="submit" class="btn btn-primary" id="birthdaySaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> <span id="birthdaySaveLabel">Ajouter</span>
+              </button>
+              <button type="button" class="btn btn-ghost hidden" id="birthdayCancelBtn">Annuler la modification</button>
+            </div>
+
+            <div class="status-msg" id="birthdayStatus"></div>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Liste des anniversaires</h2>
+          <div id="birthdaysList">
             <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
           </div>
         </div>

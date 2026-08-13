@@ -128,6 +128,7 @@
       if (btn.dataset.view === 'links') loadLinksView();
       if (btn.dataset.view === 'albums') loadAlbumsView();
       if (btn.dataset.view === 'videos') loadVideosView();
+      if (btn.dataset.view === 'birthdays') loadBirthdaysView();
     });
   });
 
@@ -1329,13 +1330,38 @@
 
   /* --- Photo --- */
 
+  function renderTeamPhotoPreview(src) {
+    if (!src) {
+      teamPhotoPreviewWrap.innerHTML = '';
+      return;
+    }
+    teamPhotoPreviewWrap.innerHTML = `
+      <img class="team-photo-preview" src="${src}" alt="">
+      <button type="button" class="btn btn-ghost" id="removeTeamPhotoBtn" title="Supprimer la photo">
+        <i class="fa-solid fa-trash"></i> Supprimer la photo
+      </button>
+    `;
+    document.getElementById('removeTeamPhotoBtn').addEventListener('click', removeTeamPhoto);
+  }
+
+  async function removeTeamPhoto() {
+    if (!confirm('Supprimer la photo de cette équipe ? Elle sera aussi supprimée de GitHub.')) return;
+    if (currentTeamPhotoPath) {
+      await deleteFileIfExists(toRepoPath(currentTeamPhotoPath));
+    }
+    currentTeamPhotoPath = '';
+    pendingTeamPhotoFile = null;
+    teamPhotoInput.value = '';
+    renderTeamPhotoPreview('');
+  }
+
   teamPhotoInput.addEventListener('change', () => {
     const file = teamPhotoInput.files[0];
     if (!file) return;
     pendingTeamPhotoFile = file;
     const reader = new FileReader();
     reader.onload = () => {
-      teamPhotoPreviewWrap.innerHTML = `<img class="team-photo-preview" src="${reader.result}" alt="">`;
+      renderTeamPhotoPreview(reader.result);
     };
     reader.readAsDataURL(file);
   });
@@ -1366,9 +1392,10 @@
       document.getElementById('teamName').value = team.name || '';
       document.getElementById('teamDivision').value = team.division || '';
       document.getElementById('teamDescription').value = team.description || '';
+      document.getElementById('teamShowPlayers').checked = team.showPlayers !== false;
       currentTeamPhotoPath = team.photo || '';
       if (team.photo) {
-        teamPhotoPreviewWrap.innerHTML = `<img class="team-photo-preview" src="${adminAssetPath(team.photo)}" alt="">`;
+        renderTeamPhotoPreview(adminAssetPath(team.photo));
       }
 
       const c = team.classification || {};
@@ -1382,6 +1409,7 @@
       document.getElementById('teamEditorTitle').textContent = 'Modifier l\'équipe';
     } else {
       document.getElementById('teamEditId').value = '';
+      document.getElementById('teamShowPlayers').checked = true;
       currentTeamPhotoPath = '';
       document.getElementById('teamEditorTitle').textContent = 'Ajouter une équipe';
     }
@@ -1453,7 +1481,8 @@
         photo = './' + photoPath;
       }
 
-      const teamData = { id, name, division, photo, description, players, classification, matches };
+      const showPlayers = document.getElementById('teamShowPlayers').checked;
+      const teamData = { id, name, division, photo, description, showPlayers, players, classification, matches };
 
       setStatus(teamEditorStatus, 'loading', 'Enregistrement de la fiche équipe…');
       const path = teamPath(id);
@@ -2736,6 +2765,167 @@ ${items}
       setStatus(videoStatus, 'error', 'Erreur : ' + err.message);
     }
   }
+
+  /* ---------- Anniversaires ---------- */
+
+  const BIRTHDAYS_PATH = 'data/birthdays.json';
+  const MONTH_NAMES_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+  const birthdaysList = document.getElementById('birthdaysList');
+  const birthdayStatus = document.getElementById('birthdayStatus');
+  const birthdayEditorForm = document.getElementById('birthdayEditorForm');
+  const birthdayCancelBtn = document.getElementById('birthdayCancelBtn');
+  const birthdaySaveLabel = document.getElementById('birthdaySaveLabel');
+  const birthdaysEnabledCheckbox = document.getElementById('birthdaysEnabled');
+  const birthdaysEnabledStatus = document.getElementById('birthdaysEnabledStatus');
+
+  async function loadBirthdaysView() {
+    birthdaysList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(BIRTHDAYS_PATH);
+      birthdaysEnabledCheckbox.checked = data.enabled !== false;
+      renderBirthdaysList(data.birthdays || []);
+    } catch (err) {
+      birthdaysList.innerHTML = '';
+      birthdaysList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les anniversaires', [err.message]));
+    }
+  }
+
+  function renderBirthdaysList(birthdays) {
+    birthdaysList.innerHTML = '';
+    if (birthdays.length === 0) {
+      birthdaysList.innerHTML = '<p class="empty-list-msg">Aucun anniversaire enregistré.</p>';
+      return;
+    }
+
+    const sorted = birthdays.slice().sort((a, b) => (a.month - b.month) || (a.day - b.day));
+
+    sorted.forEach((b) => {
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      row.innerHTML = `
+        <div class="admin-list-thumb"><i class="fa-solid fa-cake-candles" style="color:var(--color-navy);"></i></div>
+        <div class="admin-list-info">
+          <strong>${b.name}</strong>
+          <span>${b.day} ${MONTH_NAMES_FR[b.month - 1]}</span>
+        </div>
+        <div class="admin-list-actions">
+          <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+      row.querySelector('.edit-btn').addEventListener('click', () => startEditBirthday(b));
+      row.querySelector('.delete-btn').addEventListener('click', () => deleteBirthday(b.id, b.name));
+      birthdaysList.appendChild(row);
+    });
+  }
+
+  function generateBirthdayId(name, birthdays) {
+    const base = slugify(name) || 'anniversaire';
+    const allIds = birthdays.map((b) => b.id);
+    let id = base;
+    let counter = 2;
+    while (allIds.includes(id)) { id = `${base}-${counter}`; counter++; }
+    return id;
+  }
+
+  function startEditBirthday(b) {
+    document.getElementById('birthdayEditId').value = b.id;
+    document.getElementById('birthdayName').value = b.name || '';
+    document.getElementById('birthdayDay').value = b.day || '';
+    document.getElementById('birthdayMonth').value = b.month || '1';
+    birthdaySaveLabel.textContent = 'Enregistrer les modifications';
+    birthdayCancelBtn.classList.remove('hidden');
+    document.getElementById('birthdayFormTitle').textContent = 'Modifier l\'anniversaire';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetBirthdayForm() {
+    birthdayEditorForm.reset();
+    document.getElementById('birthdayEditId').value = '';
+    birthdaySaveLabel.textContent = 'Ajouter';
+    birthdayCancelBtn.classList.add('hidden');
+    document.getElementById('birthdayFormTitle').textContent = 'Ajouter un anniversaire';
+  }
+
+  birthdayCancelBtn.addEventListener('click', resetBirthdayForm);
+
+  birthdayEditorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('birthdaySaveBtn');
+    saveBtn.disabled = true;
+    setStatus(birthdayStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      if (!fileState[BIRTHDAYS_PATH]) await readFile(BIRTHDAYS_PATH);
+      const birthdays = fileState[BIRTHDAYS_PATH].json.birthdays.slice();
+
+      const editingId = document.getElementById('birthdayEditId').value;
+      const name = document.getElementById('birthdayName').value.trim();
+      const day = parseInt(document.getElementById('birthdayDay').value, 10);
+      const month = parseInt(document.getElementById('birthdayMonth').value, 10);
+
+      const entry = { id: editingId || generateBirthdayId(name, birthdays), name, day, month };
+      const updated = {
+        enabled: fileState[BIRTHDAYS_PATH].json.enabled !== false,
+        birthdays: editingId ? birthdays.map((b) => (b.id === editingId ? entry : b)) : birthdays.concat(entry)
+      };
+
+      const sha = fileState[BIRTHDAYS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, BIRTHDAYS_PATH, updated, sha,
+        editingId ? `Admin : modification de l'anniversaire "${name}"` : `Admin : ajout de l'anniversaire "${name}"`
+      );
+
+      fileState[BIRTHDAYS_PATH] = { json: updated, sha: result.content.sha };
+      renderBirthdaysList(updated.birthdays);
+      resetBirthdayForm();
+      setStatus(birthdayStatus, 'success', 'Enregistré !');
+    } catch (err) {
+      setStatus(birthdayStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  async function deleteBirthday(id, name) {
+    if (!confirm(`Supprimer l'anniversaire de "${name}" ?`)) return;
+
+    setStatus(birthdayStatus, 'loading', 'Suppression en cours…');
+    try {
+      if (!fileState[BIRTHDAYS_PATH]) await readFile(BIRTHDAYS_PATH);
+      const updated = {
+        enabled: fileState[BIRTHDAYS_PATH].json.enabled !== false,
+        birthdays: fileState[BIRTHDAYS_PATH].json.birthdays.filter((b) => b.id !== id)
+      };
+      const sha = fileState[BIRTHDAYS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, BIRTHDAYS_PATH, updated, sha, `Admin : suppression de l'anniversaire de "${name}"`);
+
+      fileState[BIRTHDAYS_PATH] = { json: updated, sha: result.content.sha };
+      renderBirthdaysList(updated.birthdays);
+      setStatus(birthdayStatus, 'success', 'Supprimé.');
+    } catch (err) {
+      setStatus(birthdayStatus, 'error', 'Erreur : ' + err.message);
+    }
+  }
+
+  birthdaysEnabledCheckbox.addEventListener('change', async () => {
+    setStatus(birthdaysEnabledStatus, 'loading', 'Enregistrement…');
+    try {
+      if (!fileState[BIRTHDAYS_PATH]) await readFile(BIRTHDAYS_PATH);
+      const updated = {
+        enabled: birthdaysEnabledCheckbox.checked,
+        birthdays: fileState[BIRTHDAYS_PATH].json.birthdays || []
+      };
+      const sha = fileState[BIRTHDAYS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, BIRTHDAYS_PATH, updated, sha, `Admin : ${updated.enabled ? 'activation' : 'désactivation'} de l'encadré anniversaires`);
+      fileState[BIRTHDAYS_PATH] = { json: updated, sha: result.content.sha };
+      setStatus(birthdaysEnabledStatus, 'success', 'Enregistré !');
+    } catch (err) {
+      setStatus(birthdaysEnabledStatus, 'error', 'Erreur : ' + err.message);
+      birthdaysEnabledCheckbox.checked = !birthdaysEnabledCheckbox.checked;
+    }
+  });
 
   /* ---------- Démarrage ---------- */
 
