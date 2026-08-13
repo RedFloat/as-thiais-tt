@@ -2,12 +2,6 @@
   "enabled": false,
   "birthdays": [
     {
-      "id": "b1",
-      "name": "Lucas Martin",
-      "day": 15,
-      "month": 8
-    },
-    {
       "id": "b2",
       "name": "Sophie Dubois",
       "day": 28,
