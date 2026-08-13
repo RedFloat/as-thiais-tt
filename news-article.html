@@ -1084,6 +1084,7 @@
     }
 
     .article-album-grid img {
+      cursor: zoom-in;
       width: 100%;
       aspect-ratio: 1 / 1;
       object-fit: cover;
@@ -1141,6 +1142,114 @@
       filter: grayscale(0%);
       opacity: 1;
     }
+
+    /* ---------- Visionneuse plein écran ---------- */
+    
+        .photo-lightbox {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(2, 12, 20, 0.92);
+          z-index: 1000;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+        }
+    
+        .photo-lightbox.is-open { display: flex; }
+    
+        .photo-lightbox img {
+          max-width: 100%;
+          max-height: 100%;
+          border-radius: 8px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+    
+        .photo-lightbox-close {
+          position: absolute;
+          top: 1.5rem;
+          right: 1.5rem;
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.12);
+          border: 1px solid rgba(255,255,255,0.25);
+          color: var(--color-white);
+          font-size: 1.3rem;
+          transition: var(--transition);
+        }
+    
+        .photo-lightbox-close:hover {
+          background: var(--color-gold);
+          color: var(--color-navy-dark);
+        }
+    
+        .photo-lightbox-nav {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.12);
+          border: 1px solid rgba(255,255,255,0.25);
+          color: var(--color-white);
+          font-size: 1.2rem;
+          transition: var(--transition);
+        }
+    
+        .photo-lightbox-nav:hover { background: var(--color-gold); color: var(--color-navy-dark); }
+        .photo-lightbox-prev { left: 1.5rem; }
+        .photo-lightbox-next { right: 1.5rem; }
+    
+        @media (max-width: 600px) {
+          .photo-lightbox-nav { display: none; }
+        }
+    
+        /* ---------- Rappel des partenaires (pied de page, ordinateur uniquement) ---------- */
+        .sponsors-reminder-section {
+          display: none;
+          padding: 2rem 0;
+          border-top: 1px solid #e2e8f0;
+        }
+    
+        @media (min-width: 992px) {
+          .sponsors-reminder-section {
+            display: block;
+          }
+        }
+    
+        .sponsors-reminder-title {
+          text-align: center;
+          color: var(--color-text-muted);
+          font-size: 0.85rem;
+          margin-bottom: 1.2rem;
+        }
+    
+        .sponsors-reminder-strip {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: center;
+          gap: 1.75rem;
+        }
+    
+        .sponsor-reminder-item { display: block; }
+    
+        .sponsor-reminder-item img {
+          height: 40px;
+          max-width: 110px;
+          object-fit: contain;
+          filter: grayscale(35%);
+          opacity: 0.8;
+          transition: var(--transition);
+        }
+    
+        .sponsor-reminder-item:hover img {
+          filter: grayscale(0%);
+          opacity: 1;
+        }
+      
   </style>
   <link rel="icon" id="faviconLink" href="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg">
 </head>
@@ -1229,6 +1338,19 @@
       <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
     </div>
   </section>
+
+<div class="photo-lightbox" id="photoLightbox">
+    <button type="button" class="photo-lightbox-close" id="photoLightboxClose" aria-label="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <button type="button" class="photo-lightbox-nav photo-lightbox-prev" id="photoLightboxPrev" aria-label="Photo précédente">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <img id="photoLightboxImg" src="" alt="">
+    <button type="button" class="photo-lightbox-nav photo-lightbox-next" id="photoLightboxNext" aria-label="Photo suivante">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
 
   <footer>
     <div class="container">

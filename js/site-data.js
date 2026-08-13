@@ -1156,11 +1156,15 @@
         albumWrap.innerHTML =
           '<h2 style="color:var(--color-navy); margin-bottom:1rem;"><i class="fa-solid fa-images" style="color:var(--color-gold);"></i> ' + album.title + '</h2>' +
           '<div class="article-album-grid">' +
-          album.photos.map((src) => `<img src="${src}" alt="${album.title}">`).join('') +
+          album.photos.map((src, i) => `<img src="${src}" alt="${album.title}" data-index="${i}">`).join('') +
           '</div>' +
           '<div style="text-align:center; margin-top:1.2rem;">' +
           '<a href="./album.html?id=' + album.id + '" class="btn-primary"><i class="fa-solid fa-up-right-and-down-left-from-center"></i> Voir l\'album complet</a>' +
           '</div>';
+
+        albumWrap.querySelectorAll('.article-album-grid img').forEach((img) => {
+          img.addEventListener('click', () => openLightbox(album.photos, parseInt(img.dataset.index, 10)));
+        });
       }
     }
 
@@ -1171,6 +1175,8 @@
   async function initNewsArticlePage() {
     const hero = document.getElementById('articleHero');
     if (!hero) return;
+
+    setupLightbox();
 
     const params = new URLSearchParams(window.location.search);
     const newsId = params.get('id');
