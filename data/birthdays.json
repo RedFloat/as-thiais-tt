@@ -1,7 +1,17 @@
 {
-  "enabled": true,
+  "enabled": false,
   "birthdays": [
-    { "id": "b1", "name": "Lucas Martin", "day": 15, "month": 8 },
-    { "id": "b2", "name": "Sophie Dubois", "day": 28, "month": 9 }
+    {
+      "id": "b1",
+      "name": "Lucas Martin",
+      "day": 15,
+      "month": 8
+    },
+    {
+      "id": "b2",
+      "name": "Sophie Dubois",
+      "day": 28,
+      "month": 9
+    }
   ]
 }
