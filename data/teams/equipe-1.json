@@ -4,13 +4,13 @@
   "division": "Nationale 3",
   "photo": "./imgs/teams/equipe-1.jpg",
   "description": "Test",
+  "showPlayers": false,
   "players": [
     "Nathan BAUDOUIN",
     "Ethan BENALAL",
     "Samy TOUKAL"
   ],
   "classification": {
-    "pool": "Poule 4",
     "rank": 2,
     "totalTeams": 8,
     "status": "up"
