@@ -129,6 +129,7 @@
       if (btn.dataset.view === 'albums') loadAlbumsView();
       if (btn.dataset.view === 'videos') loadVideosView();
       if (btn.dataset.view === 'birthdays') loadBirthdaysView();
+      if (btn.dataset.view === 'pages') loadPagesView();
     });
   });
 
@@ -2926,6 +2927,277 @@ ${items}
       birthdaysEnabledCheckbox.checked = !birthdaysEnabledCheckbox.checked;
     }
   });
+
+  /* ---------- Pages personnalisées ---------- */
+
+  const PAGES_PATH = 'data/pages.json';
+
+  const pagesList = document.getElementById('pagesList');
+  const pageEditorCard = document.getElementById('pageEditorCard');
+  const pageEditorForm = document.getElementById('pageEditorForm');
+  const pageEditorStatus = document.getElementById('pageEditorStatus');
+  const pageSaveLabel = document.getElementById('pageSaveLabel');
+  const pageRichtextEditor = document.getElementById('pageRichtextEditor');
+  const pageRichtextImageInput = document.getElementById('pageRichtextImageInput');
+  const pageCodeEditor = document.getElementById('pageCodeEditor');
+  const pageVisualEditorWrap = document.getElementById('pageVisualEditorWrap');
+  const pageCodeEditorWrap = document.getElementById('pageCodeEditorWrap');
+  const pageTitleInput = document.getElementById('pageTitleInput');
+  const pageSlugInput = document.getElementById('pageSlugInput');
+
+  let currentPagesList = [];
+  let pageEditorMode = 'visual';
+  let slugManuallyEdited = false;
+
+  async function loadPagesView() {
+    pagesList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(PAGES_PATH);
+      currentPagesList = data.pages || [];
+      renderPagesList(currentPagesList);
+    } catch (err) {
+      pagesList.innerHTML = '';
+      pagesList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les pages', [err.message]));
+    }
+  }
+
+  function renderPagesList(pages) {
+    pagesList.innerHTML = '';
+    if (pages.length === 0) {
+      pagesList.innerHTML = '<p class="empty-list-msg">Aucune page pour le moment.</p>';
+      return;
+    }
+
+    pages.forEach((page) => {
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      row.innerHTML = `
+        <div class="admin-list-thumb"><i class="fa-solid fa-file-lines" style="color:var(--color-navy);"></i></div>
+        <div class="admin-list-info">
+          <strong>${page.title}</strong>
+          <span>page.html?slug=${page.slug}</span>
+        </div>
+        <div class="admin-list-actions">
+          <a href="../page.html?slug=${page.slug}" target="_blank" rel="noopener" class="view-link-btn" title="Voir la page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+      row.querySelector('.edit-btn').addEventListener('click', () => openPageEditor(page));
+      row.querySelector('.delete-btn').addEventListener('click', () => deletePage(page.id, page.title));
+      pagesList.appendChild(row);
+    });
+  }
+
+  function generatePageId(title, pages) {
+    const base = slugify(title) || 'page';
+    const allIds = pages.map((p) => p.id);
+    let id = base;
+    let counter = 2;
+    while (allIds.includes(id)) { id = `${base}-${counter}`; counter++; }
+    return id;
+  }
+
+  /* --- Bascule mode Facile / Code --- */
+
+  function setPageEditorMode(mode) {
+    if (mode === pageEditorMode) return;
+
+    if (mode === 'code') {
+      // On passe du visuel vers le code : on récupère le HTML actuel
+      pageCodeEditor.value = pageRichtextEditor.innerHTML;
+    } else {
+      // On passe du code vers le visuel : on réinjecte le HTML tapé
+      pageRichtextEditor.innerHTML = pageCodeEditor.value;
+    }
+
+    pageEditorMode = mode;
+    pageVisualEditorWrap.classList.toggle('hidden', mode !== 'visual');
+    pageCodeEditorWrap.classList.toggle('hidden', mode !== 'code');
+    document.querySelectorAll('#pageModeSwitch .mode-switch-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.mode === mode);
+    });
+  }
+
+  document.querySelectorAll('#pageModeSwitch .mode-switch-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setPageEditorMode(btn.dataset.mode));
+  });
+
+  function getCurrentPageBody() {
+    return pageEditorMode === 'code' ? pageCodeEditor.value : pageRichtextEditor.innerHTML;
+  }
+
+  /* --- Slug automatique à partir du titre --- */
+
+  pageSlugInput.addEventListener('input', () => { slugManuallyEdited = true; });
+  pageTitleInput.addEventListener('input', () => {
+    if (!slugManuallyEdited) pageSlugInput.value = slugify(pageTitleInput.value);
+  });
+
+  /* --- Ouverture de l'éditeur --- */
+
+  function openPageEditor(page) {
+    pageEditorForm.reset();
+    pageRichtextEditor.innerHTML = '';
+    pageCodeEditor.value = '';
+    slugManuallyEdited = false;
+
+    // Revient toujours en mode visuel à l'ouverture, quel que soit le mode précédent
+    pageEditorMode = 'visual';
+    pageVisualEditorWrap.classList.remove('hidden');
+    pageCodeEditorWrap.classList.add('hidden');
+    document.querySelectorAll('#pageModeSwitch .mode-switch-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.mode === 'visual');
+    });
+
+    if (page) {
+      document.getElementById('pageEditId').value = page.id;
+      pageTitleInput.value = page.title || '';
+      pageSlugInput.value = page.slug || '';
+      slugManuallyEdited = true;
+      pageRichtextEditor.innerHTML = page.body || '';
+      pageSaveLabel.textContent = 'Enregistrer les modifications';
+      document.getElementById('pageEditorTitle').textContent = 'Modifier la page';
+    } else {
+      document.getElementById('pageEditId').value = '';
+      pageSaveLabel.textContent = 'Créer la page';
+      document.getElementById('pageEditorTitle').textContent = 'Créer une page';
+    }
+
+    pageEditorCard.classList.remove('hidden');
+    pageEditorCard.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  document.getElementById('addPageBtn').addEventListener('click', () => openPageEditor(null));
+  document.getElementById('pageEditorCancelBtn').addEventListener('click', () => {
+    pageEditorCard.classList.add('hidden');
+  });
+
+  /* --- Barre d'outils de mise en forme --- */
+
+  document.querySelectorAll('#pageRichtextToolbar button[data-cmd]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      pageRichtextEditor.focus();
+      const cmd = btn.dataset.cmd;
+      if (cmd.startsWith('formatBlock:')) {
+        document.execCommand('formatBlock', false, cmd.split(':')[1]);
+      } else {
+        document.execCommand(cmd, false, null);
+      }
+    });
+  });
+
+  document.getElementById('pageRichtextLinkBtn').addEventListener('click', () => {
+    const url = prompt('Lien à insérer (https://...) :');
+    if (!url) return;
+    pageRichtextEditor.focus();
+    document.execCommand('createLink', false, url);
+  });
+
+  document.getElementById('pageRichtextImageBtn').addEventListener('click', () => {
+    pageRichtextImageInput.click();
+  });
+
+  pageRichtextImageInput.addEventListener('change', async () => {
+    const file = pageRichtextImageInput.files[0];
+    if (!file) return;
+
+    const pageId = document.getElementById('pageEditId').value || 'page-brouillon';
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `imgs/pages/${pageId}-inline-${Date.now()}.${ext}`;
+
+    setStatus(pageEditorStatus, 'loading', 'Envoi de l\'image…');
+    try {
+      await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une page`);
+      pageRichtextEditor.focus();
+      document.execCommand('insertHTML', false, `<img src="./${path}" alt="">`);
+      hideStatus(pageEditorStatus);
+    } catch (err) {
+      setStatus(pageEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message);
+    } finally {
+      pageRichtextImageInput.value = '';
+    }
+  });
+
+  /* --- Enregistrement --- */
+
+  pageEditorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('pageSaveBtn');
+    saveBtn.disabled = true;
+    setStatus(pageEditorStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      if (!fileState[PAGES_PATH]) await readFile(PAGES_PATH);
+      const pages = fileState[PAGES_PATH].json.pages.slice();
+
+      const editingId = document.getElementById('pageEditId').value;
+      const title = pageTitleInput.value.trim();
+      const slug = slugify(pageSlugInput.value.trim() || title);
+      const body = getCurrentPageBody();
+
+      const slugTaken = pages.some((p) => p.slug === slug && p.id !== editingId);
+      if (slugTaken) {
+        throw new Error('Cette adresse (slug) est déjà utilisée par une autre page.');
+      }
+
+      const id = editingId || generatePageId(title, pages);
+      const entry = { id, title, slug, body, date: new Date().toISOString().slice(0, 10) };
+      const updatedPages = editingId ? pages.map((p) => (p.id === editingId ? entry : p)) : pages.concat(entry);
+
+      const updated = { pages: updatedPages };
+      const sha = fileState[PAGES_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, PAGES_PATH, updated, sha,
+        editingId ? `Admin : modification de la page "${title}"` : `Admin : création de la page "${title}"`
+      );
+
+      fileState[PAGES_PATH] = { json: updated, sha: result.content.sha };
+      currentPagesList = updatedPages;
+      renderPagesList(updatedPages);
+      pageEditorCard.classList.add('hidden');
+      setStatus(pageEditorStatus, 'success', 'Page enregistrée !');
+    } catch (err) {
+      setStatus(pageEditorStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  /* --- Suppression (avec nettoyage des images insérées) --- */
+
+  function collectPageImagePaths(page) {
+    const paths = [];
+    const matches = (page.body || '').matchAll(/<img[^>]+src=["']([^"']*imgs\/pages\/[^"']+)["']/g);
+    for (const m of matches) paths.push(toRepoPath(m[1]));
+    return paths;
+  }
+
+  async function deletePage(id, title) {
+    if (!confirm(`Supprimer la page "${title}" ? Ses images éventuelles seront aussi supprimées de GitHub. Cette action est immédiate.`)) return;
+
+    try {
+      if (!fileState[PAGES_PATH]) await readFile(PAGES_PATH);
+      const pageToDelete = fileState[PAGES_PATH].json.pages.find((p) => p.id === id);
+      const updatedPages = fileState[PAGES_PATH].json.pages.filter((p) => p.id !== id);
+
+      const updated = { pages: updatedPages };
+      const sha = fileState[PAGES_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, PAGES_PATH, updated, sha, `Admin : suppression de la page "${title}"`);
+      fileState[PAGES_PATH] = { json: updated, sha: result.content.sha };
+
+      if (pageToDelete) {
+        for (const imgPath of collectPageImagePaths(pageToDelete)) {
+          await deleteFileIfExists(imgPath);
+        }
+      }
+
+      currentPagesList = updatedPages;
+      renderPagesList(updatedPages);
+    } catch (err) {
+      alert('Erreur lors de la suppression : ' + err.message);
+    }
+  }
 
   /* ---------- Démarrage ---------- */
 

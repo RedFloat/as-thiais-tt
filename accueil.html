@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entraînements — AS Thiais Tennis de Table</title>
+  <title>AS Thiais Tennis de Table — Site Officiel</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -585,6 +585,93 @@
     .score-loss { background: #fee2e2; color: #dc2626; }
     .status-upcoming { background: #f1f5f9; color: var(--color-navy); font-weight: 600; border: 1px solid #cbd5e1; }
 
+    .mini-team-form {
+      display: flex;
+      gap: 0.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--color-white);
+    }
+
+    .form-v { background: #059669; }
+    .form-n { background: #d97706; }
+    .form-d { background: #dc2626; }
+
+    .mini-team-link {
+      display: block;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      margin-top: 0.5rem;
+      padding-top: 0.45rem;
+      border-top: 1px dashed #e2e8f0;
+    }
+
+    .mini-team-link:hover { color: var(--color-gold); }
+
+    /* ---------- Tableau de classement (fin de phase) ---------- */
+
+    .standings-section {
+      padding: 1rem 0 3rem;
+    }
+
+    .standings-table-wrap {
+      background: var(--color-white);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(4, 74, 110, 0.06);
+      overflow-x: auto;
+    }
+
+    .standings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .standings-table th {
+      background: var(--color-navy);
+      color: var(--color-white);
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .standings-table td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      color: var(--color-text-main);
+    }
+
+    .standings-table tr:last-child td { border-bottom: none; }
+
+    .standings-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+    }
+
+    .standings-up { background: #d1fae5; color: #059669; }
+    .standings-maintien { background: #f1f5f9; color: var(--color-navy); }
+    .standings-down { background: #fee2e2; color: #dc2626; }
+
     /* ==========================================================================
        5. WIDGETS
        ========================================================================== */
@@ -628,6 +715,24 @@
       border-radius: 6px;
       background-size: cover;
       background-position: center;
+    }
+
+    .video-mini-item {
+      background-color: var(--color-navy-dark);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-mini-item i {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      color: var(--color-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
     }
 
     .event-list-mini li {
@@ -695,6 +800,7 @@
       border: 1px solid #e2e8f0;
       border-radius: var(--radius-card);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 1.75rem;
@@ -704,7 +810,7 @@
     }
 
     .partners-featured::after {
-      content: "Partenaire du moment";
+      content: "Partenaires";
       position: absolute;
       top: 0.7rem;
       left: 0.9rem;
@@ -726,6 +832,14 @@
     .partners-featured img.is-fading {
       opacity: 0;
       transform: scale(0.96);
+    }
+
+    .partners-featured-name {
+      margin-top: 0.9rem;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--color-navy);
+      text-align: center;
     }
 
     .partners-mosaic {
@@ -907,346 +1021,16 @@
       .footer-contact-block { text-align: center; }
       .footer-contact-block h4 { justify-content: center; }
     }
-
-    /* ==========================================================================
-       7. PAGE ENTRAINEMENTS
-       ========================================================================== */
-    .page-hero {
-      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
-      color: var(--color-white);
-      padding: 3rem 0;
-      text-align: center;
-    }
-
-    .page-hero .badge-gold {
-      background: rgba(255,255,255,0.1);
-      border-color: var(--color-gold);
-      color: var(--color-gold);
-    }
-
-    .page-hero h1 {
-      font-size: 2.2rem;
-      margin: 0.8rem 0 1rem;
-    }
-
-    .page-hero p {
-      max-width: 700px;
-      margin: 0 auto;
-      color: #cbd5e1;
-      font-size: 1rem;
-      line-height: 1.7;
-    }
-
-    .page-content {
-      padding: 3.5rem 0 3.5rem;
-    }
-
-    .info-strip {
-      display: flex;
-      gap: 1.2rem;
-      flex-wrap: wrap;
-      margin-bottom: 2.5rem;
-    }
-
-    .info-strip-item {
-      flex: 1;
-      min-width: 240px;
-      background: var(--color-white);
-      border: 1px solid rgba(4, 74, 110, 0.08);
-      border-left: 4px solid var(--color-gold);
-      border-radius: var(--radius-card);
-      padding: 1.2rem 1.4rem;
-      box-shadow: var(--shadow-subtle);
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-
-    .info-strip-item i {
-      font-size: 1.4rem;
-      color: var(--color-navy);
-      margin-top: 0.15rem;
-    }
-
-    .info-strip-item strong {
-      display: block;
-      color: var(--color-navy);
-      margin-bottom: 0.2rem;
-      font-size: 0.98rem;
-    }
-
-    .info-strip-item span {
-      color: var(--color-text-muted);
-      font-size: 0.88rem;
-      line-height: 1.5;
-    }
-
-    .planning-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.75rem;
-      margin-bottom: 2.5rem;
-      align-items: start;
-    }
-
-    .planning-panel h2 {
-      color: var(--color-navy);
-      font-size: 1.2rem;
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .planning-panel h2 i { color: var(--color-gold); }
-
-    .planning-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-    }
-
-    .planning-list-item {
-      display: flex;
-      gap: 0.9rem;
-      align-items: flex-start;
-      padding: 0.9rem 1rem;
-      background: var(--color-bg-light);
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .planning-list-item i {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: var(--color-gold-light);
-      color: var(--color-navy);
-      border: 1px solid var(--color-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 0.9rem;
-    }
-
-    .planning-list-item strong {
-      display: block;
-      color: var(--color-navy);
-      font-size: 0.92rem;
-      margin-bottom: 0.15rem;
-    }
-
-    .planning-list-item span {
-      color: var(--color-text-muted);
-      font-size: 0.86rem;
-      line-height: 1.5;
-    }
-
-    .holiday-note {
-      margin-top: 1.2rem;
-      background: var(--color-gold-light);
-      border-left: 4px solid var(--color-gold);
-      border-radius: 8px;
-      padding: 0.9rem 1.1rem;
-      font-size: 0.86rem;
-      color: var(--color-navy);
-      line-height: 1.6;
-    }
-
-    .holiday-note i { color: var(--color-gold); margin-right: 0.3rem; }
-
-    .retraites-panel {
-      background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-dark) 100%);
-      color: var(--color-white);
-      border-radius: var(--radius-card);
-      padding: 1.75rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .retraites-panel .badge-gold {
-      align-self: flex-start;
-      background: rgba(255,255,255,0.1);
-      border-color: var(--color-gold);
-      color: var(--color-gold);
-      margin-bottom: 0.9rem;
-    }
-
-    .retraites-panel h2 {
-      font-size: 1.2rem;
-      margin-bottom: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .retraites-panel h2 i { color: var(--color-gold); }
-
-    .retraites-panel p {
-      color: #cbd5e1;
-      font-size: 0.9rem;
-      line-height: 1.7;
-      margin-bottom: 1.2rem;
-    }
-
-    .retraites-slots {
-      display: flex;
-      gap: 0.8rem;
-      flex-wrap: wrap;
-    }
-
-    .retraites-slot {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 0.5rem 0.9rem;
-      border-radius: 50px;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-
-    .retraites-slot i { color: var(--color-gold); }
-
-    .schedule-panel {
-      background: var(--color-white);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-subtle);
-      border: 1px solid rgba(4, 74, 110, 0.06);
-      padding: 1.75rem;
-    }
-
-    .schedule-panel h2 {
-      color: var(--color-navy);
-      font-size: 1.25rem;
-      margin-bottom: 0.4rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .schedule-panel h2 i { color: var(--color-gold); }
-
-    .schedule-panel-intro {
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 1.4rem;
-    }
-
-    .schedule-preview-link {
-      display: block;
-      position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-      max-width: 640px;
-      margin: 0 auto;
-      transition: var(--transition);
-    }
-
-    .schedule-preview-link:hover {
-      box-shadow: var(--shadow-hover);
-      border-color: var(--color-gold);
-      transform: translateY(-2px);
-    }
-
-    .schedule-preview-link img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .schedule-preview-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(2,44,67,0.85) 0%, rgba(2,44,67,0) 45%);
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 1.2rem;
-      opacity: 0;
-      transition: var(--transition);
-    }
-
-    .schedule-preview-link:hover .schedule-preview-overlay {
-      opacity: 1;
-    }
-
-    .schedule-preview-overlay span {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--color-gold);
-      color: var(--color-navy-dark);
-      font-weight: 700;
-      font-size: 0.88rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: 50px;
-    }
-
-    @media (max-width: 900px) {
-      .planning-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .info-strip {
-        flex-direction: column;
-      }
-    }
-
-    /* ---------- Rappel des partenaires (pied de page, ordinateur uniquement) ---------- */
-    .sponsors-reminder-section {
-      display: none;
-      padding: 2rem 0;
-      border-top: 1px solid #e2e8f0;
-    }
-
-    @media (min-width: 992px) {
-      .sponsors-reminder-section {
-        display: block;
-      }
-    }
-
-    .sponsors-reminder-title {
-      text-align: center;
-      color: var(--color-text-muted);
-      font-size: 0.85rem;
-      margin-bottom: 1.2rem;
-    }
-
-    .sponsors-reminder-strip {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 1.75rem;
-    }
-
-    .sponsor-reminder-item { display: block; }
-
-    .sponsor-reminder-item img {
-      height: 40px;
-      max-width: 110px;
-      object-fit: contain;
-      filter: grayscale(35%);
-      opacity: 0.8;
-      transition: var(--transition);
-    }
-
-    .sponsor-reminder-item:hover img {
-      filter: grayscale(0%);
-      opacity: 1;
-    }
+    .hidden { display: none !important; }
   </style>
   <link rel="icon" id="faviconLink" href="https://www.asthiaistt.com/media/uploaded/sites/398/association/624abd03ad5c5_LogotypeThiaistennisdetablecouleurs10243.jpg">
 </head>
 <body>
-<header>
+
+  <!-- ==========================================
+     HEADER : LOGO + BANDEAU DE NAVIGATION PC
+     ========================================== -->
+  <header>
     <!-- Niveau 1 : Logo & Titre -->
     <div class="header-top container">
       <a href="./accueil.html" class="logo">
@@ -1287,99 +1071,151 @@
   </header>
 
   <!-- ==========================================
-     HERO ENTRAINEMENTS
+     1. CARROUSEL NEWS
      ========================================== -->
-  <section class="page-hero">
-    <div class="container">
-      <span class="badge-gold" data-season-badge>Saison 2025-2026</span>
-      <h1>Entraînements</h1>
-      <p>
-        Retrouvez toutes les informations pratiques concernant le lieu, le planning et les créneaux
-        d'entraînement du club pour la saison.
-      </p>
+  <section class="featured-news-section container">
+    <div class="news-wrapper">
+      <div class="news-carousel-container" id="carouselContainer">
+        <div class="news-track" id="newsTrack">
+          <!-- Généré dynamiquement par js/site-data.js depuis data/news.json -->
+        </div>
+      </div>
+
+      <div class="carousel-dots" id="carouselDots"></div>
+
+      <div class="all-news-btn-container">
+        <a href="./news.html" class="btn-primary" style="background: transparent; border: 2px solid var(--color-navy); color: var(--color-navy);">
+          Voir tous les articles <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- ==========================================
-     CONTENU PRINCIPAL
+     2. LES 12 ÉQUIPES DU CLUB
      ========================================== -->
-  <section class="page-content">
+  <section class="teams-section container" id="teamsSection">
+    <div class="section-title">
+      <span class="badge-gold" data-season-badge>Saison 2026-2027</span>
+      <h2 id="teamsSectionTitle">Chargement en cours…</h2>
+    </div>
+
+    <div class="teams-grid" id="teamsGrid">
+      <!-- Généré dynamiquement par js/site-data.js depuis data/teams/*.json -->
+    </div>
+  </section>
+
+  <!-- ==========================================
+     2bis. CLASSEMENT DE FIN DE PHASE
+     ========================================== -->
+  <section class="standings-section container" id="standingsSection">
+    <div class="section-title">
+      <span class="badge-gold">Fin de phase</span>
+      <h2>Classement des Équipes</h2>
+    </div>
+    <div class="standings-table-wrap">
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th>Équipe</th>
+            <th>Division</th>
+            <th>Classement</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody id="standingsTableBody">
+          <!-- Généré dynamiquement par js/site-data.js depuis data/teams/*.json -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!-- ==========================================
+     3. WIDGETS
+     ========================================== -->
+  <section class="widgets-section container">
+    <div class="widgets-grid">
+      
+      <!-- Galerie Photos -->
+      <div class="widget-box">
+        <h3><i class="fa-solid fa-camera"></i> Galerie Photos</h3>
+        <div class="photo-mini-grid" id="photoGalleryWidget">
+          <!-- Généré dynamiquement par js/site-data.js depuis data/albums.json -->
+        </div>
+      </div>
+
+      <!-- Galerie Vidéo -->
+      <div class="widget-box">
+        <h3><i class="fa-solid fa-video"></i> Galerie Vidéo</h3>
+        <div class="photo-mini-grid" id="videoGalleryWidget">
+          <!-- Généré dynamiquement par js/site-data.js depuis data/videos.json -->
+        </div>
+      </div>
+
+      <!-- Calendrier -->
+      <div class="widget-box">
+        <h3><i class="fa-solid fa-calendar-days"></i> Prochains Événements</h3>
+        <ul class="event-list-mini">
+          <li>
+            <div class="event-date-badge">
+              <div class="day">25</div>
+              <div class="month">Sep</div>
+            </div>
+            <div>
+              <strong>J1 Championnat de Paris</strong>
+              <div style="font-size:0.8rem; color:var(--color-text-muted);">Toutes équipes</div>
+            </div>
+          </li>
+          <li>
+            <div class="event-date-badge">
+              <div class="day">10</div>
+              <div class="month">Oct</div>
+            </div>
+            <div>
+              <strong>Critérium Fédéral (Tour 1)</strong>
+              <div style="font-size:0.8rem; color:var(--color-text-muted);">Individuels</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Anniversaires -->
+      <div class="widget-box hidden" id="birthdaysWidgetBox">
+        <h3><i class="fa-solid fa-cake-candles"></i> Anniversaires du Mois</h3>
+        <div id="birthdaysWidget">
+          <!-- Généré dynamiquement par js/site-data.js depuis data/birthdays.json -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+     PARTENAIRES
+     ========================================== -->
+  <section class="partners-section">
     <div class="container">
-
-      <!-- Lieu -->
-      <div class="info-strip">
-        <div class="info-strip-item">
-          <i class="fa-solid fa-location-dot"></i>
-          <div>
-            <strong>Lieu</strong>
-            <span>Palais Omnisports de Thiais, salle spécifique</span>
-          </div>
-        </div>
+      <div class="section-title">
+        <span class="badge-gold">Merci à eux</span>
+        <h2>Nos Partenaires</h2>
       </div>
-
-      <!-- Planning + Créneaux retraités -->
-      <div class="planning-grid">
-        <div class="panel-card planning-panel">
-          <h2><i class="fa-solid fa-calendar-days"></i> Planning de la saison</h2>
-          <div class="planning-list">
-            <div class="planning-list-item">
-              <i class="fa-solid fa-play"></i>
-              <div>
-                <strong>Rentrée des entraînements</strong>
-                <span>Lundi 8 septembre 2025</span>
-              </div>
-            </div>
-            <div class="planning-list-item">
-              <i class="fa-solid fa-calendar-check"></i>
-              <div>
-                <strong>Sauf le samedi</strong>
-                <span>Début le samedi 20 septembre 2026</span>
-              </div>
-            </div>
-          </div>
-          <div class="holiday-note">
-            <i class="fa-solid fa-circle-info"></i>
-            Pas d'entraînement pendant les congés scolaires.
-          </div>
+      <div class="partners-content">
+        <!-- Logo mis en avant, change automatiquement toutes les 3 secondes -->
+        <div class="partners-featured">
+          <img id="featuredPartnerLogo" src="" alt="" style="display:none;">
+          <div class="partners-featured-name" id="featuredPartnerName"></div>
         </div>
 
-        <div class="retraites-panel">
-          <span class="badge-gold">Créneau dédié</span>
-          <h2><i class="fa-solid fa-user-group"></i> Créneaux retraités</h2>
-          <p>Un créneau spécialement dédié aux retraités est proposé chaque semaine.</p>
-          <div class="retraites-slots">
-            <span class="retraites-slot"><i class="fa-solid fa-clock"></i> Lundi 9h - 12h</span>
-            <span class="retraites-slot"><i class="fa-solid fa-clock"></i> Vendredi 9h - 12h</span>
-          </div>
+        <!-- Mosaïque avec l'ensemble des partenaires -->
+        <div class="partners-mosaic" id="partnersMosaic">
+          <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
         </div>
       </div>
-
-      <!-- Créneaux d'entraînement (image cliquable -> PDF) -->
-      <div class="schedule-panel">
-        <h2><i class="fa-solid fa-table-list"></i> Créneaux d'entraînement</h2>
-        <p class="schedule-panel-intro">
-          Consultez le détail de tous les créneaux d'entraînement par équipe et par catégorie. Cliquez sur
-          l'aperçu ci-dessous pour ouvrir le planning complet au format PDF.
-        </p>
-        <a href="./docs/entrainements-horaires.pdf" target="_blank" rel="noopener" class="schedule-preview-link">
-          <img src="./imgs/apercu-entrainement.png" alt="Aperçu des créneaux d'entraînement — cliquer pour ouvrir le PDF complet">
-          <div class="schedule-preview-overlay">
-            <span><i class="fa-solid fa-file-pdf"></i> Ouvrir le planning complet (PDF)</span>
-          </div>
-        </a>
-      </div>
-
     </div>
   </section>
 
-
-  <section class="sponsors-reminder-section container">
-    <p class="sponsors-reminder-title">Merci à nos partenaires, qui nous soutiennent dans nos projets :</p>
-    <div class="sponsors-reminder-strip" id="sponsorsFooterReminder">
-      <!-- Généré dynamiquement par js/site-data.js depuis data/sponsors.json -->
-    </div>
-  </section>
-
+  <!-- ==========================================
+     FOOTER RÉAGENCÉ AVEC BLOC CONTACT
+     ========================================== -->
   <footer>
     <div class="container">
       <div class="footer-flex">
@@ -1426,28 +1262,14 @@
     </div>
   </footer>
 
-<script src="./js/site-data.js"></script>
-<script>
+  <!-- ==========================================
+     SCRIPTS : NAVIGATION & CARROUSEL
+     ========================================== -->
+  <script src="./js/site-data.js"></script>
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 0. Rotation du logo partenaire mis en avant (toutes les 3 secondes)
-      const partnerLogos = Array.from(document.querySelectorAll('#partnersMosaic img')).map(img => ({
-        src: img.getAttribute('src'),
-        alt: img.getAttribute('alt')
-      }));
-      const featuredLogo = document.getElementById('featuredPartnerLogo');
-      let currentPartnerIndex = 0;
-
-      if (featuredLogo && partnerLogos.length > 1) {
-        setInterval(() => {
-          currentPartnerIndex = (currentPartnerIndex + 1) % partnerLogos.length;
-          featuredLogo.classList.add('is-fading');
-          setTimeout(() => {
-            featuredLogo.src = partnerLogos[currentPartnerIndex].src;
-            featuredLogo.alt = partnerLogos[currentPartnerIndex].alt;
-            featuredLogo.classList.remove('is-fading');
-          }, 300);
-        }, 3000);
-      }
+      // Note : les sponsors (mosaïque + logo mis en avant) sont gérés par
+      //        js/site-data.js, à partir de data/sponsors.json
 
       // 1. Menu Mobile
       const mobileBtn = document.getElementById('mobileMenuBtn');
@@ -1466,127 +1288,8 @@
       }
 
 
-      // 2. Carrousel avec Swipe boucle infinie + Auto 3.5s
-      const container = document.getElementById('carouselContainer');
-      const track = document.getElementById('newsTrack');
-      
-      if (container && track) {
-        const slides = Array.from(track.children);
-        const dotsContainer = document.getElementById('carouselDots');
-        let currentIndex = 0;
-        let slideInterval;
-
-        let isDragging = false;
-        let startPos = 0;
-        let currentTranslate = 0;
-        let prevTranslate = 0;
-        let animationID = 0;
-
-        // Génération dynamique des petits points (dots)
-        if (dotsContainer) {
-          dotsContainer.innerHTML = '';
-          slides.forEach((_, index) => {
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            if (index === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => {
-              goToSlide(index);
-              resetAutoSlide();
-            });
-            dotsContainer.appendChild(dot);
-          });
-        }
-
-        const dots = dotsContainer ? Array.from(dotsContainer.children) : [];
-
-        function updateDots() {
-          dots.forEach((dot, index) => dot.classList.toggle('active', index === currentIndex));
-        }
-
-        function setSliderPosition() {
-          track.style.transform = `translateX(${currentTranslate}px)`;
-        }
-
-        function animation() {
-          setSliderPosition();
-          if (isDragging) requestAnimationFrame(animation);
-        }
-
-        function goToSlide(index) {
-          currentIndex = (index + slides.length) % slides.length; // Boucle infinie
-          currentTranslate = currentIndex * -container.offsetWidth;
-          prevTranslate = currentTranslate;
-          track.style.transition = 'transform 0.4s ease-out';
-          setSliderPosition();
-          updateDots();
-        }
-
-        function nextSlide() {
-          goToSlide(currentIndex + 1);
-        }
-
-        function startAutoSlide() {
-          slideInterval = setInterval(nextSlide, 3500);
-        }
-
-        function resetAutoSlide() {
-          clearInterval(slideInterval);
-          startAutoSlide();
-        }
-
-        // Événements Touch / Souris pour le Swipe
-        slides.forEach((slide) => {
-          const slideImage = slide.querySelector('.slide-img');
-          if (slideImage) slideImage.addEventListener('dragstart', (e) => e.preventDefault());
-
-          // Touch events (Mobile)
-          slide.addEventListener('touchstart', touchStart);
-          slide.addEventListener('touchend', touchEnd);
-          slide.addEventListener('touchmove', touchMove);
-
-          // Mouse events (Desktop)
-          slide.addEventListener('mousedown', touchStart);
-          slide.addEventListener('mouseup', touchEnd);
-          slide.addEventListener('mouseleave', () => isDragging && touchEnd());
-          slide.addEventListener('mousemove', touchMove);
-        });
-
-        function getPositionX(event) {
-          return event.type.includes('mouse') ? event.clientX : event.touches[0].clientX;
-        }
-
-        function touchStart(event) {
-          isDragging = true;
-          startPos = getPositionX(event);
-          animationID = requestAnimationFrame(animation);
-          track.style.transition = 'none';
-          clearInterval(slideInterval);
-        }
-
-        function touchMove(event) {
-          if (!isDragging) return;
-          const currentPosition = getPositionX(event);
-          currentTranslate = prevTranslate + currentPosition - startPos;
-        }
-
-        function touchEnd() {
-          isDragging = false;
-          cancelAnimationFrame(animationID);
-          const movedBy = currentTranslate - prevTranslate;
-
-          if (movedBy < -50) goToSlide(currentIndex + 1);
-          else if (movedBy > 50) goToSlide(currentIndex - 1);
-          else goToSlide(currentIndex);
-
-          resetAutoSlide();
-        }
-
-        // Adaptation au redimensionnement de la fenêtre
-        window.addEventListener('resize', () => goToSlide(currentIndex));
-
-        // Démarrage initial
-        startAutoSlide();
-      }
+      // Note : le carrousel de news est géré par js/site-data.js,
+      //       exécuté une fois les slides injectées depuis data/news.json
     });
   </script>
 </body>

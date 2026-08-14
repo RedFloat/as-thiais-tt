@@ -679,6 +679,16 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   border: 1px solid #e2e8f0;
 }
 
+.logo-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: var(--color-bg-light);
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem;
+}
+
 .team-row-thumb {
   width: 44px;
   height: 44px;
@@ -873,6 +883,27 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   object-fit: cover;
   background: var(--color-bg-light);
   border: 1px solid #e2e8f0;
+}
+
+.mode-switch {
+  display: flex;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mode-switch-btn {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--color-white);
+  color: var(--color-text-muted);
+  border: none;
+}
+
+.mode-switch-btn.is-active {
+  background: var(--color-navy);
+  color: var(--color-white);
 }
 
 /* ---------- Responsive ---------- */

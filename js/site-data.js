@@ -890,6 +890,36 @@
     renderAlbumProfile(album);
   }
 
+  /* ---------- Page personnalisée (page.html?slug=...) ---------- */
+
+  async function initCustomPage() {
+    const title = document.getElementById('pageTitle');
+    if (!title || !document.getElementById('pageBodyWrap')) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug');
+
+    if (!slug) {
+      document.getElementById('pageNotFound').classList.remove('hidden');
+      return;
+    }
+
+    const data = await loadJSON('./data/pages.json');
+    const page = data && Array.isArray(data.pages)
+      ? data.pages.find((p) => p.slug === slug)
+      : null;
+
+    if (!page) {
+      document.getElementById('pageNotFound').classList.remove('hidden');
+      return;
+    }
+
+    document.title = page.title + ' — AS Thiais Tennis de Table';
+    title.textContent = page.title;
+    document.getElementById('pageBody').innerHTML = page.body || '';
+    document.getElementById('pageBodyWrap').classList.remove('hidden');
+  }
+
   /* ---------- Fiche sponsor individuelle (sponsor.html?id=...) ---------- */
 
   function renderSponsorProfile(sponsor) {
@@ -1366,6 +1396,7 @@
     initNewsArticlePage();
     initNewsListPage();
     initSponsorProfilePage();
+    initCustomPage();
     initSponsorsFooterReminder();
     initAlbumsListPage();
     initAlbumProfilePage();

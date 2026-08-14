@@ -100,6 +100,9 @@
         <li><button type="button" class="nav-btn" data-view="birthdays">
           <i class="fa-solid fa-cake-candles"></i> Anniversaires
         </button></li>
+        <li><button type="button" class="nav-btn" data-view="pages">
+          <i class="fa-solid fa-file-circle-plus"></i> Pages
+        </button></li>
       </ul>
     </nav>
 
@@ -894,6 +897,85 @@
           <div id="birthdaysList">
             <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
           </div>
+        </div>
+      </section>
+
+      <section class="admin-view" id="view-pages">
+        <div class="view-header">
+          <h1>Pages</h1>
+          <p>Crée et modifie des pages libres du site (mentions légales, partenariats, etc.). L'en-tête, le pied de page et la mise en forme générale restent identiques au reste du site — seul le contenu au centre est à toi.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Pages existantes</h2>
+          <button type="button" class="btn btn-primary" id="addPageBtn" style="margin-bottom:1rem;">
+            <i class="fa-solid fa-plus"></i> Créer une page
+          </button>
+          <div id="pagesList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+
+        <div class="admin-card hidden" id="pageEditorCard">
+          <h2><i class="fa-solid fa-pen"></i> <span id="pageEditorTitle">Créer une page</span></h2>
+          <form id="pageEditorForm">
+            <input type="hidden" id="pageEditId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pageTitleInput">Titre de la page</label>
+                <input type="text" id="pageTitleInput" placeholder="Mentions légales" required>
+              </div>
+              <div class="form-group">
+                <label for="pageSlugInput">Adresse (slug)</label>
+                <input type="text" id="pageSlugInput" placeholder="mentions-legales" required>
+                <span class="form-hint">La page sera accessible à : page.html?slug=...</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                <label style="margin-bottom:0;">Contenu de la page</label>
+                <div class="mode-switch" id="pageModeSwitch">
+                  <button type="button" class="mode-switch-btn is-active" data-mode="visual"><i class="fa-solid fa-wand-magic-sparkles"></i> Facile</button>
+                  <button type="button" class="mode-switch-btn" data-mode="code"><i class="fa-solid fa-code"></i> Code</button>
+                </div>
+              </div>
+
+              <div id="pageVisualEditorWrap">
+                <div class="richtext-toolbar" id="pageRichtextToolbar">
+                  <button type="button" data-cmd="bold" title="Gras"><i class="fa-solid fa-bold"></i></button>
+                  <button type="button" data-cmd="italic" title="Italique"><i class="fa-solid fa-italic"></i></button>
+                  <button type="button" data-cmd="underline" title="Souligné"><i class="fa-solid fa-underline"></i></button>
+                  <span class="richtext-sep"></span>
+                  <button type="button" data-cmd="insertUnorderedList" title="Liste à puces"><i class="fa-solid fa-list-ul"></i></button>
+                  <button type="button" data-cmd="insertOrderedList" title="Liste numérotée"><i class="fa-solid fa-list-ol"></i></button>
+                  <span class="richtext-sep"></span>
+                  <button type="button" data-cmd="formatBlock:H2" title="Titre">H2</button>
+                  <button type="button" data-cmd="formatBlock:P" title="Paragraphe">¶</button>
+                  <span class="richtext-sep"></span>
+                  <button type="button" id="pageRichtextLinkBtn" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
+                  <button type="button" id="pageRichtextImageBtn" title="Insérer une image"><i class="fa-solid fa-image"></i></button>
+                </div>
+                <div class="richtext-editor" id="pageRichtextEditor" contenteditable="true"></div>
+                <input type="file" id="pageRichtextImageInput" accept="image/*" class="hidden">
+              </div>
+
+              <div id="pageCodeEditorWrap" class="hidden">
+                <textarea id="pageCodeEditor" rows="14" style="width:100%; font-family:monospace; font-size:0.85rem;" placeholder="&lt;p&gt;Ton HTML ici...&lt;/p&gt;"></textarea>
+                <span class="form-hint">Écris du HTML directement. Utile pour des mises en page plus poussées.</span>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center; margin-top:1rem;">
+              <button type="submit" class="btn btn-primary" id="pageSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> <span id="pageSaveLabel">Créer la page</span>
+              </button>
+              <button type="button" class="btn btn-ghost" id="pageEditorCancelBtn">Annuler</button>
+            </div>
+
+            <div class="status-msg" id="pageEditorStatus"></div>
+          </form>
         </div>
       </section>
 
