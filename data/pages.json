@@ -1,3 +1,11 @@
 {
-  "pages": []
+  "pages": [
+    {
+      "id": "mentions-legales",
+      "title": "Mentions Légales",
+      "slug": "mentions-legales",
+      "body": "Ceci est un test<div><b>Je mets du texte en gras</b></div><div><i>Du texte en italique</i></div><div><b><u>Du texte souligné</u></b></div><div>Un lien <a href=\"sucy-ping.fr\">hypertexte</a></div><div><img src=\"./imgs/pages/page-brouillon-inline-1786701383850.jpg\" alt=\"\"></div>",
+      "date": "2026-08-14"
+    }
+  ]
 }
