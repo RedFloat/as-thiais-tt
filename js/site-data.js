@@ -12,6 +12,16 @@
 
   /* ---------- Utilitaires ---------- */
 
+  // Lien externe = commence par un protocole (http, https, mailto, tel...).
+  // Sinon on considère que c'est un lien interne au site (même onglet, pas de "noopener").
+  function isExternalLink(url) {
+    return /^[a-z]+:/i.test(url || '');
+  }
+
+  function linkAttrs(url) {
+    return isExternalLink(url) ? 'target="_blank" rel="noopener"' : '';
+  }
+
   async function loadJSON(path) {
     try {
       const res = await fetch(path, { cache: 'no-store' });
@@ -284,7 +294,7 @@
           '<h3>' + link.title + '</h3>' +
           '<p>' + (link.description || '') + '</p>' +
           '<span class="link-card-url">' + displayUrl + '</span>' +
-          '<a href="' + link.url + '" target="_blank" rel="noopener" class="link-card-btn">' +
+          '<a href="' + link.url + '" ' + linkAttrs(link.url) + ' class="link-card-btn">' +
           '<i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site</a>';
         grid.appendChild(card);
       });
@@ -897,7 +907,7 @@
     if (!title || !document.getElementById('pageBodyWrap')) return;
 
     const params = new URLSearchParams(window.location.search);
-    const slug = params.get('slug');
+    const slug = params.get('slug') || window.__PAGE_SLUG__;
 
     if (!slug) {
       document.getElementById('pageNotFound').classList.remove('hidden');
@@ -933,7 +943,7 @@
     const linkWrap = document.getElementById('sponsorLinkWrap');
     if (sponsor.link) {
       linkWrap.innerHTML =
-        `<a href="${sponsor.link}" target="_blank" rel="noopener" class="btn-primary">
+        `<a href="${sponsor.link}" ${linkAttrs(sponsor.link)} class="btn-primary">
           <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
         </a>`;
     }

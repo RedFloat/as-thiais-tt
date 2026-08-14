@@ -55,9 +55,14 @@
         Espace Admin
         <span>AS Thiais Tennis de Table</span>
       </div>
-      <button class="btn btn-ghost" id="logoutBtn">
-        <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
-      </button>
+      <div style="display:flex; gap:0.6rem;">
+        <a href="../accueil.html" target="_blank" rel="noopener" class="btn btn-ghost">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter le site
+        </a>
+        <button class="btn btn-ghost" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+        </button>
+      </div>
     </header>
 
     <nav class="admin-sidebar">
@@ -236,8 +241,8 @@
 
             <div class="form-group">
               <label for="sponsorLink">Lien du site du sponsor (facultatif)</label>
-              <input type="url" id="sponsorLink" placeholder="https://...">
-              <span class="form-hint">Affiché en bouton "Visiter le site" sur la fiche dédiée à ce partenaire.</span>
+              <input type="text" id="sponsorLink" placeholder="https://... ou lien interne (ex : ./inscription.html)">
+              <span class="form-hint">Affiché en bouton "Visiter le site" sur la fiche dédiée à ce partenaire. Fonctionne avec un lien externe ou une page du site.</span>
             </div>
 
             <div class="form-group">
@@ -665,7 +670,7 @@
 
             <div class="form-group">
               <label for="linkUrl">Lien du site</label>
-              <input type="url" id="linkUrl" placeholder="https://..." required>
+              <input type="text" id="linkUrl" placeholder="https://... ou lien interne (ex : ./inscription.html)" required>
             </div>
 
             <div class="form-group">
@@ -929,7 +934,7 @@
               <div class="form-group">
                 <label for="pageSlugInput">Adresse (slug)</label>
                 <input type="text" id="pageSlugInput" placeholder="mentions-legales" required>
-                <span class="form-hint">La page sera accessible à : page.html?slug=...</span>
+                <span class="form-hint">La page sera accessible à : tonsite.github.io/ton-repo/ce-slug/</span>
               </div>
             </div>
 

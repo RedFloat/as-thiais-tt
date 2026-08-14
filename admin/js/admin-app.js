@@ -1761,15 +1761,35 @@
   });
 
   document.getElementById('richtextLinkBtn').addEventListener('click', () => {
-    const url = prompt('Lien à insérer (https://...) :');
+    const url = prompt('Lien à insérer : une adresse externe (https://...) ou un lien interne au site (ex : ./inscription.html, ../mentions-legales/) :');
     if (!url) return;
     richtextEditor.focus();
     document.execCommand('createLink', false, url);
   });
 
+  let savedNewsRange = null;
+
   document.getElementById('richtextImageBtn').addEventListener('click', () => {
+    const sel = window.getSelection();
+    savedNewsRange = (sel.rangeCount > 0 && richtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
     richtextImageInput.click();
   });
+
+  function restoreEditorSelection(editor, range) {
+    editor.focus();
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    if (range) {
+      sel.addRange(range);
+    } else {
+      const fallback = document.createRange();
+      fallback.selectNodeContents(editor);
+      fallback.collapse(false);
+      sel.addRange(fallback);
+    }
+  }
 
   richtextImageInput.addEventListener('change', async () => {
     const file = richtextImageInput.files[0];
@@ -1782,7 +1802,7 @@
     setStatus(newsEditorStatus, 'loading', 'Envoi de l\'image…');
     try {
       await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une news`);
-      richtextEditor.focus();
+      restoreEditorSelection(richtextEditor, savedNewsRange);
       document.execCommand('insertHTML', false, `<img src="./${path}" alt="">`);
       hideStatus(newsEditorStatus);
     } catch (err) {
@@ -2975,10 +2995,10 @@ ${items}
         <div class="admin-list-thumb"><i class="fa-solid fa-file-lines" style="color:var(--color-navy);"></i></div>
         <div class="admin-list-info">
           <strong>${page.title}</strong>
-          <span>page.html?slug=${page.slug}</span>
+          <span>/${page.slug}/</span>
         </div>
         <div class="admin-list-actions">
-          <a href="../page.html?slug=${page.slug}" target="_blank" rel="noopener" class="view-link-btn" title="Voir la page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <a href="../${page.slug}/" target="_blank" rel="noopener" class="view-link-btn" title="Voir la page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
           <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
           <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
         </div>
@@ -3088,13 +3108,19 @@ ${items}
   });
 
   document.getElementById('pageRichtextLinkBtn').addEventListener('click', () => {
-    const url = prompt('Lien à insérer (https://...) :');
+    const url = prompt('Lien à insérer : une adresse externe (https://...) ou un lien interne au site (ex : ./inscription.html, ../mentions-legales/) :');
     if (!url) return;
     pageRichtextEditor.focus();
     document.execCommand('createLink', false, url);
   });
 
+  let savedPageRange = null;
+
   document.getElementById('pageRichtextImageBtn').addEventListener('click', () => {
+    const sel = window.getSelection();
+    savedPageRange = (sel.rangeCount > 0 && pageRichtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
     pageRichtextImageInput.click();
   });
 
@@ -3109,7 +3135,7 @@ ${items}
     setStatus(pageEditorStatus, 'loading', 'Envoi de l\'image…');
     try {
       await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une page`);
-      pageRichtextEditor.focus();
+      restoreEditorSelection(pageRichtextEditor, savedPageRange);
       document.execCommand('insertHTML', false, `<img src="./${path}" alt="">`);
       hideStatus(pageEditorStatus);
     } catch (err) {
@@ -3141,6 +3167,8 @@ ${items}
         throw new Error('Cette adresse (slug) est déjà utilisée par une autre page.');
       }
 
+      const previousPage = editingId ? pages.find((p) => p.id === editingId) : null;
+
       const id = editingId || generatePageId(title, pages);
       const entry = { id, title, slug, body, date: new Date().toISOString().slice(0, 10) };
       const updatedPages = editingId ? pages.map((p) => (p.id === editingId ? entry : p)) : pages.concat(entry);
@@ -3153,6 +3181,14 @@ ${items}
       );
 
       fileState[PAGES_PATH] = { json: updated, sha: result.content.sha };
+
+      // Génère (ou régénère) l'URL propre {slug}/index.html. Si le slug a changé, nettoie l'ancien dossier.
+      setStatus(pageEditorStatus, 'loading', 'Mise à jour de l\'adresse de la page…');
+      if (previousPage && previousPage.slug !== slug) {
+        await unpublishCleanUrlPage(previousPage.slug);
+      }
+      await publishCleanUrlPage(slug);
+
       currentPagesList = updatedPages;
       renderPagesList(updatedPages);
       pageEditorCard.classList.add('hidden');
@@ -3190,6 +3226,7 @@ ${items}
         for (const imgPath of collectPageImagePaths(pageToDelete)) {
           await deleteFileIfExists(imgPath);
         }
+        await unpublishCleanUrlPage(pageToDelete.slug);
       }
 
       currentPagesList = updatedPages;
@@ -3198,6 +3235,35 @@ ${items}
       alert('Erreur lors de la suppression : ' + err.message);
     }
   }
+
+  /* --- URL propre : génère un dossier {slug}/index.html qui sert la même matrice --- */
+
+  let cachedPageTemplate = null;
+
+  async function getPageTemplateHtml() {
+    if (cachedPageTemplate) return cachedPageTemplate;
+    const meta = await GitHubAPI.getFileMeta(cfg, 'page.html');
+    cachedPageTemplate = GitHubAPI.base64ToUtf8(meta.content);
+    return cachedPageTemplate;
+  }
+
+  async function publishCleanUrlPage(slug) {
+    const template = await getPageTemplateHtml();
+    // <base href="../"> fait en sorte que tous les chemins relatifs (css, js, data, liens du menu)
+    // continuent de fonctionner normalement, même si ce fichier vit dans un sous-dossier /{slug}/.
+    const injected = template.replace(
+      '<head>',
+      `<head>\n  <base href="../">\n  <script>window.__PAGE_SLUG__ = ${JSON.stringify(slug)};</script>`
+    );
+    const blob = new Blob([injected], { type: 'text/html' });
+    await GitHubAPI.uploadFile(cfg, `${slug}/index.html`, blob, `Admin : URL propre pour la page "${slug}"`);
+  }
+
+  async function unpublishCleanUrlPage(slug) {
+    await deleteFileIfExists(`${slug}/index.html`);
+  }
+
+
 
   /* ---------- Démarrage ---------- */
 
