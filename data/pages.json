@@ -1,3 +1,11 @@
 {
-  "pages": []
+  "pages": [
+    {
+      "id": "mentions-legales",
+      "title": "Mentions légales",
+      "slug": "mentions-legales",
+      "body": "<b>Test gras</b><div><i>Test italique</i></div><div><u>Test souligné</u></div><div><img src=\"./imgs/pages/page-brouillon-inline-1786735040068.jpg\" alt=\"\"></div><div>Test balise</div><div><a href=\"sucy-ping.fr\">Test hypertexte sucy</a></div><div><a href=\"./accueil.html\">Test hypertexte ce repo</a></div>",
+      "date": "2026-08-14"
+    }
+  ]
 }
