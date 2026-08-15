@@ -906,6 +906,22 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   color: var(--color-white);
 }
 
+.reorder-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: var(--color-white);
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.reorder-btn:hover { border-color: var(--color-navy); color: var(--color-navy); }
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {

@@ -119,6 +119,10 @@
           const childLink = document.createElement('a');
           childLink.href = child.link;
           childLink.textContent = child.label;
+          if (isExternalLink(child.link)) {
+            childLink.target = '_blank';
+            childLink.rel = 'noopener';
+          }
           if (normalizeLink(child.link) === currentPage) {
             childLink.classList.add('is-current');
           }
@@ -131,6 +135,10 @@
         link.href = item.link;
         link.className = 'nav-link';
         link.textContent = item.label;
+        if (isExternalLink(item.link)) {
+          link.target = '_blank';
+          link.rel = 'noopener';
+        }
         if (normalizeLink(item.link) === currentPage) {
           link.classList.add('is-current');
         }

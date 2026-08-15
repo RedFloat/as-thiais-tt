@@ -909,6 +909,45 @@
     }
   }
 
+  async function saveNavigation(items, message) {
+    const updated = { items };
+    const sha = fileState[NAV_PATH].sha;
+    const result = await GitHubAPI.saveJSON(cfg, NAV_PATH, updated, sha, message);
+    fileState[NAV_PATH] = { json: updated, sha: result.content.sha };
+    renderNavigation(items);
+  }
+
+  async function moveTopLevelItem(id, direction) {
+    if (!fileState[NAV_PATH]) await readFile(NAV_PATH);
+    const items = fileState[NAV_PATH].json.items.slice();
+    const idx = items.findIndex((it) => it.id === id);
+    const newIdx = idx + direction;
+    if (idx === -1 || newIdx < 0 || newIdx >= items.length) return;
+    [items[idx], items[newIdx]] = [items[newIdx], items[idx]];
+    await saveNavigation(items, 'Admin : réorganisation du menu');
+  }
+
+  async function moveChildItem(parentId, childId, direction) {
+    if (!fileState[NAV_PATH]) await readFile(NAV_PATH);
+    const items = fileState[NAV_PATH].json.items.slice();
+    const parent = items.find((it) => it.id === parentId);
+    if (!parent || !Array.isArray(parent.children)) return;
+    const children = parent.children.slice();
+    const idx = children.findIndex((c) => c.id === childId);
+    const newIdx = idx + direction;
+    if (idx === -1 || newIdx < 0 || newIdx >= children.length) return;
+    [children[idx], children[newIdx]] = [children[newIdx], children[idx]];
+    parent.children = children;
+    await saveNavigation(items, 'Admin : réorganisation d\'une catégorie du menu');
+  }
+
+  function reorderArrowsHtml() {
+    return `
+      <button type="button" class="reorder-btn move-up-btn" title="Monter"><i class="fa-solid fa-chevron-up"></i></button>
+      <button type="button" class="reorder-btn move-down-btn" title="Descendre"><i class="fa-solid fa-chevron-down"></i></button>
+    `;
+  }
+
   function renderNavigation(items) {
     /* --- Liste des catégories (dropdowns) --- */
     const categories = items.filter((it) => it.type === 'dropdown');
@@ -924,10 +963,13 @@
           <i class="fa-solid fa-folder folder-icon"></i>
           <strong>${cat.label} (${(cat.children || []).length})</strong>
           <div class="admin-list-actions">
+            ${reorderArrowsHtml()}
             <button type="button" class="rename-btn" title="Renommer"><i class="fa-solid fa-pen"></i></button>
             <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
           </div>
         `;
+        row.querySelector('.move-up-btn').addEventListener('click', () => moveTopLevelItem(cat.id, -1));
+        row.querySelector('.move-down-btn').addEventListener('click', () => moveTopLevelItem(cat.id, 1));
         row.querySelector('.rename-btn').addEventListener('click', () => renameCategory(cat.id, cat.label));
         row.querySelector('.delete-btn').addEventListener('click', () => deleteCategory(cat.id, cat.label, (cat.children || []).length));
         navCategoriesList.appendChild(row);
@@ -973,10 +1015,17 @@
         <span>${item.link}</span>
       </div>
       <div class="admin-list-actions">
+        ${reorderArrowsHtml()}
         <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
         <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
       </div>
     `;
+    row.querySelector('.move-up-btn').addEventListener('click', () => {
+      parentId ? moveChildItem(parentId, item.id, -1) : moveTopLevelItem(item.id, -1);
+    });
+    row.querySelector('.move-down-btn').addEventListener('click', () => {
+      parentId ? moveChildItem(parentId, item.id, 1) : moveTopLevelItem(item.id, 1);
+    });
     row.querySelector('.edit-btn').addEventListener('click', () => startEditNavItem(item, parentId));
     row.querySelector('.delete-btn').addEventListener('click', () => deleteNavItem(item.id, parentId));
     return row;
