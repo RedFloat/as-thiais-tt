@@ -94,15 +94,15 @@
       ]
     },
     {
-      "id": "contact",
-      "label": "Contact et plan",
-      "link": "#contact",
-      "type": "link"
-    },
-    {
       "id": "mentions-legales",
       "label": "Mentions légales",
       "link": "./mentions-legales",
+      "type": "link"
+    },
+    {
+      "id": "contact",
+      "label": "Contact et plan",
+      "link": "#contact",
       "type": "link"
     }
   ]
