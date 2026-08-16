@@ -52,6 +52,12 @@
       ]
     },
     {
+      "id": "mentions-legales",
+      "label": "Mentions légales",
+      "link": "./mentions-legales",
+      "type": "link"
+    },
+    {
       "id": "infos-pratiques",
       "label": "Infos pratiques",
       "type": "dropdown",
@@ -92,12 +98,6 @@
           "link": "./documents.html"
         }
       ]
-    },
-    {
-      "id": "mentions-legales",
-      "label": "Mentions légales",
-      "link": "./mentions-legales",
-      "type": "link"
     },
     {
       "id": "contact",
