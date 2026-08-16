@@ -1,15 +1,15 @@
 {
   "items": [
     {
-      "id": "accueil",
-      "label": "Accueil",
-      "link": "./accueil.html",
-      "type": "link"
-    },
-    {
       "id": "inscription",
       "label": "Inscription",
       "link": "./inscription.html",
+      "type": "link"
+    },
+    {
+      "id": "accueil",
+      "label": "Accueil",
+      "link": "./accueil.html",
       "type": "link"
     },
     {
