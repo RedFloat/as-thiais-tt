@@ -13,6 +13,12 @@
       "type": "link"
     },
     {
+      "id": "mentions-legales",
+      "label": "Mentions légales",
+      "link": "./mentions-legales",
+      "type": "link"
+    },
+    {
       "id": "equipes",
       "label": "Équipes",
       "type": "dropdown",
@@ -23,12 +29,6 @@
           "link": "./equipe.html?id=equipe-1"
         }
       ]
-    },
-    {
-      "id": "mentions-legales",
-      "label": "Mentions légales",
-      "link": "./mentions-legales",
-      "type": "link"
     },
     {
       "id": "vie-du-club",
