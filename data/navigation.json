@@ -13,12 +13,6 @@
       "type": "link"
     },
     {
-      "id": "mentions-legales",
-      "label": "Mentions légales",
-      "link": "./mentions-legales",
-      "type": "link"
-    },
-    {
       "id": "equipes",
       "label": "Équipes",
       "type": "dropdown",
