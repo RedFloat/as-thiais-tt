@@ -7,6 +7,64 @@
 
   const STORAGE_KEY = 'asthiaistt_admin_cfg';
 
+  /* ---------- Fenêtre modale générique (remplace confirm() / prompt() natifs) ---------- */
+
+  function showModal({ title, message, isPrompt, defaultValue = '', placeholder = '', danger = false, confirmLabel }) {
+    return new Promise((resolve) => {
+      const overlay = document.getElementById('modalOverlay');
+      const inputWrap = document.getElementById('modalInputWrap');
+      const input = document.getElementById('modalInput');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+      const cancelBtn = document.getElementById('modalCancelBtn');
+
+      document.getElementById('modalTitle').textContent = title || (isPrompt ? 'Saisie' : 'Confirmation');
+      document.getElementById('modalMessage').textContent = message || '';
+      confirmBtn.textContent = confirmLabel || (isPrompt ? 'OK' : 'Confirmer');
+      confirmBtn.classList.toggle('btn-danger', !!danger);
+      confirmBtn.classList.toggle('btn-primary', !danger);
+
+      if (isPrompt) {
+        inputWrap.classList.remove('hidden');
+        input.value = defaultValue;
+        input.placeholder = placeholder;
+      } else {
+        inputWrap.classList.add('hidden');
+      }
+
+      overlay.classList.remove('hidden');
+      if (isPrompt) setTimeout(() => input.focus(), 50);
+
+      function cleanup(result) {
+        overlay.classList.add('hidden');
+        confirmBtn.removeEventListener('click', onConfirm);
+        cancelBtn.removeEventListener('click', onCancel);
+        overlay.removeEventListener('click', onOverlayClick);
+        document.removeEventListener('keydown', onKeydown);
+        resolve(result);
+      }
+      function onConfirm() { cleanup(isPrompt ? (input.value.trim() || null) : true); }
+      function onCancel() { cleanup(isPrompt ? null : false); }
+      function onOverlayClick(e) { if (e.target === overlay) onCancel(); }
+      function onKeydown(e) {
+        if (e.key === 'Escape') onCancel();
+        if (e.key === 'Enter' && isPrompt) onConfirm();
+      }
+
+      confirmBtn.addEventListener('click', onConfirm);
+      cancelBtn.addEventListener('click', onCancel);
+      overlay.addEventListener('click', onOverlayClick);
+      document.addEventListener('keydown', onKeydown);
+    });
+  }
+
+  function showConfirmModal(message, opts = {}) {
+    return showModal(Object.assign({ message, isPrompt: false }, opts));
+  }
+
+  function showPromptModal(message, defaultValue = '', opts = {}) {
+    return showModal(Object.assign({ message, isPrompt: true, defaultValue }, opts));
+  }
+
   // Paramètres techniques fixes (transparents pour l'utilisateur de l'admin)
   const REPO_OWNER = 'redfloat';
   const REPO_NAME = 'as-thiais-tt';
@@ -657,7 +715,7 @@
   });
 
   async function deleteSponsor(id) {
-    if (!confirm('Supprimer ce sponsor ? Cette action est immédiate.')) return;
+    if (!(await showConfirmModal('Supprimer ce sponsor ? Cette action est immédiate.'))) return;
 
     setStatus(sponsorStatus, 'loading', 'Suppression en cours…');
     try {
@@ -857,7 +915,7 @@
   });
 
   async function deleteDoc(categoryId, docId) {
-    if (!confirm('Supprimer ce document ? Cette action est immédiate.')) return;
+    if (!(await showConfirmModal('Supprimer ce document ? Cette action est immédiate.'))) return;
 
     setStatus(docStatus, 'loading', 'Suppression en cours…');
     try {
@@ -1131,7 +1189,7 @@
   });
 
   async function deleteNavItem(id, parentId) {
-    if (!confirm('Retirer cette page du menu ? Cette action est immédiate.')) return;
+    if (!(await showConfirmModal('Retirer cette page du menu ? Cette action est immédiate.'))) return;
 
     setStatus(navPageStatus, 'loading', 'Suppression en cours…');
     try {
@@ -1188,7 +1246,7 @@
   });
 
   async function renameCategory(id, currentLabel) {
-    const newLabel = prompt('Nouveau nom de la catégorie :', currentLabel);
+    const newLabel = await showPromptModal('Nouveau nom de la catégorie', currentLabel);
     if (!newLabel || !newLabel.trim() || newLabel.trim() === currentLabel) return;
 
     setStatus(navCategoryStatus, 'loading', 'Renommage en cours…');
@@ -1214,7 +1272,7 @@
     const message = childCount > 0
       ? `Supprimer la catégorie "${label}" ? Les ${childCount} page(s) qu'elle contient seront supprimées du menu aussi.`
       : `Supprimer la catégorie "${label}" ?`;
-    if (!confirm(message)) return;
+    if (!(await showConfirmModal(message))) return;
 
     setStatus(navCategoryStatus, 'loading', 'Suppression en cours…');
     try {
@@ -1395,7 +1453,7 @@
   }
 
   async function removeTeamPhoto() {
-    if (!confirm('Supprimer la photo de cette équipe ? Elle sera aussi supprimée de GitHub.')) return;
+    if (!(await showConfirmModal('Supprimer la photo de cette équipe ? Elle sera aussi supprimée de GitHub.'))) return;
     if (currentTeamPhotoPath) {
       await deleteFileIfExists(toRepoPath(currentTeamPhotoPath));
     }
@@ -1568,7 +1626,7 @@
   /* --- Suppression --- */
 
   async function deleteTeam(id, name) {
-    if (!confirm(`Supprimer l'équipe "${name}" ? Sa fiche, son calendrier et sa photo seront définitivement supprimés.`)) return;
+    if (!(await showConfirmModal(`Supprimer l'équipe "${name}" ? Sa fiche, son calendrier et sa photo seront définitivement supprimés.`))) return;
 
     try {
       const path = teamPath(id);
@@ -1822,8 +1880,23 @@
     document.execCommand('foreColor', false, richtextColorInput.value);
   });
 
-  document.getElementById('richtextLinkBtn').addEventListener('click', () => {
-    const url = prompt('Lien à insérer : une adresse externe (https://...) ou un lien interne au site (ex : ./inscription.html, ../mentions-legales/) :');
+  let savedNewsSizeRange = null;
+  const richtextFontSizeSelect = document.getElementById('richtextFontSizeSelect');
+  richtextFontSizeSelect.addEventListener('mousedown', () => {
+    const sel = window.getSelection();
+    savedNewsSizeRange = (sel.rangeCount > 0 && richtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
+  });
+  richtextFontSizeSelect.addEventListener('change', () => {
+    if (!richtextFontSizeSelect.value) return;
+    restoreEditorSelection(richtextEditor, savedNewsSizeRange);
+    document.execCommand('fontSize', false, richtextFontSizeSelect.value);
+    richtextFontSizeSelect.value = '';
+  });
+
+  document.getElementById('richtextLinkBtn').addEventListener('click', async () => {
+    const url = await showPromptModal('Adresse du lien à insérer', '', { placeholder: 'https://exemple.com' });
     if (!url) return;
     richtextEditor.focus();
     document.execCommand('createLink', false, url);
@@ -1860,16 +1933,23 @@
     const newsId = document.getElementById('newsEditId').value || 'news-brouillon';
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const path = `imgs/news/${newsId}-inline-${Date.now()}.${ext}`;
+    const tempId = 'tmp-img-' + Date.now();
+
+    const dataUrl = await readFileAsDataUrl(file);
+    restoreEditorSelection(richtextEditor, savedNewsRange);
+    document.execCommand('insertHTML', false, `<img id="${tempId}" class="resizable-img" src="${dataUrl}" alt="">`);
 
     setStatus(newsEditorStatus, 'loading', 'Envoi de l\'image…');
     try {
       await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une news`);
-      const imageUrl = `https://${cfg.owner}.github.io/${cfg.repo}/${path}`;
-      restoreEditorSelection(richtextEditor, savedNewsRange);
-      document.execCommand('insertHTML', false, `<img src="${imageUrl}" alt="">`);
+      const insertedImg = richtextEditor.querySelector('#' + tempId);
+      if (insertedImg) {
+        insertedImg.src = `./${path}`;
+        insertedImg.removeAttribute('id');
+      }
       hideStatus(newsEditorStatus);
     } catch (err) {
-      setStatus(newsEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message);
+      setStatus(newsEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message + ' (l\'aperçu reste affiché mais ne sera pas enregistré, réessaie l\'envoi)');
     } finally {
       richtextImageInput.value = '';
     }
@@ -1973,7 +2053,7 @@
   }
 
   async function deleteNews(id, title) {
-    if (!confirm(`Supprimer la news "${title}" ? Ses photos associées seront aussi supprimées. Cette action est immédiate.`)) return;
+    if (!(await showConfirmModal(`Supprimer la news "${title}" ? Ses photos associées seront aussi supprimées. Cette action est immédiate.`))) return;
 
     setStatus(newsEditorStatus, 'loading', 'Suppression en cours…');
     try {
@@ -2241,7 +2321,7 @@ ${items}
   });
 
   async function deleteLink(categoryId, linkId, title) {
-    if (!confirm(`Supprimer le lien "${title}" ?`)) return;
+    if (!(await showConfirmModal(`Supprimer le lien "${title}" ?`))) return;
 
     setStatus(linkStatus, 'loading', 'Suppression en cours…');
     try {
@@ -2294,7 +2374,7 @@ ${items}
   });
 
   async function renameLinkCategory(id, currentLabel) {
-    const newLabel = prompt('Nouveau nom de la catégorie :', currentLabel);
+    const newLabel = await showPromptModal('Nouveau nom de la catégorie', currentLabel);
     if (!newLabel || !newLabel.trim() || newLabel.trim() === currentLabel) return;
 
     setStatus(linkCategoryStatus, 'loading', 'Renommage en cours…');
@@ -2320,7 +2400,7 @@ ${items}
     const message = linkCount > 0
       ? `Supprimer la catégorie "${label}" ? Les ${linkCount} lien(s) qu'elle contient seront supprimés aussi.`
       : `Supprimer la catégorie "${label}" ?`;
-    if (!confirm(message)) return;
+    if (!(await showConfirmModal(message))) return;
 
     setStatus(linkCategoryStatus, 'loading', 'Suppression en cours…');
     try {
@@ -2574,7 +2654,7 @@ ${items}
   /* --- Suppression d'une photo individuelle --- */
 
   async function removeAlbumPhoto(index) {
-    if (!confirm('Supprimer cette photo ? Elle sera aussi retirée de GitHub.')) return;
+    if (!(await showConfirmModal('Supprimer cette photo ? Elle sera aussi retirée de GitHub.'))) return;
 
     const albumId = document.getElementById('albumEditId').value;
     setStatus(albumPhotosStatus, 'loading', 'Suppression en cours…');
@@ -2610,7 +2690,7 @@ ${items}
   /* --- Suppression d'un album entier --- */
 
   async function deleteAlbum(id, title) {
-    if (!confirm(`Supprimer l'album "${title}" ? Toutes ses photos seront aussi supprimées de GitHub. Cette action est immédiate.`)) return;
+    if (!(await showConfirmModal(`Supprimer l'album "${title}" ? Toutes ses photos seront aussi supprimées de GitHub. Cette action est immédiate.`))) return;
 
     try {
       if (!fileState[ALBUMS_PATH]) await readFile(ALBUMS_PATH);
@@ -2837,7 +2917,7 @@ ${items}
   });
 
   async function deleteVideo(id, title) {
-    if (!confirm(`Supprimer la vidéo "${title}" ?`)) return;
+    if (!(await showConfirmModal(`Supprimer la vidéo "${title}" ?`))) return;
 
     setStatus(videoStatus, 'loading', 'Suppression en cours…');
     try {
@@ -2979,7 +3059,7 @@ ${items}
   });
 
   async function deleteBirthday(id, name) {
-    if (!confirm(`Supprimer l'anniversaire de "${name}" ?`)) return;
+    if (!(await showConfirmModal(`Supprimer l'anniversaire de "${name}" ?`))) return;
 
     setStatus(birthdayStatus, 'loading', 'Suppression en cours…');
     try {
@@ -3189,8 +3269,23 @@ ${items}
     document.execCommand('foreColor', false, pageRichtextColorInput.value);
   });
 
-  document.getElementById('pageRichtextLinkBtn').addEventListener('click', () => {
-    const url = prompt('Lien à insérer : une adresse externe (https://...) ou un lien interne au site (ex : ./inscription.html, ../mentions-legales/) :');
+  let savedPageSizeRange = null;
+  const pageRichtextFontSizeSelect = document.getElementById('pageRichtextFontSizeSelect');
+  pageRichtextFontSizeSelect.addEventListener('mousedown', () => {
+    const sel = window.getSelection();
+    savedPageSizeRange = (sel.rangeCount > 0 && pageRichtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
+  });
+  pageRichtextFontSizeSelect.addEventListener('change', () => {
+    if (!pageRichtextFontSizeSelect.value) return;
+    restoreEditorSelection(pageRichtextEditor, savedPageSizeRange);
+    document.execCommand('fontSize', false, pageRichtextFontSizeSelect.value);
+    pageRichtextFontSizeSelect.value = '';
+  });
+
+  document.getElementById('pageRichtextLinkBtn').addEventListener('click', async () => {
+    const url = await showPromptModal('Adresse du lien à insérer', '', { placeholder: 'https://exemple.com' });
     if (!url) return;
     pageRichtextEditor.focus();
     document.execCommand('createLink', false, url);
@@ -3206,6 +3301,15 @@ ${items}
     pageRichtextImageInput.click();
   });
 
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   pageRichtextImageInput.addEventListener('change', async () => {
     const file = pageRichtextImageInput.files[0];
     if (!file) return;
@@ -3213,16 +3317,24 @@ ${items}
     const pageId = document.getElementById('pageEditId').value || 'page-brouillon';
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const path = `imgs/pages/${pageId}-inline-${Date.now()}.${ext}`;
+    const tempId = 'tmp-img-' + Date.now();
+
+    // Aperçu instantané avec le fichier local (pas d'attente réseau, ça s'affiche tout de suite)
+    const dataUrl = await readFileAsDataUrl(file);
+    restoreEditorSelection(pageRichtextEditor, savedPageRange);
+    document.execCommand('insertHTML', false, `<img id="${tempId}" class="resizable-img" src="${dataUrl}" alt="">`);
 
     setStatus(pageEditorStatus, 'loading', 'Envoi de l\'image…');
     try {
       await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une page`);
-      const imageUrl = `https://${cfg.owner}.github.io/${cfg.repo}/${path}`;
-      restoreEditorSelection(pageRichtextEditor, savedPageRange);
-      document.execCommand('insertHTML', false, `<img src="${imageUrl}" alt="">`);
+      const insertedImg = pageRichtextEditor.querySelector('#' + tempId);
+      if (insertedImg) {
+        insertedImg.src = `./${path}`;
+        insertedImg.removeAttribute('id');
+      }
       hideStatus(pageEditorStatus);
     } catch (err) {
-      setStatus(pageEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message);
+      setStatus(pageEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message + ' (l\'aperçu reste affiché mais ne sera pas enregistré, réessaie l\'envoi)');
     } finally {
       pageRichtextImageInput.value = '';
     }
@@ -3293,7 +3405,7 @@ ${items}
   }
 
   async function deletePage(id, title) {
-    if (!confirm(`Supprimer la page "${title}" ? Ses images éventuelles seront aussi supprimées de GitHub. Cette action est immédiate.`)) return;
+    if (!(await showConfirmModal(`Supprimer la page "${title}" ? Ses images éventuelles seront aussi supprimées de GitHub. Cette action est immédiate.`))) return;
 
     try {
       if (!fileState[PAGES_PATH]) await readFile(PAGES_PATH);
@@ -3347,6 +3459,87 @@ ${items}
   }
 
 
+
+  /* ---------- Redimensionnement / placement des images dans les éditeurs ---------- */
+
+  let selectedImg = null;
+  const imgFloatToolbar = document.getElementById('imgFloatToolbar');
+
+  function positionImgToolbar(img) {
+    const rect = img.getBoundingClientRect();
+    imgFloatToolbar.style.top = Math.max(8, rect.top - 46) + 'px';
+    imgFloatToolbar.style.left = Math.max(8, rect.left) + 'px';
+    imgFloatToolbar.classList.add('is-open');
+  }
+
+  function selectImage(img) {
+    if (selectedImg) selectedImg.classList.remove('is-selected');
+    selectedImg = img;
+    img.classList.add('is-selected');
+    positionImgToolbar(img);
+  }
+
+  function deselectImage() {
+    if (selectedImg) selectedImg.classList.remove('is-selected');
+    selectedImg = null;
+    imgFloatToolbar.classList.remove('is-open');
+  }
+
+  function setupImageResizing(editor) {
+    editor.addEventListener('click', (e) => {
+      if (e.target.tagName === 'IMG') {
+        e.preventDefault();
+        selectImage(e.target);
+      } else {
+        deselectImage();
+      }
+    });
+  }
+
+  setupImageResizing(richtextEditor);
+  setupImageResizing(pageRichtextEditor);
+
+  document.addEventListener('click', (e) => {
+    if (!imgFloatToolbar.contains(e.target) && e.target.tagName !== 'IMG') {
+      deselectImage();
+    }
+  });
+
+  imgFloatToolbar.querySelectorAll('button[data-size]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!selectedImg) return;
+      selectedImg.style.width = btn.dataset.size + '%';
+      selectedImg.style.height = 'auto';
+      positionImgToolbar(selectedImg);
+    });
+  });
+
+  imgFloatToolbar.querySelectorAll('button[data-align]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!selectedImg) return;
+      const align = btn.dataset.align;
+      selectedImg.style.float = '';
+      selectedImg.style.display = '';
+      selectedImg.style.margin = '';
+      if (align === 'left') {
+        selectedImg.style.float = 'left';
+        selectedImg.style.margin = '0.3rem 1rem 0.5rem 0';
+      } else if (align === 'right') {
+        selectedImg.style.float = 'right';
+        selectedImg.style.margin = '0.3rem 0 0.5rem 1rem';
+      } else {
+        selectedImg.style.display = 'block';
+        selectedImg.style.margin = '0.8rem auto';
+      }
+      positionImgToolbar(selectedImg);
+    });
+  });
+
+  document.getElementById('imgDeleteBtn').addEventListener('click', () => {
+    if (!selectedImg) return;
+    selectedImg.remove();
+    deselectImage();
+  });
 
   /* ---------- Démarrage ---------- */
 
