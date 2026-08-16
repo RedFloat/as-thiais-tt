@@ -25,6 +25,12 @@
       ]
     },
     {
+      "id": "mentions-legales",
+      "label": "Mentions légales",
+      "link": "./mentions-legales",
+      "type": "link"
+    },
+    {
       "id": "vie-du-club",
       "label": "La vie du Club",
       "type": "dropdown",
@@ -50,12 +56,6 @@
           "link": "./videos.html"
         }
       ]
-    },
-    {
-      "id": "mentions-legales",
-      "label": "Mentions légales",
-      "link": "./mentions-legales",
-      "type": "link"
     },
     {
       "id": "infos-pratiques",
