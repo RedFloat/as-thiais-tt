@@ -1809,6 +1809,19 @@
     });
   });
 
+  let savedNewsColorRange = null;
+  const richtextColorInput = document.getElementById('richtextColorInput');
+  richtextColorInput.addEventListener('click', () => {
+    const sel = window.getSelection();
+    savedNewsColorRange = (sel.rangeCount > 0 && richtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
+  });
+  richtextColorInput.addEventListener('input', () => {
+    restoreEditorSelection(richtextEditor, savedNewsColorRange);
+    document.execCommand('foreColor', false, richtextColorInput.value);
+  });
+
   document.getElementById('richtextLinkBtn').addEventListener('click', () => {
     const url = prompt('Lien à insérer : une adresse externe (https://...) ou un lien interne au site (ex : ./inscription.html, ../mentions-legales/) :');
     if (!url) return;
@@ -1851,8 +1864,9 @@
     setStatus(newsEditorStatus, 'loading', 'Envoi de l\'image…');
     try {
       await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une news`);
+      const imageUrl = `https://${cfg.owner}.github.io/${cfg.repo}/${path}`;
       restoreEditorSelection(richtextEditor, savedNewsRange);
-      document.execCommand('insertHTML', false, `<img src="./${path}" alt="">`);
+      document.execCommand('insertHTML', false, `<img src="${imageUrl}" alt="">`);
       hideStatus(newsEditorStatus);
     } catch (err) {
       setStatus(newsEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message);
@@ -1925,7 +1939,13 @@
   // Retire le "./" en tête d'un chemin stocké (image.image, image dans le body...)
   // pour obtenir le chemin brut attendu par l'API GitHub.
   function toRepoPath(path) {
-    return (path || '').replace(/^\.\//, '');
+    if (!path) return path;
+    // URL absolue GitHub Pages (ex: images insérées dans l'éditeur riche) -> chemin relatif au dépôt
+    const absolutePrefix = `https://${cfg.owner}.github.io/${cfg.repo}/`;
+    if (path.startsWith(absolutePrefix)) {
+      return path.slice(absolutePrefix.length);
+    }
+    return path.replace(/^\.\//, '');
   }
 
   async function deleteFileIfExists(path) {
@@ -3156,6 +3176,19 @@ ${items}
     });
   });
 
+  let savedPageColorRange = null;
+  const pageRichtextColorInput = document.getElementById('pageRichtextColorInput');
+  pageRichtextColorInput.addEventListener('click', () => {
+    const sel = window.getSelection();
+    savedPageColorRange = (sel.rangeCount > 0 && pageRichtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
+  });
+  pageRichtextColorInput.addEventListener('input', () => {
+    restoreEditorSelection(pageRichtextEditor, savedPageColorRange);
+    document.execCommand('foreColor', false, pageRichtextColorInput.value);
+  });
+
   document.getElementById('pageRichtextLinkBtn').addEventListener('click', () => {
     const url = prompt('Lien à insérer : une adresse externe (https://...) ou un lien interne au site (ex : ./inscription.html, ../mentions-legales/) :');
     if (!url) return;
@@ -3184,8 +3217,9 @@ ${items}
     setStatus(pageEditorStatus, 'loading', 'Envoi de l\'image…');
     try {
       await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une page`);
+      const imageUrl = `https://${cfg.owner}.github.io/${cfg.repo}/${path}`;
       restoreEditorSelection(pageRichtextEditor, savedPageRange);
-      document.execCommand('insertHTML', false, `<img src="./${path}" alt="">`);
+      document.execCommand('insertHTML', false, `<img src="${imageUrl}" alt="">`);
       hideStatus(pageEditorStatus);
     } catch (err) {
       setStatus(pageEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message);
