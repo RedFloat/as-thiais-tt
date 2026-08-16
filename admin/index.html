@@ -601,13 +601,10 @@
             <div class="form-group">
               <label>Contenu de l'article</label>
               <div class="richtext-toolbar" id="richtextToolbar">
-                <select id="richtextFontSizeSelect" title="Taille du texte" style="height:32px; border-radius:6px; border:1px solid #e2e8f0; font-size:0.8rem; padding:0 0.3rem;">
-                  <option value="">Taille</option>
-                  <option value="2">Petit</option>
-                  <option value="3">Normal</option>
-                  <option value="5">Grand</option>
-                  <option value="7">Très grand</option>
-                </select>
+                <div class="font-size-control" title="Taille du texte en pixels">
+                  <input type="number" id="richtextFontSizeInput" min="5" max="75" placeholder="16">
+                  <button type="button" id="richtextFontSizeApplyBtn">Appliquer</button>
+                </div>
                 <span class="richtext-sep"></span>
                 <button type="button" data-cmd="bold" title="Gras"><i class="fa-solid fa-bold"></i></button>
                 <button type="button" data-cmd="italic" title="Italique"><i class="fa-solid fa-italic"></i></button>
@@ -967,13 +964,10 @@
 
               <div id="pageVisualEditorWrap">
                 <div class="richtext-toolbar" id="pageRichtextToolbar">
-                  <select id="pageRichtextFontSizeSelect" title="Taille du texte" style="height:32px; border-radius:6px; border:1px solid #e2e8f0; font-size:0.8rem; padding:0 0.3rem;">
-                    <option value="">Taille</option>
-                    <option value="2">Petit</option>
-                    <option value="3">Normal</option>
-                    <option value="5">Grand</option>
-                    <option value="7">Très grand</option>
-                  </select>
+                  <div class="font-size-control" title="Taille du texte en pixels">
+                    <input type="number" id="pageRichtextFontSizeInput" min="5" max="75" placeholder="16">
+                    <button type="button" id="pageRichtextFontSizeApplyBtn">Appliquer</button>
+                  </div>
                   <span class="richtext-sep"></span>
                   <button type="button" data-cmd="bold" title="Gras"><i class="fa-solid fa-bold"></i></button>
                   <button type="button" data-cmd="italic" title="Italique"><i class="fa-solid fa-italic"></i></button>

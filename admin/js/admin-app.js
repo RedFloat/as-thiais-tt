@@ -1881,18 +1881,18 @@
   });
 
   let savedNewsSizeRange = null;
-  const richtextFontSizeSelect = document.getElementById('richtextFontSizeSelect');
-  richtextFontSizeSelect.addEventListener('mousedown', () => {
+  const richtextFontSizeInput = document.getElementById('richtextFontSizeInput');
+  richtextFontSizeInput.addEventListener('mousedown', () => {
     const sel = window.getSelection();
     savedNewsSizeRange = (sel.rangeCount > 0 && richtextEditor.contains(sel.anchorNode))
       ? sel.getRangeAt(0).cloneRange()
       : null;
   });
-  richtextFontSizeSelect.addEventListener('change', () => {
-    if (!richtextFontSizeSelect.value) return;
+  document.getElementById('richtextFontSizeApplyBtn').addEventListener('click', () => {
+    const size = parseInt(richtextFontSizeInput.value, 10);
+    if (!size || size < 5 || size > 75) return;
     restoreEditorSelection(richtextEditor, savedNewsSizeRange);
-    document.execCommand('fontSize', false, richtextFontSizeSelect.value);
-    richtextFontSizeSelect.value = '';
+    applyFontSizePx(richtextEditor, size);
   });
 
   document.getElementById('richtextLinkBtn').addEventListener('click', async () => {
@@ -1926,6 +1926,42 @@
     }
   }
 
+  // Applique une taille de texte précise en pixels (execCommand ne gère nativement que 7 paliers,
+  // donc on passe par un <font size="7"> temporaire qu'on remplace aussitôt par un <span style>).
+  // Suivi des images dont l'upload est en cours, pour attendre leur fin avant d'enregistrer
+  // et ne remplacer la prévisualisation locale par le chemin définitif qu'à ce moment-là.
+  const pendingImageUploads = new Map();
+
+  async function waitForPendingImages(editor) {
+    const promises = Array.from(editor.querySelectorAll('img[data-pending="true"]'))
+      .map((img) => pendingImageUploads.get(img.id))
+      .filter(Boolean);
+    if (promises.length > 0) await Promise.all(promises);
+  }
+
+  function finalizeImagesForSave(editor) {
+    editor.querySelectorAll('img[data-final-src]').forEach((img) => {
+      img.src = img.dataset.finalSrc;
+      img.removeAttribute('data-final-src');
+      img.removeAttribute('data-pending');
+      img.removeAttribute('id');
+    });
+  }
+
+  function hasFailedImageUpload(editor) {
+    return !!editor.querySelector('img[data-upload-failed]');
+  }
+
+  function applyFontSizePx(editor, sizePx) {
+    document.execCommand('fontSize', false, '7');
+    editor.querySelectorAll('font[size="7"]').forEach((el) => {
+      const span = document.createElement('span');
+      span.style.fontSize = sizePx + 'px';
+      while (el.firstChild) span.appendChild(el.firstChild);
+      el.replaceWith(span);
+    });
+  }
+
   richtextImageInput.addEventListener('change', async () => {
     const file = richtextImageInput.files[0];
     if (!file) return;
@@ -1937,22 +1973,26 @@
 
     const dataUrl = await readFileAsDataUrl(file);
     restoreEditorSelection(richtextEditor, savedNewsRange);
-    document.execCommand('insertHTML', false, `<img id="${tempId}" class="resizable-img" src="${dataUrl}" alt="">`);
+    document.execCommand('insertHTML', false, `<img id="${tempId}" data-pending="true" class="resizable-img" src="${dataUrl}" alt="">`);
 
-    setStatus(newsEditorStatus, 'loading', 'Envoi de l\'image…');
-    try {
-      await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une news`);
-      const insertedImg = richtextEditor.querySelector('#' + tempId);
-      if (insertedImg) {
-        insertedImg.src = `./${path}`;
-        insertedImg.removeAttribute('id');
-      }
-      hideStatus(newsEditorStatus);
-    } catch (err) {
-      setStatus(newsEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message + ' (l\'aperçu reste affiché mais ne sera pas enregistré, réessaie l\'envoi)');
-    } finally {
-      richtextImageInput.value = '';
-    }
+    setStatus(newsEditorStatus, 'loading', 'Envoi de l\'image en arrière-plan…');
+    const uploadPromise = GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une news`)
+      .then(() => {
+        const img = richtextEditor.querySelector('#' + tempId);
+        if (img) {
+          img.dataset.finalSrc = `./${path}`;
+          img.removeAttribute('data-pending');
+        }
+        hideStatus(newsEditorStatus);
+      })
+      .catch((err) => {
+        const img = richtextEditor.querySelector('#' + tempId);
+        if (img) img.dataset.uploadFailed = 'true';
+        setStatus(newsEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message + ' (supprime-la et réessaie avant d\'enregistrer)');
+      });
+
+    pendingImageUploads.set(tempId, uploadPromise);
+    richtextImageInput.value = '';
   });
 
   /* --- Enregistrement --- */
@@ -1978,6 +2018,13 @@
         await GitHubAPI.uploadFile(cfg, coverPath, pendingNewsCoverFile, `Admin : photo de couverture de la news "${id}"`);
         image = './' + coverPath;
       }
+
+      setStatus(newsEditorStatus, 'loading', 'Finalisation des images du contenu…');
+      await waitForPendingImages(richtextEditor);
+      if (hasFailedImageUpload(richtextEditor)) {
+        throw new Error('Une image du contenu n\'a pas pu être envoyée. Supprime-la (clique dessus puis sur la corbeille) et réessaie.');
+      }
+      finalizeImagesForSave(richtextEditor);
 
       const entry = {
         id,
@@ -3270,18 +3317,18 @@ ${items}
   });
 
   let savedPageSizeRange = null;
-  const pageRichtextFontSizeSelect = document.getElementById('pageRichtextFontSizeSelect');
-  pageRichtextFontSizeSelect.addEventListener('mousedown', () => {
+  const pageRichtextFontSizeInput = document.getElementById('pageRichtextFontSizeInput');
+  pageRichtextFontSizeInput.addEventListener('mousedown', () => {
     const sel = window.getSelection();
     savedPageSizeRange = (sel.rangeCount > 0 && pageRichtextEditor.contains(sel.anchorNode))
       ? sel.getRangeAt(0).cloneRange()
       : null;
   });
-  pageRichtextFontSizeSelect.addEventListener('change', () => {
-    if (!pageRichtextFontSizeSelect.value) return;
+  document.getElementById('pageRichtextFontSizeApplyBtn').addEventListener('click', () => {
+    const size = parseInt(pageRichtextFontSizeInput.value, 10);
+    if (!size || size < 5 || size > 75) return;
     restoreEditorSelection(pageRichtextEditor, savedPageSizeRange);
-    document.execCommand('fontSize', false, pageRichtextFontSizeSelect.value);
-    pageRichtextFontSizeSelect.value = '';
+    applyFontSizePx(pageRichtextEditor, size);
   });
 
   document.getElementById('pageRichtextLinkBtn').addEventListener('click', async () => {
@@ -3319,25 +3366,30 @@ ${items}
     const path = `imgs/pages/${pageId}-inline-${Date.now()}.${ext}`;
     const tempId = 'tmp-img-' + Date.now();
 
-    // Aperçu instantané avec le fichier local (pas d'attente réseau, ça s'affiche tout de suite)
+    // Aperçu instantané avec le fichier local (pas d'attente réseau, ça s'affiche tout de suite
+    // et ça reste affiché tel quel jusqu'à l'enregistrement de la page).
     const dataUrl = await readFileAsDataUrl(file);
     restoreEditorSelection(pageRichtextEditor, savedPageRange);
-    document.execCommand('insertHTML', false, `<img id="${tempId}" class="resizable-img" src="${dataUrl}" alt="">`);
+    document.execCommand('insertHTML', false, `<img id="${tempId}" data-pending="true" class="resizable-img" src="${dataUrl}" alt="">`);
 
-    setStatus(pageEditorStatus, 'loading', 'Envoi de l\'image…');
-    try {
-      await GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une page`);
-      const insertedImg = pageRichtextEditor.querySelector('#' + tempId);
-      if (insertedImg) {
-        insertedImg.src = `./${path}`;
-        insertedImg.removeAttribute('id');
-      }
-      hideStatus(pageEditorStatus);
-    } catch (err) {
-      setStatus(pageEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message + ' (l\'aperçu reste affiché mais ne sera pas enregistré, réessaie l\'envoi)');
-    } finally {
-      pageRichtextImageInput.value = '';
-    }
+    setStatus(pageEditorStatus, 'loading', 'Envoi de l\'image en arrière-plan…');
+    const uploadPromise = GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une page`)
+      .then(() => {
+        const img = pageRichtextEditor.querySelector('#' + tempId);
+        if (img) {
+          img.dataset.finalSrc = `./${path}`;
+          img.removeAttribute('data-pending');
+        }
+        hideStatus(pageEditorStatus);
+      })
+      .catch((err) => {
+        const img = pageRichtextEditor.querySelector('#' + tempId);
+        if (img) img.dataset.uploadFailed = 'true';
+        setStatus(pageEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message + ' (supprime-la et réessaie avant d\'enregistrer)');
+      });
+
+    pendingImageUploads.set(tempId, uploadPromise);
+    pageRichtextImageInput.value = '';
   });
 
   /* --- Enregistrement --- */
@@ -3355,6 +3407,14 @@ ${items}
       const editingId = document.getElementById('pageEditId').value;
       const title = pageTitleInput.value.trim();
       const slug = slugify(pageSlugInput.value.trim() || title);
+
+      setStatus(pageEditorStatus, 'loading', 'Finalisation des images du contenu…');
+      await waitForPendingImages(pageRichtextEditor);
+      if (hasFailedImageUpload(pageRichtextEditor)) {
+        throw new Error('Une image du contenu n\'a pas pu être envoyée. Supprime-la (clique dessus puis sur la corbeille) et réessaie.');
+      }
+      finalizeImagesForSave(pageRichtextEditor);
+
       const body = getCurrentPageBody();
 
       const slugTaken = pages.some((p) => p.slug === slug && p.id !== editingId);
