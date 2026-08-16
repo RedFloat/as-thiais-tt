@@ -1,3 +1,11 @@
 {
-  "pages": []
+  "pages": [
+    {
+      "id": "mentions-legakes",
+      "title": "Mentions légakes",
+      "slug": "mentions-legakes",
+      "body": "<b>TEST</b><br><i>TEST</i><br><h2><font color=\"#9f1919\"><b>TEST</b></font><font color=\"#9f1919\"><b><br></b></font><font color=\"#9f1919\"><b><br></b></font></h2><u><div><img src=\"https://redfloat.github.io/as-thiais-tt/imgs/pages/page-brouillon-inline-1786882709003.png\" alt=\"\"><u></u></div>TEST</u><div style=\"text-align: right;\"><u><a href=\"sucy-ping.fr\">TEST</a></u></div>",
+      "date": "2026-08-16"
+    }
+  ]
 }
