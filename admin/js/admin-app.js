@@ -649,9 +649,13 @@
     return id;
   }
 
+  let sponsorSlugManuallyEdited = false;
+
   function startEditSponsor(sponsor) {
     document.getElementById('sponsorId').value = sponsor.id;
     document.getElementById('sponsorName').value = sponsor.name || '';
+    document.getElementById('sponsorSlug').value = sponsor.id || '';
+    sponsorSlugManuallyEdited = true;
     document.getElementById('sponsorLogo').value = sponsor.logo || '';
     document.getElementById('sponsorLink').value = sponsor.link || '';
     document.getElementById('sponsorDescription').value = sponsor.description || '';
@@ -664,10 +668,18 @@
   function resetSponsorForm() {
     sponsorForm.reset();
     document.getElementById('sponsorId').value = '';
+    sponsorSlugManuallyEdited = false;
     sponsorSaveLabel.textContent = 'Ajouter le sponsor';
     sponsorCancelBtn.classList.add('hidden');
     document.getElementById('sponsorFormTitle').textContent = 'Ajouter un sponsor';
   }
+
+  document.getElementById('sponsorSlug').addEventListener('input', () => { sponsorSlugManuallyEdited = true; });
+  document.getElementById('sponsorName').addEventListener('input', () => {
+    if (!sponsorSlugManuallyEdited) {
+      document.getElementById('sponsorSlug').value = slugify(document.getElementById('sponsorName').value);
+    }
+  });
 
   sponsorCancelBtn.addEventListener('click', resetSponsorForm);
 
@@ -684,16 +696,22 @@
 
       const editingId = document.getElementById('sponsorId').value;
       const name = document.getElementById('sponsorName').value.trim();
+      const slugInput = document.getElementById('sponsorSlug').value.trim();
+      const slug = slugify(slugInput || name);
       const logo = document.getElementById('sponsorLogo').value.trim();
       const link = document.getElementById('sponsorLink').value.trim();
       const description = document.getElementById('sponsorDescription').value.trim();
 
+      const slugTaken = sponsors.some((s) => s.id === slug && s.id !== editingId);
+      if (slugTaken) {
+        throw new Error('Cette adresse est déjà utilisée par un autre sponsor.');
+      }
+
       if (editingId) {
         const idx = sponsors.findIndex((s) => s.id === editingId);
-        if (idx !== -1) sponsors[idx] = { id: editingId, name, logo, link, description };
+        if (idx !== -1) sponsors[idx] = { id: slug, name, logo, link, description };
       } else {
-        const id = generateSponsorId(name, sponsors);
-        sponsors.push({ id, name, logo, link, description });
+        sponsors.push({ id: slug, name, logo, link, description });
       }
 
       const updated = { sponsors };
@@ -1896,9 +1914,13 @@
   });
 
   document.getElementById('richtextLinkBtn').addEventListener('click', async () => {
+    const sel = window.getSelection();
+    const linkRange = (sel.rangeCount > 0 && richtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
     const url = await showPromptModal('Adresse du lien à insérer', '', { placeholder: 'https://exemple.com' });
     if (!url) return;
-    richtextEditor.focus();
+    restoreEditorSelection(richtextEditor, linkRange);
     document.execCommand('createLink', false, url);
   });
 
@@ -1953,13 +1975,27 @@
   }
 
   function applyFontSizePx(editor, sizePx) {
-    document.execCommand('fontSize', false, '7');
-    editor.querySelectorAll('font[size="7"]').forEach((el) => {
-      const span = document.createElement('span');
-      span.style.fontSize = sizePx + 'px';
-      while (el.firstChild) span.appendChild(el.firstChild);
-      el.replaceWith(span);
-    });
+    const sel = window.getSelection();
+    if (sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    if (range.collapsed || !editor.contains(range.commonAncestorContainer)) return;
+
+    const span = document.createElement('span');
+    span.style.fontSize = sizePx + 'px';
+
+    try {
+      range.surroundContents(span);
+    } catch (e) {
+      // Sélection qui chevauche plusieurs éléments : on extrait puis on réinsère dans le span
+      const contents = range.extractContents();
+      span.appendChild(contents);
+      range.insertNode(span);
+    }
+
+    sel.removeAllRanges();
+    const newRange = document.createRange();
+    newRange.selectNodeContents(span);
+    sel.addRange(newRange);
   }
 
   richtextImageInput.addEventListener('change', async () => {
@@ -1999,6 +2035,7 @@
 
   newsEditorForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    deselectImage();
     const saveBtn = document.getElementById('newsSaveBtn');
     saveBtn.disabled = true;
     setStatus(newsEditorStatus, 'loading', 'Enregistrement en cours…');
@@ -3332,9 +3369,13 @@ ${items}
   });
 
   document.getElementById('pageRichtextLinkBtn').addEventListener('click', async () => {
+    const sel = window.getSelection();
+    const linkRange = (sel.rangeCount > 0 && pageRichtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
     const url = await showPromptModal('Adresse du lien à insérer', '', { placeholder: 'https://exemple.com' });
     if (!url) return;
-    pageRichtextEditor.focus();
+    restoreEditorSelection(pageRichtextEditor, linkRange);
     document.execCommand('createLink', false, url);
   });
 
@@ -3396,6 +3437,7 @@ ${items}
 
   pageEditorForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    deselectImage();
     const saveBtn = document.getElementById('pageSaveBtn');
     saveBtn.disabled = true;
     setStatus(pageEditorStatus, 'loading', 'Enregistrement en cours…');
@@ -3523,6 +3565,8 @@ ${items}
   /* ---------- Redimensionnement / placement des images dans les éditeurs ---------- */
 
   let selectedImg = null;
+  let resizeWrapper = null;
+  let resizeState = null;
   const imgFloatToolbar = document.getElementById('imgFloatToolbar');
 
   function positionImgToolbar(img) {
@@ -3532,15 +3576,72 @@ ${items}
     imgFloatToolbar.classList.add('is-open');
   }
 
+  function wrapImageForResize(img) {
+    const wrapper = document.createElement('span');
+    wrapper.className = 'img-resize-wrapper';
+    img.parentNode.insertBefore(wrapper, img);
+    wrapper.appendChild(img);
+
+    ['nw', 'ne', 'sw', 'se'].forEach((pos) => {
+      const handle = document.createElement('span');
+      handle.className = 'img-resize-handle ' + pos;
+      handle.dataset.pos = pos;
+      handle.addEventListener('mousedown', startImageResize);
+      wrapper.appendChild(handle);
+    });
+
+    resizeWrapper = wrapper;
+  }
+
+  function unwrapImage(img) {
+    if (!resizeWrapper) return;
+    resizeWrapper.parentNode.insertBefore(img, resizeWrapper);
+    resizeWrapper.remove();
+    resizeWrapper = null;
+  }
+
+  function startImageResize(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!selectedImg) return;
+    resizeState = {
+      pos: e.currentTarget.dataset.pos,
+      startX: e.clientX,
+      startWidth: selectedImg.offsetWidth
+    };
+    document.addEventListener('mousemove', onImageResizeMove);
+    document.addEventListener('mouseup', onImageResizeEnd);
+  }
+
+  function onImageResizeMove(e) {
+    if (!resizeState || !selectedImg) return;
+    const dx = e.clientX - resizeState.startX;
+    const direction = (resizeState.pos === 'nw' || resizeState.pos === 'sw') ? -1 : 1;
+    const newWidth = Math.max(30, resizeState.startWidth + dx * direction);
+    selectedImg.style.width = newWidth + 'px';
+    selectedImg.style.height = 'auto';
+    positionImgToolbar(selectedImg);
+  }
+
+  function onImageResizeEnd() {
+    resizeState = null;
+    document.removeEventListener('mousemove', onImageResizeMove);
+    document.removeEventListener('mouseup', onImageResizeEnd);
+  }
+
   function selectImage(img) {
-    if (selectedImg) selectedImg.classList.remove('is-selected');
+    if (selectedImg && selectedImg !== img) deselectImage();
     selectedImg = img;
     img.classList.add('is-selected');
+    wrapImageForResize(img);
     positionImgToolbar(img);
   }
 
   function deselectImage() {
-    if (selectedImg) selectedImg.classList.remove('is-selected');
+    if (selectedImg) {
+      selectedImg.classList.remove('is-selected');
+      unwrapImage(selectedImg);
+    }
     selectedImg = null;
     imgFloatToolbar.classList.remove('is-open');
   }
@@ -3550,7 +3651,7 @@ ${items}
       if (e.target.tagName === 'IMG') {
         e.preventDefault();
         selectImage(e.target);
-      } else {
+      } else if (!e.target.classList.contains('img-resize-handle')) {
         deselectImage();
       }
     });

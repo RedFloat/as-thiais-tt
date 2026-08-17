@@ -196,6 +196,7 @@
 
     // Logo mis en avant, en rotation toutes les 3 secondes
     const featuredName = document.getElementById('featuredPartnerName');
+    const featuredLink = document.getElementById('featuredPartnerLink');
     if (featured && sponsors.length > 0) {
       let index = 0;
       const showSponsor = (i) => {
@@ -203,6 +204,7 @@
         featured.alt = sponsors[i].name || '';
         featured.style.display = '';
         if (featuredName) featuredName.textContent = sponsors[i].name || '';
+        if (featuredLink) featuredLink.href = './sponsor.html?id=' + sponsors[i].id;
       };
       showSponsor(index);
 
