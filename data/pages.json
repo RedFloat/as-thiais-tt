@@ -1,11 +1,3 @@
 {
-  "pages": [
-    {
-      "id": "mentions-legales",
-      "title": "Mentions légales",
-      "slug": "mentions-legales",
-      "body": "TEST<div><b>TEST</b><br><i>TEST</i><br><u>TEST</u></div><div><div style=\"text-align: center;\"><img class=\"resizable-img\" src=\"./imgs/pages/mentions-legales-inline-1786955086456.png\" alt=\"\" style=\"font-size: 0.92rem; width: 524px; height: auto;\"><img class=\"resizable-img\" src=\"./imgs/pages/page-brouillon-inline-1786913637354.png\" alt=\"\" style=\"font-size: 0.92rem; width: 75%; height: auto;\"></div><ul><li><span style=\"font-size: 0.92rem;\"><span style=\"font-size: 27px;\"><span style=\"font-size: 5px;\"><span style=\"font-size: 20px;\"><span style=\"font-size: 30px;\"><span style=\"font-size: 40px;\"><span style=\"font-size: 50px;\"><span style=\"font-size: 60px;\"><span style=\"font-size: 70px;\">TEST</span></span></span></span></span></span></span></span></span></li></ul><div style=\"text-align: center;\"><span style=\"font-size: 0.92rem;\">TEST</span></div><div style=\"text-align: right;\"><span style=\"font-size: 0.92rem;\">TEST</span></div><font color=\"#eb0a0a\">TEST</font></div><div><font color=\"#030303\"><a href=\"sucy-ping.fr\">TETS</a></font></div>",
-      "date": "2026-08-17"
-    }
-  ]
+  "pages": []
 }
