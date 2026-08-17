@@ -1,3 +1,11 @@
 {
-  "pages": []
+  "pages": [
+    {
+      "id": "mentions-legales",
+      "title": "Mentions légales",
+      "slug": "mentions-legales",
+      "body": "TEST<div><b>TEST</b><br><i>TEST</i><br><u>TEST</u></div><div><div style=\"text-align: center;\"><img class=\"resizable-img\" src=\"./imgs/pages/page-brouillon-inline-1786913637354.png\" alt=\"\" style=\"font-size: 0.92rem; width: 75%; height: auto;\"></div><ul><li><span style=\"font-size: 0.92rem;\">TEST</span></li></ul><div style=\"text-align: center;\"><span style=\"font-size: 0.92rem;\">TEST</span></div><div style=\"text-align: right;\"><span style=\"font-size: 0.92rem;\">TEST</span></div><font color=\"#eb0a0a\">TEST</font></div><div><font color=\"#030303\">TETS</font></div>",
+      "date": "2026-08-16"
+    }
+  ]
 }
