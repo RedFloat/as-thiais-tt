@@ -962,24 +962,23 @@
 
   const NAV_PATH = 'data/navigation.json';
 
-  const navCategoriesList = document.getElementById('navCategoriesList');
-  const navItemsList = document.getElementById('navItemsList');
+  const navTree = document.getElementById('navTree');
   const navCategoryStatus = document.getElementById('navCategoryStatus');
   const navPageStatus = document.getElementById('navPageStatus');
   const navPageForm = document.getElementById('navPageForm');
+  const navPageEditorCard = document.getElementById('navPageEditorCard');
   const navPageCancelBtn = document.getElementById('navPageCancelBtn');
   const navPageSaveLabel = document.getElementById('navPageSaveLabel');
   const navPageCategorySelect = document.getElementById('navPageCategory');
 
   async function loadNavigationView() {
-    navCategoriesList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.85rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
-    navItemsList.innerHTML = '';
+    navTree.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.85rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
     try {
       const data = await readFile(NAV_PATH);
       renderNavigation(data.items || []);
     } catch (err) {
-      navCategoriesList.innerHTML = '';
-      navItemsList.appendChild(
+      navTree.innerHTML = '';
+      navTree.appendChild(
         buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger le menu', [err.message])
       );
     }
@@ -993,66 +992,88 @@
     renderNavigation(items);
   }
 
-  async function moveTopLevelItem(id, direction) {
-    if (!fileState[NAV_PATH]) await readFile(NAV_PATH);
-    const items = fileState[NAV_PATH].json.items.slice();
-    const idx = items.findIndex((it) => it.id === id);
-    const newIdx = idx + direction;
-    if (idx === -1 || newIdx < 0 || newIdx >= items.length) return;
-    [items[idx], items[newIdx]] = [items[newIdx], items[idx]];
-    await saveNavigation(items, 'Admin : réorganisation du menu');
+  /* --- Glisser-déposer pour réordonner --- */
+
+  let dragState = null;
+
+  function makeRowDraggable(row, id, parentId) {
+    row.draggable = true;
+
+    row.addEventListener('dragstart', (e) => {
+      dragState = { id, parentId };
+      row.classList.add('is-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    row.addEventListener('dragend', () => {
+      row.classList.remove('is-dragging');
+      navTree.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach((el) => {
+        el.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+      dragState = null;
+    });
+
+    row.addEventListener('dragover', (e) => {
+      if (!dragState || dragState.parentId !== parentId || dragState.id === id) return;
+      e.preventDefault();
+      const rect = row.getBoundingClientRect();
+      const isAfter = (e.clientY - rect.top) > rect.height / 2;
+      row.classList.toggle('drag-over-bottom', isAfter);
+      row.classList.toggle('drag-over-top', !isAfter);
+    });
+
+    row.addEventListener('dragleave', () => {
+      row.classList.remove('drag-over-top', 'drag-over-bottom');
+    });
+
+    row.addEventListener('drop', (e) => {
+      if (!dragState || dragState.parentId !== parentId || dragState.id === id) return;
+      e.preventDefault();
+      const rect = row.getBoundingClientRect();
+      const isAfter = (e.clientY - rect.top) > rect.height / 2;
+      row.classList.remove('drag-over-top', 'drag-over-bottom');
+      reorderByDrop(dragState.id, id, parentId, isAfter);
+    });
   }
 
-  async function moveChildItem(parentId, childId, direction) {
+  async function reorderByDrop(draggedId, targetId, parentId, insertAfter) {
     if (!fileState[NAV_PATH]) await readFile(NAV_PATH);
     const items = fileState[NAV_PATH].json.items.slice();
-    const parent = items.find((it) => it.id === parentId);
-    if (!parent || !Array.isArray(parent.children)) return;
-    const children = parent.children.slice();
-    const idx = children.findIndex((c) => c.id === childId);
-    const newIdx = idx + direction;
-    if (idx === -1 || newIdx < 0 || newIdx >= children.length) return;
-    [children[idx], children[newIdx]] = [children[newIdx], children[idx]];
-    parent.children = children;
-    await saveNavigation(items, 'Admin : réorganisation d\'une catégorie du menu');
+
+    let list;
+    let parent = null;
+    if (parentId) {
+      parent = items.find((it) => it.id === parentId);
+      if (!parent) return;
+      list = parent.children.slice();
+    } else {
+      list = items;
+    }
+
+    const fromIdx = list.findIndex((it) => it.id === draggedId);
+    if (fromIdx === -1) return;
+    const [moved] = list.splice(fromIdx, 1);
+    const toIdx = list.findIndex((it) => it.id === targetId);
+    if (toIdx === -1) return;
+    list.splice(insertAfter ? toIdx + 1 : toIdx, 0, moved);
+
+    if (parent) parent.children = list;
+    await saveNavigation(parent ? items : list, 'Admin : réorganisation du menu');
   }
 
-  function reorderArrowsHtml() {
-    return `
-      <button type="button" class="reorder-btn move-up-btn" title="Monter"><i class="fa-solid fa-chevron-up"></i></button>
-      <button type="button" class="reorder-btn move-down-btn" title="Descendre"><i class="fa-solid fa-chevron-down"></i></button>
-    `;
+  function dragHandleHtml() {
+    return '<i class="fa-solid fa-grip-vertical drag-handle" title="Glisser pour réordonner"></i>';
   }
 
   function renderNavigation(items) {
-    /* --- Liste des catégories (dropdowns) --- */
-    const categories = items.filter((it) => it.type === 'dropdown');
-    navCategoriesList.innerHTML = '';
+    navTree.innerHTML = '';
 
-    if (categories.length === 0) {
-      navCategoriesList.innerHTML = '<p class="empty-list-msg">Aucune catégorie pour le moment.</p>';
-    } else {
-      categories.forEach((cat) => {
-        const row = document.createElement('div');
-        row.className = 'nav-category-row';
-        row.innerHTML = `
-          <i class="fa-solid fa-folder folder-icon"></i>
-          <strong>${cat.label} (${(cat.children || []).length})</strong>
-          <div class="admin-list-actions">
-            ${reorderArrowsHtml()}
-            <button type="button" class="rename-btn" title="Renommer"><i class="fa-solid fa-pen"></i></button>
-            <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        `;
-        row.querySelector('.move-up-btn').addEventListener('click', () => moveTopLevelItem(cat.id, -1));
-        row.querySelector('.move-down-btn').addEventListener('click', () => moveTopLevelItem(cat.id, 1));
-        row.querySelector('.rename-btn').addEventListener('click', () => renameCategory(cat.id, cat.label));
-        row.querySelector('.delete-btn').addEventListener('click', () => deleteCategory(cat.id, cat.label, (cat.children || []).length));
-        navCategoriesList.appendChild(row);
-      });
+    if (items.length === 0) {
+      navTree.innerHTML = '<p class="empty-list-msg">Le menu est vide.</p>';
     }
 
-    /* --- Menu déroulant "Catégorie" du formulaire d'ajout de page --- */
+    /* --- Menu déroulant "Catégorie" du formulaire d'édition --- */
+    const categories = items.filter((it) => it.type === 'dropdown');
     navPageCategorySelect.innerHTML = '<option value="">Aucune — lien direct dans le menu</option>';
     categories.forEach((cat) => {
       const opt = document.createElement('option');
@@ -1061,49 +1082,50 @@
       navPageCategorySelect.appendChild(opt);
     });
 
-    /* --- Liste de toutes les pages (liens directs + pages dans les catégories) --- */
-    navItemsList.innerHTML = '';
-    let total = 0;
-
     items.forEach((item) => {
       if (item.type === 'dropdown') {
+        const row = document.createElement('div');
+        row.className = 'page-tree-row is-folder';
+        row.innerHTML = `
+          ${dragHandleHtml()}
+          <i class="fa-solid fa-folder folder-icon"></i>
+          <strong style="flex:1;">${item.label} (${(item.children || []).length})</strong>
+          <div class="admin-list-actions">
+            <button type="button" class="rename-btn" title="Renommer"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        row.querySelector('.rename-btn').addEventListener('click', () => renameCategory(item.id, item.label));
+        row.querySelector('.delete-btn').addEventListener('click', () => deleteCategory(item.id, item.label, (item.children || []).length));
+        makeRowDraggable(row, item.id, null);
+        navTree.appendChild(row);
+
         (item.children || []).forEach((child) => {
-          total++;
-          navItemsList.appendChild(buildNavItemRow(child, item.id, item.label));
+          navTree.appendChild(buildNavItemRow(child, item.id, item.label));
         });
       } else {
-        total++;
-        navItemsList.appendChild(buildNavItemRow(item, null, null));
+        navTree.appendChild(buildNavItemRow(item, null, null));
       }
     });
-
-    if (total === 0) {
-      navItemsList.innerHTML = '<p class="empty-list-msg">Aucune page dans le menu.</p>';
-    }
   }
 
   function buildNavItemRow(item, parentId, parentLabel) {
     const row = document.createElement('div');
-    row.className = 'nav-item-row' + (parentId ? ' is-child' : '');
+    row.className = 'page-tree-row' + (parentId ? ' is-child' : '');
     row.innerHTML = `
+      ${dragHandleHtml()}
       <div class="nav-item-info">
         <strong>${item.label}${parentLabel ? ' <span style="font-weight:400; color:var(--color-text-muted); font-size:0.76rem;">— ' + parentLabel + '</span>' : ''}</strong>
         <span>${item.link}</span>
       </div>
       <div class="admin-list-actions">
-        ${reorderArrowsHtml()}
         <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
         <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
       </div>
     `;
-    row.querySelector('.move-up-btn').addEventListener('click', () => {
-      parentId ? moveChildItem(parentId, item.id, -1) : moveTopLevelItem(item.id, -1);
-    });
-    row.querySelector('.move-down-btn').addEventListener('click', () => {
-      parentId ? moveChildItem(parentId, item.id, 1) : moveTopLevelItem(item.id, 1);
-    });
     row.querySelector('.edit-btn').addEventListener('click', () => startEditNavItem(item, parentId));
     row.querySelector('.delete-btn').addEventListener('click', () => deleteNavItem(item.id, parentId));
+    makeRowDraggable(row, item.id, parentId);
     return row;
   }
 
@@ -1116,18 +1138,16 @@
     document.getElementById('navPageLink').value = item.link || '';
     navPageCategorySelect.value = parentId || '';
     navPageSaveLabel.textContent = 'Enregistrer les modifications';
-    navPageCancelBtn.classList.remove('hidden');
     document.getElementById('navFormTitle').textContent = 'Modifier la page';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navPageEditorCard.classList.remove('hidden');
+    navPageEditorCard.scrollIntoView({ behavior: 'smooth' });
   }
 
   function resetNavPageForm() {
     navPageForm.reset();
     document.getElementById('navPageId').value = '';
     document.getElementById('navPageParentId').value = '';
-    navPageSaveLabel.textContent = 'Ajouter la page';
-    navPageCancelBtn.classList.add('hidden');
-    document.getElementById('navFormTitle').textContent = 'Ajouter une page au menu';
+    navPageEditorCard.classList.add('hidden');
   }
 
   navPageCancelBtn.addEventListener('click', resetNavPageForm);
@@ -3205,14 +3225,41 @@ ${items}
   async function loadPagesView() {
     pagesList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
     try {
-      const data = await readFile(PAGES_PATH);
+      const [data, navData] = await Promise.all([
+        readFile(PAGES_PATH),
+        readFile(NAV_PATH).catch(() => ({ items: [] }))
+      ]);
       currentPagesList = data.pages || [];
+      populatePageMenuCategorySelect(navData.items || []);
       renderPagesList(currentPagesList);
     } catch (err) {
       pagesList.innerHTML = '';
       pagesList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les pages', [err.message]));
     }
   }
+
+  function populatePageMenuCategorySelect(items) {
+    const select = document.getElementById('pageMenuCategory');
+    const categories = items.filter((it) => it.type === 'dropdown');
+    select.innerHTML = '<option value="">Lien direct (haut niveau)</option>' +
+      categories.map((cat) => `<option value="${cat.id}">${cat.label}</option>`).join('');
+  }
+
+  // Cherche dans le menu si une page (par id) y figure déjà, où qu'elle soit
+  function findNavEntryForPage(items, pageId) {
+    for (const it of items) {
+      if (it.id === pageId) return { entry: it, parentId: null };
+      if (it.type === 'dropdown') {
+        const child = (it.children || []).find((c) => c.id === pageId);
+        if (child) return { entry: child, parentId: it.id };
+      }
+    }
+    return null;
+  }
+
+  document.getElementById('pageAddToMenu').addEventListener('change', (e) => {
+    document.getElementById('pageMenuOptions').classList.toggle('hidden', !e.target.checked);
+  });
 
   function renderPagesList(pages) {
     pagesList.innerHTML = '';
@@ -3303,6 +3350,15 @@ ${items}
       btn.classList.toggle('is-active', btn.dataset.mode === 'visual');
     });
 
+    const menuCheckbox = document.getElementById('pageAddToMenu');
+    const menuOptions = document.getElementById('pageMenuOptions');
+    const menuLabelInput = document.getElementById('pageMenuLabel');
+    const menuCategorySelect = document.getElementById('pageMenuCategory');
+    menuLabelInput.value = '';
+    menuCategorySelect.value = '';
+    menuCheckbox.checked = false;
+    menuOptions.classList.add('hidden');
+
     if (page) {
       document.getElementById('pageEditId').value = page.id;
       pageTitleInput.value = page.title || '';
@@ -3311,6 +3367,15 @@ ${items}
       pageRichtextEditor.innerHTML = page.body || '';
       pageSaveLabel.textContent = 'Enregistrer les modifications';
       document.getElementById('pageEditorTitle').textContent = 'Modifier la page';
+
+      const navItems = fileState[NAV_PATH] ? fileState[NAV_PATH].json.items : [];
+      const found = findNavEntryForPage(navItems, page.id);
+      if (found) {
+        menuCheckbox.checked = true;
+        menuOptions.classList.remove('hidden');
+        menuLabelInput.value = found.entry.label || '';
+        menuCategorySelect.value = found.parentId || '';
+      }
     } else {
       document.getElementById('pageEditId').value = '';
       pageSaveLabel.textContent = 'Créer la page';
@@ -3486,6 +3551,35 @@ ${items}
       }
       await publishCleanUrlPage(slug);
 
+      // Synchronise la présence de cette page dans le menu du site
+      setStatus(pageEditorStatus, 'loading', 'Mise à jour du menu…');
+      if (!fileState[NAV_PATH]) await readFile(NAV_PATH);
+      let navItems = fileState[NAV_PATH].json.items.map((it) =>
+        it.type === 'dropdown' ? Object.assign({}, it, { children: (it.children || []).slice() }) : Object.assign({}, it)
+      );
+      // Retire toute entrée existante pour cette page, où qu'elle soit
+      navItems = navItems
+        .map((it) => it.type === 'dropdown' ? Object.assign({}, it, { children: it.children.filter((c) => c.id !== id) }) : it)
+        .filter((it) => it.type === 'dropdown' || it.id !== id);
+
+      const addToMenu = document.getElementById('pageAddToMenu').checked;
+      if (addToMenu) {
+        const menuLabel = document.getElementById('pageMenuLabel').value.trim() || title;
+        const targetCatId = document.getElementById('pageMenuCategory').value;
+        if (targetCatId) {
+          const cat = navItems.find((it) => it.id === targetCatId && it.type === 'dropdown');
+          if (cat) cat.children.push({ id, label: menuLabel, link: `./${slug}/` });
+        } else {
+          navItems.push({ id, label: menuLabel, link: `./${slug}/`, type: 'link' });
+        }
+      }
+
+      const navResult = await GitHubAPI.saveJSON(
+        cfg, NAV_PATH, { items: navItems }, fileState[NAV_PATH].sha,
+        `Admin : mise à jour du menu pour la page "${title}"`
+      );
+      fileState[NAV_PATH] = { json: { items: navItems }, sha: navResult.content.sha };
+
       currentPagesList = updatedPages;
       renderPagesList(updatedPages);
       pageEditorCard.classList.add('hidden');
@@ -3524,6 +3618,19 @@ ${items}
           await deleteFileIfExists(imgPath);
         }
         await unpublishCleanUrlPage(pageToDelete.slug);
+      }
+
+      // Retire aussi cette page du menu si elle y figurait
+      if (!fileState[NAV_PATH]) await readFile(NAV_PATH);
+      const navFound = findNavEntryForPage(fileState[NAV_PATH].json.items, id);
+      if (navFound) {
+        const navItems = fileState[NAV_PATH].json.items
+          .map((it) => it.type === 'dropdown' ? Object.assign({}, it, { children: it.children.filter((c) => c.id !== id) }) : it)
+          .filter((it) => it.type === 'dropdown' || it.id !== id);
+        const navResult = await GitHubAPI.saveJSON(
+          cfg, NAV_PATH, { items: navItems }, fileState[NAV_PATH].sha, `Admin : retrait de la page "${title}" du menu`
+        );
+        fileState[NAV_PATH] = { json: { items: navItems }, sha: navResult.content.sha };
       }
 
       currentPagesList = updatedPages;

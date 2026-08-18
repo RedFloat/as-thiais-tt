@@ -85,7 +85,7 @@
           <i class="fa-solid fa-file-lines"></i> Documents
         </button></li>
         <li><button type="button" class="nav-btn" data-view="navigation">
-          <i class="fa-solid fa-bars"></i> Menu du site
+          <i class="fa-solid fa-bars"></i> Ordre des Pages
         </button></li>
         <li><button type="button" class="nav-btn" data-view="teams">
           <i class="fa-solid fa-people-group"></i> Équipes & matchs
@@ -354,18 +354,16 @@
 
       <section class="admin-view" id="view-navigation">
         <div class="view-header">
-          <h1>Menu du site</h1>
-          <p>Ajoute une nouvelle page au menu de navigation, avec ou sans catégorie. Répercuté automatiquement sur les 8 pages du site.</p>
+          <h1>Ordre des Pages</h1>
+          <p>Organise les catégories et les pages du menu. Glisse-dépose avec la poignée ⠿ pour réordonner. Pour ajouter une page au menu, coche la case prévue à cet effet lors de sa création dans "Pages".</p>
         </div>
 
         <div class="admin-card">
-          <h2><i class="fa-solid fa-folder-plus"></i> Catégories</h2>
+          <h2><i class="fa-solid fa-folder-plus"></i> Créer une catégorie</h2>
           <p style="color:var(--color-text-muted); font-size:0.85rem; margin-bottom:1rem;">
             Une catégorie regroupe plusieurs pages dans un sous-menu déroulant (comme "Infos pratiques").
           </p>
-          <div id="navCategoriesList"></div>
-
-          <div class="form-row" style="margin-top:1.2rem;">
+          <div class="form-row">
             <div class="form-group" style="margin-bottom:0;">
               <label for="newCategoryLabel">Nom de la nouvelle catégorie</label>
               <input type="text" id="newCategoryLabel" placeholder="Ex : Vie du club">
@@ -377,8 +375,8 @@
           <div class="status-msg" id="navCategoryStatus"></div>
         </div>
 
-        <div class="admin-card">
-          <h2><i class="fa-solid fa-plus"></i> <span id="navFormTitle">Ajouter une page au menu</span></h2>
+        <div class="admin-card hidden" id="navPageEditorCard">
+          <h2><i class="fa-solid fa-pen"></i> <span id="navFormTitle">Modifier la page</span></h2>
           <form id="navPageForm">
             <input type="hidden" id="navPageId">
             <input type="hidden" id="navPageParentId">
@@ -404,9 +402,9 @@
 
             <div style="display:flex; gap:0.7rem; align-items:center;">
               <button type="submit" class="btn btn-primary" id="navPageSaveBtn">
-                <i class="fa-solid fa-floppy-disk"></i> <span id="navPageSaveLabel">Ajouter la page</span>
+                <i class="fa-solid fa-floppy-disk"></i> <span id="navPageSaveLabel">Enregistrer les modifications</span>
               </button>
-              <button type="button" class="btn btn-ghost hidden" id="navPageCancelBtn">Annuler la modification</button>
+              <button type="button" class="btn btn-ghost" id="navPageCancelBtn">Annuler</button>
             </div>
 
             <div class="status-msg" id="navPageStatus"></div>
@@ -414,10 +412,8 @@
         </div>
 
         <div class="admin-card">
-          <h2><i class="fa-solid fa-list"></i> Menu actuel</h2>
-          <div id="navItemsList">
-            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
-          </div>
+          <h2><i class="fa-solid fa-list"></i> Menu du site</h2>
+          <div id="navTree"></div>
         </div>
       </section>
 
@@ -956,6 +952,28 @@
                 <label for="pageSlugInput">Adresse (slug)</label>
                 <input type="text" id="pageSlugInput" placeholder="mentions-legales" required>
                 <span class="form-hint">La page sera accessible à : tonsite.github.io/ton-repo/ce-slug/</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem;">
+                <input type="checkbox" id="pageAddToMenu" style="width:auto; transform:scale(1.2);">
+                Ajouter cette page au menu du site
+              </label>
+            </div>
+
+            <div id="pageMenuOptions" class="hidden" style="background:var(--color-bg-light); border-radius:8px; padding:1rem; margin-bottom:1.25rem;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="pageMenuLabel">Titre affiché dans le menu</label>
+                  <input type="text" id="pageMenuLabel" placeholder="Reprend le titre de la page si laissé vide">
+                </div>
+                <div class="form-group">
+                  <label for="pageMenuCategory">Emplacement</label>
+                  <select id="pageMenuCategory">
+                    <option value="">Lien direct (haut niveau)</option>
+                  </select>
+                </div>
               </div>
             </div>
 
