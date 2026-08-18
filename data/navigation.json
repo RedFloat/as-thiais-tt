@@ -7,6 +7,12 @@
       "type": "link"
     },
     {
+      "id": "inscription",
+      "label": "Inscription",
+      "link": "./inscription.html",
+      "type": "link"
+    },
+    {
       "id": "equipes",
       "label": "Équipes",
       "type": "dropdown",
@@ -17,12 +23,6 @@
           "link": "./equipe.html?id=equipe-1"
         }
       ]
-    },
-    {
-      "id": "inscription",
-      "label": "Inscription",
-      "link": "./inscription.html",
-      "type": "link"
     },
     {
       "id": "vie-du-club",
