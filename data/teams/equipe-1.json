@@ -1,32 +1,68 @@
 {
   "id": "equipe-1",
-  "name": "Équipe 1",
-  "division": "Nationale 3",
-  "photo": "./imgs/teams/equipe-1.jpg",
-  "description": "Test",
+  "name": "Équipe 1 - Masculine",
+  "division": "Nationale 1",
+  "photo": "",
+  "description": "L'équipe 1 du club de tennis de table de Thiais fait rayonner le club au niveau national en évoluant au sommet de la Nationale 1. Portée des joueurs d'exception, elle fait rêver les passionnés et joueurs du club depuis plusieurs années.",
   "showPlayers": false,
-  "players": [
-    "Nathan BAUDOUIN",
-    "Ethan BENALAL",
-    "Samy TOUKAL"
-  ],
+  "players": [],
   "classification": {
-    "rank": 2,
-    "totalTeams": 8,
-    "status": "up"
+    "rank": null,
+    "totalTeams": null,
+    "status": null
   },
   "matches": [
     {
-      "date": "",
-      "opponent": "TT Montreuil",
+      "date": "2026-09-19",
+      "opponent": "LE CHESNAY 78 AS 1",
       "home": true,
-      "status": "played",
-      "result": "V",
-      "score": "V 8-4"
+      "status": "upcoming",
+      "result": null,
+      "score": null
     },
     {
-      "date": "",
-      "opponent": "US Fontenay",
+      "date": "2026-10-03",
+      "opponent": "CUGNAUX VILLENEUVE TT 1",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-17",
+      "opponent": "IGNY AP 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-07",
+      "opponent": "ROMANS ASPTT 1",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-21",
+      "opponent": "CESSON OC 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-05",
+      "opponent": "CHARLEVILLE MEZIERES ATT 1",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-12",
+      "opponent": "METZ T.T 1",
       "home": true,
       "status": "upcoming",
       "result": null,
