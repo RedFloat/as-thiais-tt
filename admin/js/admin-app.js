@@ -188,6 +188,7 @@
       if (btn.dataset.view === 'videos') loadVideosView();
       if (btn.dataset.view === 'birthdays') loadBirthdaysView();
       if (btn.dataset.view === 'pages') loadPagesView();
+      if (btn.dataset.view === 'sitecontent') loadStaticContentView();
     });
   });
 
@@ -1894,8 +1895,8 @@
   /* --- Barre d'outils de mise en forme --- */
 
   document.querySelectorAll('#richtextToolbar button[data-cmd]').forEach((btn) => {
+    preventFocusSteal(btn);
     btn.addEventListener('click', () => {
-      richtextEditor.focus();
       const cmd = btn.dataset.cmd;
       if (cmd.startsWith('formatBlock:')) {
         document.execCommand('formatBlock', false, cmd.split(':')[1]);
@@ -1905,32 +1906,12 @@
     });
   });
 
-  let savedNewsColorRange = null;
-  const richtextColorInput = document.getElementById('richtextColorInput');
-  richtextColorInput.addEventListener('click', () => {
-    const sel = window.getSelection();
-    savedNewsColorRange = (sel.rangeCount > 0 && richtextEditor.contains(sel.anchorNode))
-      ? sel.getRangeAt(0).cloneRange()
-      : null;
-  });
-  richtextColorInput.addEventListener('input', () => {
-    restoreEditorSelection(richtextEditor, savedNewsColorRange);
-    document.execCommand('foreColor', false, richtextColorInput.value);
-  });
-
-  let savedNewsSizeRange = null;
-  const richtextFontSizeInput = document.getElementById('richtextFontSizeInput');
-  richtextFontSizeInput.addEventListener('mousedown', () => {
-    const sel = window.getSelection();
-    savedNewsSizeRange = (sel.rangeCount > 0 && richtextEditor.contains(sel.anchorNode))
-      ? sel.getRangeAt(0).cloneRange()
-      : null;
-  });
-  document.getElementById('richtextFontSizeApplyBtn').addEventListener('click', () => {
-    const size = parseInt(richtextFontSizeInput.value, 10);
-    if (!size || size < 5 || size > 75) return;
-    restoreEditorSelection(richtextEditor, savedNewsSizeRange);
-    applyFontSizePx(richtextEditor, size);
+  setupRichTextExtras(richtextEditor, {
+    sizeMinus: 'richtextSizeMinus',
+    sizePlus: 'richtextSizePlus',
+    sizeReadout: 'richtextSizeReadout',
+    colorToggle: 'richtextColorToggle',
+    colorPanel: 'richtextColorPanel'
   });
 
   document.getElementById('richtextLinkBtn').addEventListener('click', async () => {
@@ -1994,28 +1975,113 @@
     return !!editor.querySelector('img[data-upload-failed]');
   }
 
-  function applyFontSizePx(editor, sizePx) {
+  // Empêche un bouton de voler le focus (et donc la sélection en cours) au clic —
+  // c'est ce qui permet de cliquer sur les boutons de la barre d'outils sans jamais
+  // perdre le texte sélectionné dans l'éditeur, comme dans Word.
+  function preventFocusSteal(el) {
+    el.addEventListener('mousedown', (e) => e.preventDefault());
+  }
+
+  const TEXT_COLOR_SWATCHES = [
+    '#000000', '#374151', '#6b7280', '#ffffff',
+    '#dc2626', '#ea580c', '#d97706', '#16a34a',
+    '#0891b2', '#2563eb', '#4f46e5', '#9333ea'
+  ];
+
+  function getSelectionFontSize(editor) {
+    const sel = window.getSelection();
+    if (sel.rangeCount === 0) return 16;
+    let node = sel.anchorNode;
+    if (node && node.nodeType === 3) node = node.parentElement;
+    while (node && node !== editor && editor.contains(node)) {
+      if (node.style && node.style.fontSize) return parseInt(node.style.fontSize, 10);
+      node = node.parentElement;
+    }
+    return 16;
+  }
+
+  function stepFontSize(editor, delta, readoutEl) {
     const sel = window.getSelection();
     if (sel.rangeCount === 0) return;
     const range = sel.getRangeAt(0);
     if (range.collapsed || !editor.contains(range.commonAncestorContainer)) return;
 
-    const span = document.createElement('span');
-    span.style.fontSize = sizePx + 'px';
+    // Si la sélection correspond exactement au contenu d'un span de taille déjà posé
+    // par un clic précédent, on ajuste directement ce même span (pas d'empilement).
+    const container = range.commonAncestorContainer;
+    const wrapper = container.nodeType === 3 ? container.parentElement : container;
 
+    if (wrapper && wrapper.tagName === 'SPAN' && wrapper.style.fontSize &&
+        wrapper.textContent === range.toString() && editor.contains(wrapper)) {
+      const current = parseInt(wrapper.style.fontSize, 10) || 16;
+      const next = Math.max(5, Math.min(75, current + delta));
+      wrapper.style.fontSize = next + 'px';
+      if (readoutEl) readoutEl.textContent = next + 'px';
+      return;
+    }
+
+    const current = getSelectionFontSize(editor);
+    const next = Math.max(5, Math.min(75, current + delta));
+    const span = document.createElement('span');
+    span.style.fontSize = next + 'px';
     try {
       range.surroundContents(span);
     } catch (e) {
-      // Sélection qui chevauche plusieurs éléments : on extrait puis on réinsère dans le span
       const contents = range.extractContents();
       span.appendChild(contents);
       range.insertNode(span);
     }
-
     sel.removeAllRanges();
     const newRange = document.createRange();
     newRange.selectNodeContents(span);
     sel.addRange(newRange);
+    if (readoutEl) readoutEl.textContent = next + 'px';
+  }
+
+  function setupColorPicker(toggleBtn, panelEl) {
+    panelEl.innerHTML = TEXT_COLOR_SWATCHES.map((c) =>
+      `<button type="button" class="color-swatch" data-color="${c}" style="background:${c};" title="${c}"></button>`
+    ).join('');
+
+    preventFocusSteal(toggleBtn);
+    toggleBtn.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch-panel').forEach((p) => { if (p !== panelEl) p.classList.add('hidden'); });
+      panelEl.classList.toggle('hidden');
+    });
+
+    panelEl.querySelectorAll('.color-swatch').forEach((btn) => {
+      preventFocusSteal(btn);
+      btn.addEventListener('click', () => {
+        document.execCommand('foreColor', false, btn.dataset.color);
+        panelEl.classList.add('hidden');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!panelEl.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
+        panelEl.classList.add('hidden');
+      }
+    });
+  }
+
+  // Câble la taille (avec affichage en direct dès qu'on sélectionne du texte) et la couleur.
+  function setupRichTextExtras(editor, ids) {
+    const sizeMinus = document.getElementById(ids.sizeMinus);
+    const sizePlus = document.getElementById(ids.sizePlus);
+    const sizeReadout = document.getElementById(ids.sizeReadout);
+
+    preventFocusSteal(sizeMinus);
+    preventFocusSteal(sizePlus);
+    sizeMinus.addEventListener('click', () => stepFontSize(editor, -1, sizeReadout));
+    sizePlus.addEventListener('click', () => stepFontSize(editor, 1, sizeReadout));
+
+    document.addEventListener('selectionchange', () => {
+      const sel = window.getSelection();
+      if (sel.rangeCount === 0 || !sel.anchorNode || !editor.contains(sel.anchorNode)) return;
+      sizeReadout.textContent = getSelectionFontSize(editor) + 'px';
+    });
+
+    setupColorPicker(document.getElementById(ids.colorToggle), document.getElementById(ids.colorPanel));
   }
 
   richtextImageInput.addEventListener('change', async () => {
@@ -3394,8 +3460,8 @@ ${items}
   /* --- Barre d'outils de mise en forme --- */
 
   document.querySelectorAll('#pageRichtextToolbar button[data-cmd]').forEach((btn) => {
+    preventFocusSteal(btn);
     btn.addEventListener('click', () => {
-      pageRichtextEditor.focus();
       const cmd = btn.dataset.cmd;
       if (cmd.startsWith('formatBlock:')) {
         document.execCommand('formatBlock', false, cmd.split(':')[1]);
@@ -3405,32 +3471,12 @@ ${items}
     });
   });
 
-  let savedPageColorRange = null;
-  const pageRichtextColorInput = document.getElementById('pageRichtextColorInput');
-  pageRichtextColorInput.addEventListener('click', () => {
-    const sel = window.getSelection();
-    savedPageColorRange = (sel.rangeCount > 0 && pageRichtextEditor.contains(sel.anchorNode))
-      ? sel.getRangeAt(0).cloneRange()
-      : null;
-  });
-  pageRichtextColorInput.addEventListener('input', () => {
-    restoreEditorSelection(pageRichtextEditor, savedPageColorRange);
-    document.execCommand('foreColor', false, pageRichtextColorInput.value);
-  });
-
-  let savedPageSizeRange = null;
-  const pageRichtextFontSizeInput = document.getElementById('pageRichtextFontSizeInput');
-  pageRichtextFontSizeInput.addEventListener('mousedown', () => {
-    const sel = window.getSelection();
-    savedPageSizeRange = (sel.rangeCount > 0 && pageRichtextEditor.contains(sel.anchorNode))
-      ? sel.getRangeAt(0).cloneRange()
-      : null;
-  });
-  document.getElementById('pageRichtextFontSizeApplyBtn').addEventListener('click', () => {
-    const size = parseInt(pageRichtextFontSizeInput.value, 10);
-    if (!size || size < 5 || size > 75) return;
-    restoreEditorSelection(pageRichtextEditor, savedPageSizeRange);
-    applyFontSizePx(pageRichtextEditor, size);
+  setupRichTextExtras(pageRichtextEditor, {
+    sizeMinus: 'pageRichtextSizeMinus',
+    sizePlus: 'pageRichtextSizePlus',
+    sizeReadout: 'pageRichtextSizeReadout',
+    colorToggle: 'pageRichtextColorToggle',
+    colorPanel: 'pageRichtextColorPanel'
   });
 
   document.getElementById('pageRichtextLinkBtn').addEventListener('click', async () => {
@@ -3668,6 +3714,222 @@ ${items}
   }
 
 
+
+  /* ---------- Contenu du site (pages déjà codées : le_club, entrainements...) ---------- */
+
+  const STATIC_CONTENT_PATH = 'data/page-content.json';
+
+  const staticPagesList = document.getElementById('staticPagesList');
+  const staticPageEditorCard = document.getElementById('staticPageEditorCard');
+  const staticPageEditorForm = document.getElementById('staticPageEditorForm');
+  const staticPageEditorStatus = document.getElementById('staticPageEditorStatus');
+  const staticPageRichtextEditor = document.getElementById('staticPageRichtextEditor');
+  const staticPageCodeEditor = document.getElementById('staticPageCodeEditor');
+  const staticPageVisualEditorWrap = document.getElementById('staticPageVisualEditorWrap');
+  const staticPageCodeEditorWrap = document.getElementById('staticPageCodeEditorWrap');
+  const staticPageImageInput = document.getElementById('staticPageImageInput');
+
+  let staticPageEditorMode = 'visual';
+
+  async function loadStaticContentView() {
+    staticPagesList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(STATIC_CONTENT_PATH);
+      renderStaticPagesList(data.pages || {});
+    } catch (err) {
+      staticPagesList.innerHTML = '';
+      staticPagesList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger le contenu du site', [err.message]));
+    }
+  }
+
+  function renderStaticPagesList(pages) {
+    staticPagesList.innerHTML = '';
+    const keys = Object.keys(pages);
+    if (keys.length === 0) {
+      staticPagesList.innerHTML = '<p class="empty-list-msg">Aucune page disponible pour le moment.</p>';
+      return;
+    }
+    keys.forEach((key) => {
+      const page = pages[key];
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      row.innerHTML = `
+        <div class="admin-list-thumb"><i class="fa-solid fa-file-lines" style="color:var(--color-navy);"></i></div>
+        <div class="admin-list-info">
+          <strong>${page.label || key}</strong>
+          <span>${page.file || ''}</span>
+        </div>
+        <div class="admin-list-actions">
+          <a href="../${page.file}" target="_blank" rel="noopener" class="view-link-btn" title="Voir la page"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+        </div>
+      `;
+      row.querySelector('.edit-btn').addEventListener('click', () => openStaticPageEditor(key, page));
+      staticPagesList.appendChild(row);
+    });
+  }
+
+  function setStaticPageEditorMode(mode) {
+    if (mode === staticPageEditorMode) return;
+    if (mode === 'code') {
+      staticPageCodeEditor.value = staticPageRichtextEditor.innerHTML;
+    } else {
+      staticPageRichtextEditor.innerHTML = staticPageCodeEditor.value;
+    }
+    staticPageEditorMode = mode;
+    staticPageVisualEditorWrap.classList.toggle('hidden', mode !== 'visual');
+    staticPageCodeEditorWrap.classList.toggle('hidden', mode !== 'code');
+    document.querySelectorAll('#staticPageModeSwitch .mode-switch-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.mode === mode);
+    });
+  }
+
+  document.querySelectorAll('#staticPageModeSwitch .mode-switch-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setStaticPageEditorMode(btn.dataset.mode));
+  });
+
+  function getCurrentStaticPageBody() {
+    return staticPageEditorMode === 'code' ? staticPageCodeEditor.value : staticPageRichtextEditor.innerHTML;
+  }
+
+  function openStaticPageEditor(key, page) {
+    staticPageEditorForm.reset();
+    staticPageRichtextEditor.innerHTML = page.body || '';
+    staticPageCodeEditor.value = '';
+    staticPageEditorMode = 'visual';
+    staticPageVisualEditorWrap.classList.remove('hidden');
+    staticPageCodeEditorWrap.classList.add('hidden');
+    document.querySelectorAll('#staticPageModeSwitch .mode-switch-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.mode === 'visual');
+    });
+
+    document.getElementById('staticPageEditKey').value = key;
+    document.getElementById('staticPageEditorTitle').textContent = 'Modifier : ' + (page.label || key);
+    hideStatus(staticPageEditorStatus);
+    staticPageEditorCard.classList.remove('hidden');
+    staticPageEditorCard.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  document.getElementById('staticPageEditorCancelBtn').addEventListener('click', () => {
+    staticPageEditorCard.classList.add('hidden');
+  });
+
+  /* --- Barre d'outils --- */
+
+  document.querySelectorAll('#staticPageRichtextToolbar button[data-cmd]').forEach((btn) => {
+    preventFocusSteal(btn);
+    btn.addEventListener('click', () => {
+      const cmd = btn.dataset.cmd;
+      if (cmd.startsWith('formatBlock:')) {
+        document.execCommand('formatBlock', false, cmd.split(':')[1]);
+      } else {
+        document.execCommand(cmd, false, null);
+      }
+    });
+  });
+
+  setupRichTextExtras(staticPageRichtextEditor, {
+    sizeMinus: 'staticPageSizeMinus',
+    sizePlus: 'staticPageSizePlus',
+    sizeReadout: 'staticPageSizeReadout',
+    colorToggle: 'staticPageColorToggle',
+    colorPanel: 'staticPageColorPanel'
+  });
+
+  document.getElementById('staticPageLinkBtn').addEventListener('click', async () => {
+    const sel = window.getSelection();
+    const linkRange = (sel.rangeCount > 0 && staticPageRichtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
+    const url = await showPromptModal('Adresse du lien à insérer', '', { placeholder: 'https://exemple.com' });
+    if (!url) return;
+    restoreEditorSelection(staticPageRichtextEditor, linkRange);
+    document.execCommand('createLink', false, url);
+  });
+
+  let savedStaticPageImgRange = null;
+  document.getElementById('staticPageImageBtn').addEventListener('click', () => {
+    const sel = window.getSelection();
+    savedStaticPageImgRange = (sel.rangeCount > 0 && staticPageRichtextEditor.contains(sel.anchorNode))
+      ? sel.getRangeAt(0).cloneRange()
+      : null;
+    staticPageImageInput.click();
+  });
+
+  staticPageImageInput.addEventListener('change', async () => {
+    const file = staticPageImageInput.files[0];
+    if (!file) return;
+
+    const key = document.getElementById('staticPageEditKey').value || 'page';
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `imgs/sitecontent/${key}-inline-${Date.now()}.${ext}`;
+    const tempId = 'tmp-img-' + Date.now();
+
+    const dataUrl = await readFileAsDataUrl(file);
+    restoreEditorSelection(staticPageRichtextEditor, savedStaticPageImgRange);
+    document.execCommand('insertHTML', false, `<img id="${tempId}" data-pending="true" class="resizable-img" src="${dataUrl}" alt="">`);
+
+    setStatus(staticPageEditorStatus, 'loading', 'Envoi de l\'image en arrière-plan…');
+    const uploadPromise = GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans "${key}"`)
+      .then(() => {
+        const img = staticPageRichtextEditor.querySelector('#' + tempId);
+        if (img) {
+          img.dataset.finalSrc = `./${path}`;
+          img.removeAttribute('data-pending');
+        }
+        hideStatus(staticPageEditorStatus);
+      })
+      .catch((err) => {
+        const img = staticPageRichtextEditor.querySelector('#' + tempId);
+        if (img) img.dataset.uploadFailed = 'true';
+        setStatus(staticPageEditorStatus, 'error', 'Erreur d\'envoi de l\'image : ' + err.message + ' (supprime-la et réessaie avant d\'enregistrer)');
+      });
+
+    pendingImageUploads.set(tempId, uploadPromise);
+    staticPageImageInput.value = '';
+  });
+
+  setupImageResizing(staticPageRichtextEditor);
+
+  /* --- Enregistrement --- */
+
+  staticPageEditorForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    deselectImage();
+    const saveBtn = document.getElementById('staticPageSaveBtn');
+    saveBtn.disabled = true;
+    setStatus(staticPageEditorStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      const key = document.getElementById('staticPageEditKey').value;
+
+      setStatus(staticPageEditorStatus, 'loading', 'Finalisation des images…');
+      await waitForPendingImages(staticPageRichtextEditor);
+      if (hasFailedImageUpload(staticPageRichtextEditor)) {
+        throw new Error('Une image n\'a pas pu être envoyée. Supprime-la (clique dessus puis sur la corbeille) et réessaie.');
+      }
+      finalizeImagesForSave(staticPageRichtextEditor);
+
+      const body = getCurrentStaticPageBody();
+
+      if (!fileState[STATIC_CONTENT_PATH]) await readFile(STATIC_CONTENT_PATH);
+      const pages = Object.assign({}, fileState[STATIC_CONTENT_PATH].json.pages);
+      pages[key] = Object.assign({}, pages[key], { body });
+
+      const updated = { pages };
+      const sha = fileState[STATIC_CONTENT_PATH].sha;
+      const result = await GitHubAPI.saveJSON(cfg, STATIC_CONTENT_PATH, updated, sha, `Admin : modification du contenu de "${pages[key].label || key}"`);
+      fileState[STATIC_CONTENT_PATH] = { json: updated, sha: result.content.sha };
+
+      renderStaticPagesList(pages);
+      staticPageEditorCard.classList.add('hidden');
+      setStatus(staticPageEditorStatus, 'success', 'Contenu enregistré !');
+    } catch (err) {
+      setStatus(staticPageEditorStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
 
   /* ---------- Redimensionnement / placement des images dans les éditeurs ---------- */
 

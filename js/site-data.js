@@ -910,6 +910,39 @@
     renderAlbumProfile(album);
   }
 
+  /* ---------- Contenu éditable des pages du site (le_club, entrainements...) ---------- */
+
+  async function initStaticPageContent() {
+    const container = document.getElementById('staticPageBody');
+    if (!container) return;
+
+    const key = container.dataset.pageKey;
+    const [data, config] = await Promise.all([
+      loadJSON('./data/page-content.json'),
+      loadJSON('./data/site-config.json')
+    ]);
+    const page = data && data.pages ? data.pages[key] : null;
+
+    container.innerHTML = (page && page.body) ? page.body : '<p style="text-align:center; padding:3rem; color:var(--color-text-muted);">Contenu à venir.</p>';
+
+    // Le contenu vient d'être injecté après le premier passage de applySeason/applySocialLinks :
+    // on relance ces deux-là uniquement pour ce qui vient d'apparaître.
+    if (config) {
+      container.querySelectorAll('[data-season-badge]').forEach((el) => {
+        el.textContent = 'Saison ' + config.season;
+      });
+      container.querySelectorAll('[data-season]').forEach((el) => {
+        el.textContent = config.season;
+      });
+      if (config.facebookUrl) {
+        container.querySelectorAll('[data-social="facebook"]').forEach((el) => { el.href = config.facebookUrl; });
+      }
+      if (config.instagramUrl) {
+        container.querySelectorAll('[data-social="instagram"]').forEach((el) => { el.href = config.instagramUrl; });
+      }
+    }
+  }
+
   /* ---------- Page personnalisée (page.html?slug=...) ---------- */
 
   async function initCustomPage() {
@@ -1417,6 +1450,7 @@
     initNewsListPage();
     initSponsorProfilePage();
     initCustomPage();
+    initStaticPageContent();
     initSponsorsFooterReminder();
     initAlbumsListPage();
     initAlbumProfilePage();

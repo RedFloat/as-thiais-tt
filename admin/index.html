@@ -108,6 +108,9 @@
         <li><button type="button" class="nav-btn" data-view="pages">
           <i class="fa-solid fa-file-circle-plus"></i> Pages
         </button></li>
+        <li><button type="button" class="nav-btn" data-view="sitecontent">
+          <i class="fa-solid fa-file-pen"></i> Contenu du site
+        </button></li>
       </ul>
     </nav>
 
@@ -603,9 +606,10 @@
             <div class="form-group">
               <label>Contenu de l'article</label>
               <div class="richtext-toolbar" id="richtextToolbar">
-                <div class="font-size-control" title="Taille du texte en pixels">
-                  <input type="number" id="richtextFontSizeInput" min="5" max="75" placeholder="16">
-                  <button type="button" id="richtextFontSizeApplyBtn">Appliquer</button>
+                <div class="font-size-stepper" title="Taille du texte sélectionné">
+                  <button type="button" class="font-size-btn" id="richtextSizeMinus">−</button>
+                  <span class="font-size-readout" id="richtextSizeReadout">16px</span>
+                  <button type="button" class="font-size-btn" id="richtextSizePlus">+</button>
                 </div>
                 <span class="richtext-sep"></span>
                 <button type="button" data-cmd="bold" title="Gras"><i class="fa-solid fa-bold"></i></button>
@@ -622,10 +626,12 @@
                 <button type="button" data-cmd="justifyCenter" title="Centrer"><i class="fa-solid fa-align-center"></i></button>
                 <button type="button" data-cmd="justifyRight" title="Aligner à droite"><i class="fa-solid fa-align-right"></i></button>
                 <span class="richtext-sep"></span>
-                <label class="richtext-color-btn" title="Couleur du texte">
-                  <i class="fa-solid fa-palette"></i>
-                  <input type="color" id="richtextColorInput" value="#000000">
-                </label>
+                <div class="color-swatch-picker" id="richtextColorPicker">
+                  <button type="button" class="richtext-color-btn" id="richtextColorToggle" title="Couleur du texte">
+                    <i class="fa-solid fa-palette"></i>
+                  </button>
+                  <div class="color-swatch-panel hidden" id="richtextColorPanel"></div>
+                </div>
                 <span class="richtext-sep"></span>
                 <button type="button" id="richtextLinkBtn" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
                 <button type="button" id="richtextImageBtn" title="Insérer une image"><i class="fa-solid fa-image"></i></button>
@@ -988,9 +994,10 @@
 
               <div id="pageVisualEditorWrap">
                 <div class="richtext-toolbar" id="pageRichtextToolbar">
-                  <div class="font-size-control" title="Taille du texte en pixels">
-                    <input type="number" id="pageRichtextFontSizeInput" min="5" max="75" placeholder="16">
-                    <button type="button" id="pageRichtextFontSizeApplyBtn">Appliquer</button>
+                  <div class="font-size-stepper" title="Taille du texte sélectionné">
+                    <button type="button" class="font-size-btn" id="pageRichtextSizeMinus">−</button>
+                    <span class="font-size-readout" id="pageRichtextSizeReadout">16px</span>
+                    <button type="button" class="font-size-btn" id="pageRichtextSizePlus">+</button>
                   </div>
                   <span class="richtext-sep"></span>
                   <button type="button" data-cmd="bold" title="Gras"><i class="fa-solid fa-bold"></i></button>
@@ -1007,10 +1014,12 @@
                   <button type="button" data-cmd="justifyCenter" title="Centrer"><i class="fa-solid fa-align-center"></i></button>
                   <button type="button" data-cmd="justifyRight" title="Aligner à droite"><i class="fa-solid fa-align-right"></i></button>
                   <span class="richtext-sep"></span>
-                  <label class="richtext-color-btn" title="Couleur du texte">
-                    <i class="fa-solid fa-palette"></i>
-                    <input type="color" id="pageRichtextColorInput" value="#000000">
-                  </label>
+                  <div class="color-swatch-picker" id="pageRichtextColorPicker">
+                    <button type="button" class="richtext-color-btn" id="pageRichtextColorToggle" title="Couleur du texte">
+                      <i class="fa-solid fa-palette"></i>
+                    </button>
+                    <div class="color-swatch-panel hidden" id="pageRichtextColorPanel"></div>
+                  </div>
                   <span class="richtext-sep"></span>
                   <button type="button" id="pageRichtextLinkBtn" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
                   <button type="button" id="pageRichtextImageBtn" title="Insérer une image"><i class="fa-solid fa-image"></i></button>
@@ -1033,6 +1042,87 @@
             </div>
 
             <div class="status-msg" id="pageEditorStatus"></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="admin-view" id="view-sitecontent">
+        <div class="view-header">
+          <h1>Contenu du site</h1>
+          <p>Modifie le contenu des pages déjà construites du site. L'en-tête, le pied de page et la mise en page générale restent identiques — seul le texte, les images et les liens à l'intérieur sont à toi.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Pages du site</h2>
+          <div id="staticPagesList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+
+        <div class="admin-card hidden" id="staticPageEditorCard">
+          <h2><i class="fa-solid fa-pen"></i> <span id="staticPageEditorTitle">Modifier la page</span></h2>
+          <form id="staticPageEditorForm">
+            <input type="hidden" id="staticPageEditKey">
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                <label style="margin-bottom:0;">Contenu de la page</label>
+                <div class="mode-switch" id="staticPageModeSwitch">
+                  <button type="button" class="mode-switch-btn is-active" data-mode="visual"><i class="fa-solid fa-wand-magic-sparkles"></i> Facile</button>
+                  <button type="button" class="mode-switch-btn" data-mode="code"><i class="fa-solid fa-code"></i> Code</button>
+                </div>
+              </div>
+
+              <div id="staticPageVisualEditorWrap">
+                <div class="richtext-toolbar" id="staticPageRichtextToolbar">
+                  <div class="font-size-stepper" title="Taille du texte sélectionné">
+                    <button type="button" class="font-size-btn" id="staticPageSizeMinus">−</button>
+                    <span class="font-size-readout" id="staticPageSizeReadout">16px</span>
+                    <button type="button" class="font-size-btn" id="staticPageSizePlus">+</button>
+                  </div>
+                  <span class="richtext-sep"></span>
+                  <button type="button" data-cmd="bold" title="Gras"><i class="fa-solid fa-bold"></i></button>
+                  <button type="button" data-cmd="italic" title="Italique"><i class="fa-solid fa-italic"></i></button>
+                  <button type="button" data-cmd="underline" title="Souligné"><i class="fa-solid fa-underline"></i></button>
+                  <span class="richtext-sep"></span>
+                  <button type="button" data-cmd="insertUnorderedList" title="Liste à puces"><i class="fa-solid fa-list-ul"></i></button>
+                  <button type="button" data-cmd="insertOrderedList" title="Liste numérotée"><i class="fa-solid fa-list-ol"></i></button>
+                  <span class="richtext-sep"></span>
+                  <button type="button" data-cmd="formatBlock:H2" title="Titre">H2</button>
+                  <button type="button" data-cmd="formatBlock:P" title="Paragraphe">¶</button>
+                  <span class="richtext-sep"></span>
+                  <button type="button" data-cmd="justifyLeft" title="Aligner à gauche"><i class="fa-solid fa-align-left"></i></button>
+                  <button type="button" data-cmd="justifyCenter" title="Centrer"><i class="fa-solid fa-align-center"></i></button>
+                  <button type="button" data-cmd="justifyRight" title="Aligner à droite"><i class="fa-solid fa-align-right"></i></button>
+                  <span class="richtext-sep"></span>
+                  <div class="color-swatch-picker" id="staticPageColorPicker">
+                    <button type="button" class="richtext-color-btn" id="staticPageColorToggle" title="Couleur du texte">
+                      <i class="fa-solid fa-palette"></i>
+                    </button>
+                    <div class="color-swatch-panel hidden" id="staticPageColorPanel"></div>
+                  </div>
+                  <span class="richtext-sep"></span>
+                  <button type="button" id="staticPageLinkBtn" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
+                  <button type="button" id="staticPageImageBtn" title="Insérer une image"><i class="fa-solid fa-image"></i></button>
+                </div>
+                <div class="richtext-editor" id="staticPageRichtextEditor" contenteditable="true" style="min-height:400px;"></div>
+                <input type="file" id="staticPageImageInput" accept="image/*" class="hidden">
+              </div>
+
+              <div id="staticPageCodeEditorWrap" class="hidden">
+                <textarea id="staticPageCodeEditor" rows="22" style="width:100%; font-family:monospace; font-size:0.85rem;" placeholder="&lt;p&gt;Ton HTML ici...&lt;/p&gt;"></textarea>
+                <span class="form-hint">Écris du HTML directement. Utile pour les blocs en colonnes ou une mise en page plus poussée — le contenu que tu vois en mode Facile est le même que celui-ci.</span>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center; margin-top:1rem;">
+              <button type="submit" class="btn btn-primary" id="staticPageSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications
+              </button>
+              <button type="button" class="btn btn-ghost" id="staticPageEditorCancelBtn">Annuler</button>
+            </div>
+
+            <div class="status-msg" id="staticPageEditorStatus"></div>
           </form>
         </div>
       </section>
