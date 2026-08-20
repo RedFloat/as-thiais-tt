@@ -1,10 +1,10 @@
 {
-  "id": "equipe-1",
-  "name": "Équipe 1 - Masculine",
-  "division": "Nationale 1",
+  "id": "equipe-2",
+  "name": "Equipe 1 - Féminine",
+  "division": "Pré Nationale",
   "photo": "",
-  "description": "L'équipe 1 du club de tennis de table de Thiais fait rayonner le club au niveau national en évoluant au sommet de la Nationale 1. Portée des joueurs d'exception, elle fait rêver les passionnés et joueurs du club depuis plusieurs années.",
-  "showPlayers": false,
+  "description": "Portée par des joueuses passionnées et talentueuses, l'équipe 1 féminine du Tennis de Table de Thiais fait vibrer la Pré-Nationale et fait rêver tout le club.",
+  "showPlayers": true,
   "players": [],
   "classification": {
     "rank": null,
@@ -14,56 +14,56 @@
   "matches": [
     {
       "date": "2026-09-19",
-      "opponent": "LE CHESNAY 78 AS 1",
-      "home": true,
+      "opponent": "CHATENAY ASVTT 1",
+      "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
       "date": "2026-10-03",
-      "opponent": "CUGNAUX VILLENEUVE TT 1",
-      "home": false,
+      "opponent": "KREMLIN BICETRE US 1",
+      "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
       "date": "2026-10-17",
-      "opponent": "IGNY AP 1",
-      "home": true,
+      "opponent": "RUEIL ATHLETIC 1",
+      "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
       "date": "2026-11-07",
-      "opponent": "ROMANS ASPTT 1",
-      "home": false,
+      "opponent": "ESP REUILLY 1",
+      "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
       "date": "2026-11-21",
-      "opponent": "CESSON OC 1",
-      "home": true,
-      "status": "upcoming",
-      "result": null,
-      "score": null
-    },
-    {
-      "date": "2026-12-05",
-      "opponent": "CHARLEVILLE MEZIERES ATT 1",
+      "opponent": "ENT LE BOURGET / RAMBOUILLET 2",
       "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-12-12",
-      "opponent": "METZ T.T 1",
+      "date": "2026-12-05",
+      "opponent": "PALAISEAU US 1",
       "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-12",
+      "opponent": "SARTROUVILLOIS 1",
+      "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
