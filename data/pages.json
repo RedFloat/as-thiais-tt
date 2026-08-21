@@ -1,11 +1,3 @@
 {
-  "pages": [
-    {
-      "id": "alors",
-      "title": "Alors",
-      "slug": "alors",
-      "body": "<span style=\"font-size: 23px;\"><b><i><u><font color=\"#dc2626\"><a href=\"sucy-ping.fr\">ALors</a></font></u></i></b></span><span class=\"img-resize-wrapper\"><img class=\"resizable-img\" src=\"./imgs/pages/page-brouillon-inline-1787341109159.png\" alt=\"\"><span class=\"img-resize-handle ne\" data-pos=\"ne\"><img class=\"resizable-img\" src=\"./imgs/pages/page-brouillon-inline-1787341132271.png\" alt=\"\" style=\"width: 30px; height: auto;\"></span></span>",
-      "date": "2026-08-21"
-    }
-  ]
+  "pages": []
 }
