@@ -4,7 +4,7 @@
   "division": "Pré Nationale",
   "photo": "",
   "description": "Portée par des joueuses passionnées et talentueuses, l'équipe 1 féminine du Tennis de Table de Thiais fait vibrer la Pré-Nationale et fait rêver tout le club.",
-  "showPlayers": true,
+  "showPlayers": false,
   "players": [],
   "classification": {
     "rank": null,
