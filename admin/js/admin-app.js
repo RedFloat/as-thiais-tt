@@ -7,6 +7,115 @@
 
   const STORAGE_KEY = 'asthiaistt_admin_cfg';
 
+  // Empêche un bouton de voler le focus (et donc la sélection en cours) au clic —
+  // c'est ce qui permet de cliquer sur les boutons de la barre d'outils sans jamais
+  // perdre le texte sélectionné dans l'éditeur, comme dans Word.
+  function preventFocusSteal(el) {
+    el.addEventListener('mousedown', (e) => e.preventDefault());
+  }
+
+  const TEXT_COLOR_SWATCHES = [
+    '#000000', '#374151', '#6b7280', '#ffffff',
+    '#dc2626', '#ea580c', '#d97706', '#16a34a',
+    '#0891b2', '#2563eb', '#4f46e5', '#9333ea'
+  ];
+
+  function getSelectionFontSize(editor) {
+    const sel = window.getSelection();
+    if (sel.rangeCount === 0) return 16;
+    let node = sel.anchorNode;
+    if (node && node.nodeType === 3) node = node.parentElement;
+    while (node && node !== editor && editor.contains(node)) {
+      if (node.style && node.style.fontSize) return parseInt(node.style.fontSize, 10);
+      node = node.parentElement;
+    }
+    return 16;
+  }
+
+  function stepFontSize(editor, delta, readoutEl) {
+    const sel = window.getSelection();
+    if (sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    if (range.collapsed || !editor.contains(range.commonAncestorContainer)) return;
+
+    // Si la sélection correspond exactement au contenu d'un span de taille déjà posé
+    // par un clic précédent, on ajuste directement ce même span (pas d'empilement).
+    const container = range.commonAncestorContainer;
+    const wrapper = container.nodeType === 3 ? container.parentElement : container;
+
+    if (wrapper && wrapper.tagName === 'SPAN' && wrapper.style.fontSize &&
+        wrapper.textContent === range.toString() && editor.contains(wrapper)) {
+      const current = parseInt(wrapper.style.fontSize, 10) || 16;
+      const next = Math.max(5, Math.min(75, current + delta));
+      wrapper.style.fontSize = next + 'px';
+      if (readoutEl) readoutEl.textContent = next + 'px';
+      return;
+    }
+
+    const current = getSelectionFontSize(editor);
+    const next = Math.max(5, Math.min(75, current + delta));
+    const span = document.createElement('span');
+    span.style.fontSize = next + 'px';
+    try {
+      range.surroundContents(span);
+    } catch (e) {
+      const contents = range.extractContents();
+      span.appendChild(contents);
+      range.insertNode(span);
+    }
+    sel.removeAllRanges();
+    const newRange = document.createRange();
+    newRange.selectNodeContents(span);
+    sel.addRange(newRange);
+    if (readoutEl) readoutEl.textContent = next + 'px';
+  }
+
+  function setupColorPicker(toggleBtn, panelEl) {
+    panelEl.innerHTML = TEXT_COLOR_SWATCHES.map((c) =>
+      `<button type="button" class="color-swatch" data-color="${c}" style="background:${c};" title="${c}"></button>`
+    ).join('');
+
+    preventFocusSteal(toggleBtn);
+    toggleBtn.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch-panel').forEach((p) => { if (p !== panelEl) p.classList.add('hidden'); });
+      panelEl.classList.toggle('hidden');
+    });
+
+    panelEl.querySelectorAll('.color-swatch').forEach((btn) => {
+      preventFocusSteal(btn);
+      btn.addEventListener('click', () => {
+        document.execCommand('foreColor', false, btn.dataset.color);
+        panelEl.classList.add('hidden');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!panelEl.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
+        panelEl.classList.add('hidden');
+      }
+    });
+  }
+
+  // Câble la taille (avec affichage en direct dès qu'on sélectionne du texte) et la couleur.
+  function setupRichTextExtras(editor, ids) {
+    const sizeMinus = document.getElementById(ids.sizeMinus);
+    const sizePlus = document.getElementById(ids.sizePlus);
+    const sizeReadout = document.getElementById(ids.sizeReadout);
+
+    preventFocusSteal(sizeMinus);
+    preventFocusSteal(sizePlus);
+    sizeMinus.addEventListener('click', () => stepFontSize(editor, -1, sizeReadout));
+    sizePlus.addEventListener('click', () => stepFontSize(editor, 1, sizeReadout));
+
+    document.addEventListener('selectionchange', () => {
+      const sel = window.getSelection();
+      if (sel.rangeCount === 0 || !sel.anchorNode || !editor.contains(sel.anchorNode)) return;
+      sizeReadout.textContent = getSelectionFontSize(editor) + 'px';
+    });
+
+    setupColorPicker(document.getElementById(ids.colorToggle), document.getElementById(ids.colorPanel));
+  }
+
   /* ---------- Fenêtre modale générique (remplace confirm() / prompt() natifs) ---------- */
 
   function showModal({ title, message, isPrompt, defaultValue = '', placeholder = '', danger = false, confirmLabel }) {
@@ -1975,114 +2084,6 @@
     return !!editor.querySelector('img[data-upload-failed]');
   }
 
-  // Empêche un bouton de voler le focus (et donc la sélection en cours) au clic —
-  // c'est ce qui permet de cliquer sur les boutons de la barre d'outils sans jamais
-  // perdre le texte sélectionné dans l'éditeur, comme dans Word.
-  function preventFocusSteal(el) {
-    el.addEventListener('mousedown', (e) => e.preventDefault());
-  }
-
-  const TEXT_COLOR_SWATCHES = [
-    '#000000', '#374151', '#6b7280', '#ffffff',
-    '#dc2626', '#ea580c', '#d97706', '#16a34a',
-    '#0891b2', '#2563eb', '#4f46e5', '#9333ea'
-  ];
-
-  function getSelectionFontSize(editor) {
-    const sel = window.getSelection();
-    if (sel.rangeCount === 0) return 16;
-    let node = sel.anchorNode;
-    if (node && node.nodeType === 3) node = node.parentElement;
-    while (node && node !== editor && editor.contains(node)) {
-      if (node.style && node.style.fontSize) return parseInt(node.style.fontSize, 10);
-      node = node.parentElement;
-    }
-    return 16;
-  }
-
-  function stepFontSize(editor, delta, readoutEl) {
-    const sel = window.getSelection();
-    if (sel.rangeCount === 0) return;
-    const range = sel.getRangeAt(0);
-    if (range.collapsed || !editor.contains(range.commonAncestorContainer)) return;
-
-    // Si la sélection correspond exactement au contenu d'un span de taille déjà posé
-    // par un clic précédent, on ajuste directement ce même span (pas d'empilement).
-    const container = range.commonAncestorContainer;
-    const wrapper = container.nodeType === 3 ? container.parentElement : container;
-
-    if (wrapper && wrapper.tagName === 'SPAN' && wrapper.style.fontSize &&
-        wrapper.textContent === range.toString() && editor.contains(wrapper)) {
-      const current = parseInt(wrapper.style.fontSize, 10) || 16;
-      const next = Math.max(5, Math.min(75, current + delta));
-      wrapper.style.fontSize = next + 'px';
-      if (readoutEl) readoutEl.textContent = next + 'px';
-      return;
-    }
-
-    const current = getSelectionFontSize(editor);
-    const next = Math.max(5, Math.min(75, current + delta));
-    const span = document.createElement('span');
-    span.style.fontSize = next + 'px';
-    try {
-      range.surroundContents(span);
-    } catch (e) {
-      const contents = range.extractContents();
-      span.appendChild(contents);
-      range.insertNode(span);
-    }
-    sel.removeAllRanges();
-    const newRange = document.createRange();
-    newRange.selectNodeContents(span);
-    sel.addRange(newRange);
-    if (readoutEl) readoutEl.textContent = next + 'px';
-  }
-
-  function setupColorPicker(toggleBtn, panelEl) {
-    panelEl.innerHTML = TEXT_COLOR_SWATCHES.map((c) =>
-      `<button type="button" class="color-swatch" data-color="${c}" style="background:${c};" title="${c}"></button>`
-    ).join('');
-
-    preventFocusSteal(toggleBtn);
-    toggleBtn.addEventListener('click', () => {
-      document.querySelectorAll('.color-swatch-panel').forEach((p) => { if (p !== panelEl) p.classList.add('hidden'); });
-      panelEl.classList.toggle('hidden');
-    });
-
-    panelEl.querySelectorAll('.color-swatch').forEach((btn) => {
-      preventFocusSteal(btn);
-      btn.addEventListener('click', () => {
-        document.execCommand('foreColor', false, btn.dataset.color);
-        panelEl.classList.add('hidden');
-      });
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!panelEl.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
-        panelEl.classList.add('hidden');
-      }
-    });
-  }
-
-  // Câble la taille (avec affichage en direct dès qu'on sélectionne du texte) et la couleur.
-  function setupRichTextExtras(editor, ids) {
-    const sizeMinus = document.getElementById(ids.sizeMinus);
-    const sizePlus = document.getElementById(ids.sizePlus);
-    const sizeReadout = document.getElementById(ids.sizeReadout);
-
-    preventFocusSteal(sizeMinus);
-    preventFocusSteal(sizePlus);
-    sizeMinus.addEventListener('click', () => stepFontSize(editor, -1, sizeReadout));
-    sizePlus.addEventListener('click', () => stepFontSize(editor, 1, sizeReadout));
-
-    document.addEventListener('selectionchange', () => {
-      const sel = window.getSelection();
-      if (sel.rangeCount === 0 || !sel.anchorNode || !editor.contains(sel.anchorNode)) return;
-      sizeReadout.textContent = getSelectionFontSize(editor) + 'px';
-    });
-
-    setupColorPicker(document.getElementById(ids.colorToggle), document.getElementById(ids.colorPanel));
-  }
 
   richtextImageInput.addEventListener('change', async () => {
     const file = richtextImageInput.files[0];
