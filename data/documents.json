@@ -30,14 +30,6 @@
           "expirationDate": "2026-06-30"
         },
         {
-          "id": "questionnaire-sante-mineur",
-          "title": "Questionnaire de santé pour Mineur",
-          "description": "Questionnaire de santé requis pour les joueurs mineurs.",
-          "file": "./docs/questionnaire_sante_mineur.pdf",
-          "icon": "fa-file-medical",
-          "expirationDate": "2026-06-30"
-        },
-        {
           "id": "certificat-medical",
           "title": "Certificat médical",
           "description": "Modèle de certificat médical pour la pratique en compétition.",
@@ -51,6 +43,14 @@
           "description": "Règlement intérieur officiel régissant la vie du club et des installations.",
           "file": "./docs/reglement_interieur.pdf",
           "icon": "fa-file-lines",
+          "expirationDate": "2027-07-01"
+        },
+        {
+          "id": "questionnaire-sante-mineur",
+          "title": "Questionnaire de santé pour Mineur",
+          "description": "Questionnaire de santé requis pour les joueurs mineurs.",
+          "file": "./docs/questionnaire_sante_mineur.pdf",
+          "icon": "fa-file-medical",
           "expirationDate": "2027-07-01"
         }
       ]
