@@ -77,7 +77,7 @@
       "documents": [
         {
           "id": "fiche-inscription-ping-adapte",
-          "title": "Fiche d'inscription",
+          "title": "Fiche d'inscription Ping Adapté",
           "description": "Fiche d'inscription dédiée au ping adapté.",
           "file": "./inscription_ping_adapte.pdf",
           "icon": "fa-id-card",
