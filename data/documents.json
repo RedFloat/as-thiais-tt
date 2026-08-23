@@ -30,14 +30,6 @@
           "expirationDate": "2026-06-30"
         },
         {
-          "id": "certificat-medical",
-          "title": "Certificat médical",
-          "description": "Modèle de certificat médical pour la pratique en compétition.",
-          "file": "./docs/Certificat_medical.pdf",
-          "icon": "fa-stethoscope",
-          "expirationDate": "2026-06-30"
-        },
-        {
           "id": "reglement-interieur",
           "title": "Règlement intérieur",
           "description": "Règlement intérieur officiel régissant la vie du club et des installations.",
@@ -51,6 +43,14 @@
           "description": "Questionnaire de santé requis pour les joueurs mineurs.",
           "file": "./docs/questionnaire_sante_mineur.pdf",
           "icon": "fa-file-medical",
+          "expirationDate": "2027-07-01"
+        },
+        {
+          "id": "certificat-medical",
+          "title": "Certificat médical",
+          "description": "Modèle de certificat médical pour la pratique en compétition.",
+          "file": "./docs/Certificat_medical.pdf",
+          "icon": "fa-stethoscope",
           "expirationDate": "2027-07-01"
         }
       ]
