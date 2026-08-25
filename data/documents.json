@@ -22,14 +22,6 @@
           "expirationDate": "2026-06-30"
         },
         {
-          "id": "reglement-interieur",
-          "title": "Règlement intérieur",
-          "description": "Règlement intérieur officiel régissant la vie du club et des installations.",
-          "file": "./docs/reglement_interieur.pdf",
-          "icon": "fa-file-lines",
-          "expirationDate": "2026-08-01"
-        },
-        {
           "id": "planning-2025-2026",
           "title": "Planning 2025 - 2026",
           "description": "Planning des horaires et créneaux d'entraînements de la saison.",
@@ -38,20 +30,20 @@
           "expirationDate": "2026-06-30"
         },
         {
+          "id": "reglement-interieur",
+          "title": "Règlement intérieur",
+          "description": "Règlement intérieur officiel régissant la vie du club et des installations.",
+          "file": "./docs/reglement_interieur.pdf",
+          "icon": "fa-file-lines",
+          "expirationDate": "2027-07-01"
+        },
+        {
           "id": "questionnaire-sante-mineur",
           "title": "Questionnaire de santé pour Mineur",
           "description": "Questionnaire de santé requis pour les joueurs mineurs.",
           "file": "./docs/questionnaire_sante_mineur.pdf",
           "icon": "fa-file-medical",
-          "expirationDate": "2026-06-30"
-        },
-        {
-          "id": "questionnaire-sante-majeur",
-          "title": "Questionnaire de santé pour majeur",
-          "description": "Questionnaire de santé requis pour les joueurs majeurs.",
-          "file": "./docs/questionnaire_sante_majeur.pdf",
-          "icon": "fa-file-medical",
-          "expirationDate": "2026-06-30"
+          "expirationDate": "2027-07-01"
         },
         {
           "id": "certificat-medical",
@@ -59,7 +51,7 @@
           "description": "Modèle de certificat médical pour la pratique en compétition.",
           "file": "./docs/Certificat_medical.pdf",
           "icon": "fa-stethoscope",
-          "expirationDate": "2026-06-30"
+          "expirationDate": "2027-07-01"
         }
       ]
     },
@@ -82,16 +74,7 @@
       "id": "divers",
       "label": "Divers",
       "icon": "fa-folder",
-      "documents": [
-        {
-          "id": "fiche-inscription-ping-adapte",
-          "title": "Fiche d'inscription",
-          "description": "Fiche d'inscription dédiée au ping adapté.",
-          "file": "./inscription_ping_adapte.pdf",
-          "icon": "fa-id-card",
-          "expirationDate": null
-        }
-      ]
+      "documents": []
     }
   ]
 }
