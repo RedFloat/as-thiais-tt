@@ -1,0 +1,15 @@
+{
+  "id": "test",
+  "name": "TEST",
+  "division": "Pro A",
+  "photo": "",
+  "description": "",
+  "showPlayers": true,
+  "players": [],
+  "classification": {
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
+  "matches": []
+}
