@@ -14,6 +14,28 @@
 
   // Lien externe = commence par un protocole (http, https, mailto, tel...).
   // Sinon on considère que c'est un lien interne au site (même onglet, pas de "noopener").
+  const DIVISION_ABBR = {
+    'Pro A': 'Pro A',
+    'Pro B': 'Pro B',
+    'Nationale 1A': 'N1A',
+    'Nationale 1': 'N1',
+    'Nationale 2': 'N2',
+    'Nationale 3': 'N3',
+    'Pré Nationale': 'PN',
+    'Régionale 1': 'R1',
+    'Régionale 2': 'R2',
+    'Régionale 3': 'R3',
+    'Pré Régionale': 'PR',
+    'Départementale 1': 'D1',
+    'Départementale 2': 'D2',
+    'Départementale 3': 'D3',
+    'Départementale 4': 'D4'
+  };
+
+  function divisionAbbr(division) {
+    return DIVISION_ABBR[division] || division || '';
+  }
+
   function isExternalLink(url) {
     return /^[a-z]+:/i.test(url || '');
   }
@@ -385,8 +407,7 @@
       const header = document.createElement('div');
       header.className = 'mini-team-header';
       header.innerHTML =
-        '<span class="mini-team-name">' + team.name + '</span>' +
-        '<span class="mini-team-div">' + team.division + '</span>';
+        '<span class="mini-team-name">' + team.name + ' <span class="mini-team-div">(' + divisionAbbr(team.division) + ')</span></span>';
       card.appendChild(header);
 
       const form = computeForm(team.matches, 5);
@@ -1046,7 +1067,7 @@
 
   function renderTeamProfile(team) {
     document.getElementById('teamHeroName').textContent = team.name;
-    document.getElementById('teamHeroDivision').textContent = team.division || '';
+    document.getElementById('teamHeroDivision').textContent = team.division ? '(' + divisionAbbr(team.division) + ') ' + team.division : '';
 
     const photoBlock = document.getElementById('teamPhotoBlock');
     photoBlock.innerHTML = team.photo

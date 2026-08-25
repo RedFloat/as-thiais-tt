@@ -14,6 +14,15 @@
     el.addEventListener('mousedown', (e) => e.preventDefault());
   }
 
+  // Crée le lien puis ajoute un title=url sur le <a> fraîchement inséré,
+  // pour que l'adresse s'affiche en infobulle native au survol.
+  function createLinkWithTooltip(editor, url) {
+    document.execCommand('createLink', false, url);
+    editor.querySelectorAll(`a[href="${CSS.escape(url)}"]`).forEach((a) => {
+      if (!a.title) a.title = url;
+    });
+  }
+
   const TEXT_COLOR_SWATCHES = [
     '#000000', '#374151', '#6b7280', '#ffffff',
     '#dc2626', '#ea580c', '#d97706', '#16a34a',
@@ -1442,6 +1451,29 @@
   /* ---------- Équipes & matchs ---------- */
 
   const TEAMS_INDEX_PATH = 'data/teams/index.json';
+
+  const DIVISION_ABBR = {
+    'Pro A': 'Pro A',
+    'Pro B': 'Pro B',
+    'Nationale 1A': 'N1A',
+    'Nationale 1': 'N1',
+    'Nationale 2': 'N2',
+    'Nationale 3': 'N3',
+    'Pré Nationale': 'PN',
+    'Régionale 1': 'R1',
+    'Régionale 2': 'R2',
+    'Régionale 3': 'R3',
+    'Pré Régionale': 'PR',
+    'Départementale 1': 'D1',
+    'Départementale 2': 'D2',
+    'Départementale 3': 'D3',
+    'Départementale 4': 'D4'
+  };
+
+  function divisionAbbr(division) {
+    return DIVISION_ABBR[division] || division || '';
+  }
+
   const HOMEPAGE_SETTINGS_PATH = 'data/homepage-settings.json';
 
   const teamsList = document.getElementById('teamsList');
@@ -1508,6 +1540,8 @@
     saveToggle('showStandingsTable', e.target.checked);
   });
 
+  let teamDragState = null;
+
   function renderTeamsList(teams) {
     teamsList.innerHTML = '';
     if (teams.length === 0) {
@@ -1518,23 +1552,77 @@
     teams.forEach((team) => {
       const row = document.createElement('div');
       row.className = 'admin-list-item';
+      row.draggable = true;
       row.innerHTML = `
+        <i class="fa-solid fa-grip-vertical drag-handle" title="Glisser pour réordonner"></i>
         ${team.photo
           ? `<img class="team-row-thumb" src="${adminAssetPath(team.photo)}" alt="">`
           : `<div class="admin-list-thumb"><i class="fa-solid fa-people-group" style="color:var(--color-navy);"></i></div>`}
         <div class="admin-list-info">
-          <strong>${team.name}</strong>
+          <strong>${team.name} (${divisionAbbr(team.division)})</strong>
           <span>${team.division || ''}</span>
         </div>
         <div class="admin-list-actions">
+          <a href="../equipe.html?id=${team.id}" target="_blank" rel="noopener" class="view-link-btn" title="Voir la fiche"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
           <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
           <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
         </div>
       `;
       row.querySelector('.edit-btn').addEventListener('click', () => startEditTeam(team));
       row.querySelector('.delete-btn').addEventListener('click', () => deleteTeam(team.id, team.name));
+
+      row.addEventListener('dragstart', () => {
+        teamDragState = team.id;
+        row.classList.add('is-dragging');
+      });
+      row.addEventListener('dragend', () => {
+        row.classList.remove('is-dragging');
+        teamsList.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach((el) => {
+          el.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+        teamDragState = null;
+      });
+      row.addEventListener('dragover', (e) => {
+        if (!teamDragState || teamDragState === team.id) return;
+        e.preventDefault();
+        const rect = row.getBoundingClientRect();
+        const isAfter = (e.clientY - rect.top) > rect.height / 2;
+        row.classList.toggle('drag-over-bottom', isAfter);
+        row.classList.toggle('drag-over-top', !isAfter);
+      });
+      row.addEventListener('dragleave', () => {
+        row.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+      row.addEventListener('drop', (e) => {
+        if (!teamDragState || teamDragState === team.id) return;
+        e.preventDefault();
+        const rect = row.getBoundingClientRect();
+        const isAfter = (e.clientY - rect.top) > rect.height / 2;
+        row.classList.remove('drag-over-top', 'drag-over-bottom');
+        reorderTeams(teamDragState, team.id, isAfter);
+      });
+
       teamsList.appendChild(row);
     });
+  }
+
+  async function reorderTeams(draggedId, targetId, insertAfter) {
+    if (!fileState[TEAMS_INDEX_PATH]) await readFile(TEAMS_INDEX_PATH);
+    const teamIds = fileState[TEAMS_INDEX_PATH].json.teamIds.slice();
+    const fromIdx = teamIds.indexOf(draggedId);
+    if (fromIdx === -1) return;
+    teamIds.splice(fromIdx, 1);
+    const toIdx = teamIds.indexOf(targetId);
+    if (toIdx === -1) return;
+    teamIds.splice(insertAfter ? toIdx + 1 : toIdx, 0, draggedId);
+
+    const result = await GitHubAPI.saveJSON(
+      cfg, TEAMS_INDEX_PATH, { teamIds }, fileState[TEAMS_INDEX_PATH].sha, 'Admin : réorganisation de l\'ordre des équipes'
+    );
+    fileState[TEAMS_INDEX_PATH] = { json: { teamIds }, sha: result.content.sha };
+
+    currentTeamsCache = teamIds.map((id) => currentTeamsCache.find((t) => t.id === id)).filter(Boolean);
+    renderTeamsList(currentTeamsCache);
   }
 
   /* --- Lignes dynamiques : joueurs --- */
@@ -1636,16 +1724,28 @@
     openTeamEditor(null);
   });
 
+  let teamSlugManuallyEdited = false;
+
+  document.getElementById('teamSlug').addEventListener('input', () => { teamSlugManuallyEdited = true; });
+  document.getElementById('teamName').addEventListener('input', () => {
+    if (!teamSlugManuallyEdited) {
+      document.getElementById('teamSlug').value = slugify(document.getElementById('teamName').value);
+    }
+  });
+
   function openTeamEditor(team) {
     teamEditorForm.reset();
     teamPlayersRows.innerHTML = '';
     teamMatchesRows.innerHTML = '';
     teamPhotoPreviewWrap.innerHTML = '';
     pendingTeamPhotoFile = null;
+    teamSlugManuallyEdited = false;
 
     if (team) {
       document.getElementById('teamEditId').value = team.id;
       document.getElementById('teamName').value = team.name || '';
+      document.getElementById('teamSlug').value = team.id || '';
+      teamSlugManuallyEdited = true;
       document.getElementById('teamDivision').value = team.division || '';
       document.getElementById('teamDescription').value = team.description || '';
       document.getElementById('teamShowPlayers').checked = team.showPlayers !== false;
@@ -1694,11 +1794,17 @@
     try {
       const editingId = document.getElementById('teamEditId').value;
       const isNewTeam = !editingId;
-      const id = editingId || generateTeamId(currentTeamsCache);
 
       const name = document.getElementById('teamName').value.trim();
+      const slugInput = document.getElementById('teamSlug').value.trim();
+      const id = slugify(slugInput || name);
       const division = document.getElementById('teamDivision').value.trim();
       const description = document.getElementById('teamDescription').value.trim();
+
+      const slugTaken = currentTeamsCache.some((t) => t.id === id && t.id !== editingId);
+      if (slugTaken) {
+        throw new Error('Cette adresse est déjà utilisée par une autre équipe.');
+      }
 
       const players = Array.from(teamPlayersRows.querySelectorAll('input'))
         .map((input) => input.value.trim())
@@ -1742,21 +1848,33 @@
 
       setStatus(teamEditorStatus, 'loading', 'Enregistrement de la fiche équipe…');
       const path = teamPath(id);
-      const sha = fileState[path] ? fileState[path].sha : undefined;
+      const renamed = !isNewTeam && editingId !== id;
+      const sha = (!renamed && fileState[path]) ? fileState[path].sha : undefined;
       const result = await GitHubAPI.saveJSON(
         cfg, path, teamData, sha,
         isNewTeam ? `Admin : création de l'équipe "${name}"` : `Admin : modification de l'équipe "${name}"`
       );
       fileState[path] = { json: teamData, sha: result.content.sha };
 
-      // Si nouvelle équipe : on l'ajoute à l'index
+      if (!fileState[TEAMS_INDEX_PATH]) await readFile(TEAMS_INDEX_PATH);
+
       if (isNewTeam) {
-        if (!fileState[TEAMS_INDEX_PATH]) await readFile(TEAMS_INDEX_PATH);
-        const indexJson = fileState[TEAMS_INDEX_PATH].json;
-        const teamIds = (indexJson.teamIds || []).concat(id);
-        const indexSha = fileState[TEAMS_INDEX_PATH].sha;
+        const teamIds = (fileState[TEAMS_INDEX_PATH].json.teamIds || []).concat(id);
         const indexResult = await GitHubAPI.saveJSON(
-          cfg, TEAMS_INDEX_PATH, { teamIds }, indexSha, `Admin : ajout de l'équipe "${name}" à l'index`
+          cfg, TEAMS_INDEX_PATH, { teamIds }, fileState[TEAMS_INDEX_PATH].sha, `Admin : ajout de l'équipe "${name}" à l'index`
+        );
+        fileState[TEAMS_INDEX_PATH] = { json: { teamIds }, sha: indexResult.content.sha };
+      } else if (renamed) {
+        // L'adresse a changé : on déplace l'entrée dans l'index et on supprime l'ancien fichier
+        const oldPath = teamPath(editingId);
+        if (!fileState[oldPath]) await readFile(oldPath).catch(() => {});
+        if (fileState[oldPath]) {
+          await GitHubAPI.deleteFile(cfg, oldPath, fileState[oldPath].sha, `Admin : ancienne fiche équipe déplacée vers "${id}"`);
+          delete fileState[oldPath];
+        }
+        const teamIds = fileState[TEAMS_INDEX_PATH].json.teamIds.map((tid) => (tid === editingId ? id : tid));
+        const indexResult = await GitHubAPI.saveJSON(
+          cfg, TEAMS_INDEX_PATH, { teamIds }, fileState[TEAMS_INDEX_PATH].sha, `Admin : renommage de l'équipe "${name}"`
         );
         fileState[TEAMS_INDEX_PATH] = { json: { teamIds }, sha: indexResult.content.sha };
       }
@@ -2031,7 +2149,7 @@
     const url = await showPromptModal('Adresse du lien à insérer', '', { placeholder: 'https://exemple.com' });
     if (!url) return;
     restoreEditorSelection(richtextEditor, linkRange);
-    document.execCommand('createLink', false, url);
+    createLinkWithTooltip(richtextEditor, url);
   });
 
   let savedNewsRange = null;
@@ -3488,7 +3606,7 @@ ${items}
     const url = await showPromptModal('Adresse du lien à insérer', '', { placeholder: 'https://exemple.com' });
     if (!url) return;
     restoreEditorSelection(pageRichtextEditor, linkRange);
-    document.execCommand('createLink', false, url);
+    createLinkWithTooltip(pageRichtextEditor, url);
   });
 
   let savedPageRange = null;
@@ -3845,7 +3963,7 @@ ${items}
     const url = await showPromptModal('Adresse du lien à insérer', '', { placeholder: 'https://exemple.com' });
     if (!url) return;
     restoreEditorSelection(staticPageRichtextEditor, linkRange);
-    document.execCommand('createLink', false, url);
+    createLinkWithTooltip(staticPageRichtextEditor, url);
   });
 
   let savedStaticPageImgRange = null;
@@ -4066,10 +4184,26 @@ ${items}
     });
   });
 
-  document.getElementById('imgDeleteBtn').addEventListener('click', () => {
+  function deleteSelectedImage() {
     if (!selectedImg) return;
-    selectedImg.remove();
-    deselectImage();
+    if (resizeWrapper) {
+      resizeWrapper.remove();
+      resizeWrapper = null;
+    } else {
+      selectedImg.remove();
+    }
+    selectedImg = null;
+    imgFloatToolbar.classList.remove('is-open');
+  }
+
+  document.getElementById('imgDeleteBtn').addEventListener('click', deleteSelectedImage);
+
+  document.addEventListener('keydown', (e) => {
+    if (!selectedImg) return;
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      e.preventDefault();
+      deleteSelectedImage();
+    }
   });
 
   /* ---------- Démarrage ---------- */

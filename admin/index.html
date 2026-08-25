@@ -463,8 +463,30 @@
               </div>
               <div class="form-group">
                 <label for="teamDivision">Division</label>
-                <input type="text" id="teamDivision" placeholder="Nationale 3" required>
+                <select id="teamDivision" required>
+                  <option value="Pro A">Pro A</option>
+                  <option value="Pro B">Pro B</option>
+                  <option value="Nationale 1A">Nationale 1A</option>
+                  <option value="Nationale 1">Nationale 1</option>
+                  <option value="Nationale 2">Nationale 2</option>
+                  <option value="Nationale 3">Nationale 3</option>
+                  <option value="Pré Nationale">Pré Nationale</option>
+                  <option value="Régionale 1">Régionale 1</option>
+                  <option value="Régionale 2">Régionale 2</option>
+                  <option value="Régionale 3">Régionale 3</option>
+                  <option value="Pré Régionale">Pré Régionale</option>
+                  <option value="Départementale 1">Départementale 1</option>
+                  <option value="Départementale 2">Départementale 2</option>
+                  <option value="Départementale 3">Départementale 3</option>
+                  <option value="Départementale 4">Départementale 4</option>
+                </select>
               </div>
+            </div>
+
+            <div class="form-group">
+              <label for="teamSlug">Adresse de sa fiche</label>
+              <input type="text" id="teamSlug" placeholder="equipe-1" required>
+              <span class="form-hint">equipe.html?id=...</span>
             </div>
 
             <div class="form-group">
@@ -1136,6 +1158,8 @@
     <button type="button" data-size="50">50%</button>
     <button type="button" data-size="75">75%</button>
     <button type="button" data-size="100">100%</button>
+    <button type="button" data-size="150">150%</button>
+    <button type="button" data-size="200">200%</button>
     <span class="img-toolbar-sep"></span>
     <button type="button" data-align="left" title="Aligner à gauche, texte autour"><i class="fa-solid fa-align-left"></i></button>
     <button type="button" data-align="center" title="Centrer"><i class="fa-solid fa-align-center"></i></button>
