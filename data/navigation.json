@@ -18,11 +18,6 @@
       "type": "dropdown",
       "children": [
         {
-          "id": "test",
-          "label": "TEST (Pro A)",
-          "link": "./equipe.html?id=test"
-        },
-        {
           "id": "equipe-1",
           "label": "Équipe 1 - Masculine (N1)",
           "link": "./equipe.html?id=equipe-1"
