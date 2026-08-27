@@ -154,6 +154,55 @@
     );
   }
 
+  // Certains liens/images sont parfois collés en adresse complète (plutôt qu'en chemin relatif),
+  // ex : https://redfloat.github.io/as-thiais-tt/docs/x.pdf. On les détecte partout sur le site
+  // et on vérifie que le fichier visé existe bien dans le dépôt.
+  const SITE_BASE_URL = 'https://redfloat.github.io/as-thiais-tt/';
+  const ABSOLUTE_SITE_URL_PATTERN = /https:\/\/redfloat\.github\.io\/as-thiais-tt\/[^"'\s\\]*/g;
+
+  async function findBrokenAbsoluteSiteLinks() {
+    const occurrences = []; // { label, url }
+
+    for (const { path, label } of SCANNABLE_DATA_FILES) {
+      try {
+        const data = await readFile(path);
+        const matches = JSON.stringify(data).match(ABSOLUTE_SITE_URL_PATTERN) || [];
+        matches.forEach((url) => occurrences.push({ label, url }));
+      } catch (err) { /* fichier absent ou illisible : ignoré */ }
+    }
+
+    try {
+      const teamsIndex = await readFile(TEAMS_INDEX_PATH);
+      for (const id of (teamsIndex.teamIds || [])) {
+        try {
+          const team = await readFile(teamPath(id));
+          const matches = JSON.stringify(team).match(ABSOLUTE_SITE_URL_PATTERN) || [];
+          matches.forEach((url) => occurrences.push({ label: `Équipe : ${team.name || id}`, url }));
+        } catch (err) { /* équipe illisible : ignorée */ }
+      }
+    } catch (err) { /* index des équipes indisponible */ }
+
+    if (occurrences.length === 0) return [];
+
+    // On ne vérifie chaque adresse unique qu'une seule fois, même si elle apparaît à plusieurs endroits
+    const uniqueUrls = [...new Set(occurrences.map((o) => o.url))];
+    const brokenUrls = new Set();
+    for (const url of uniqueUrls) {
+      const repoPath = url.slice(SITE_BASE_URL.length).split('?')[0].split('#')[0];
+      if (!repoPath) continue;
+      try {
+        await GitHubAPI.getFileMeta(cfg, decodeURIComponent(repoPath));
+      } catch (err) {
+        brokenUrls.add(url);
+      }
+    }
+
+    if (brokenUrls.size === 0) return [];
+    return occurrences
+      .filter((o) => brokenUrls.has(o.url))
+      .map((o) => `${o.label} → ${o.url}`);
+  }
+
   // Crée le lien puis ajoute un title=url sur le <a> fraîchement inséré,
   // pour que l'adresse s'affiche en infobulle native au survol.
   function createLinkWithTooltip(editor, url) {
@@ -701,6 +750,19 @@
           buildAlert('alert-success', 'fa-circle-check', 'Tout est à jour, rien à traiter pour le moment', [])
         );
       }
+
+      // Vérification des liens/images en adresse absolue cassés : en tâche de fond,
+      // ajoutée séparément dès qu'elle est prête, pour ne pas ralentir l'affichage du reste.
+      findBrokenAbsoluteSiteLinks()
+        .then((broken) => {
+          if (broken.length === 0) return;
+          alertsEl.appendChild(
+            buildAlert('alert-danger', 'fa-link-slash',
+              `${broken.length} lien${broken.length > 1 ? 's' : ''}/image${broken.length > 1 ? 's' : ''} en adresse absolue introuvable${broken.length > 1 ? 's' : ''}`,
+              broken)
+          );
+        })
+        .catch((err) => console.warn('Vérification des liens absolus impossible :', err.message));
 
       /* --- Statistiques --- */
       statsEl.innerHTML = `
