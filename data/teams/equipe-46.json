@@ -1,0 +1,15 @@
+{
+  "id": "equipe-46",
+  "name": "Equipe 46",
+  "division": "Pré Régionale",
+  "photo": "",
+  "description": "",
+  "showPlayers": true,
+  "players": [],
+  "classification": {
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
+  "matches": []
+}
