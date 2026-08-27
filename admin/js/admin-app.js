@@ -14,6 +14,34 @@
     el.addEventListener('mousedown', (e) => e.preventDefault());
   }
 
+  // Charge le CSS réel d'une page du site et l'injecte isolé via @scope, pour que
+  // l'éditeur visuel affiche le contenu exactement comme sur le site public — sans
+  // jamais affecter le reste de l'interface admin (le CSS ne s'applique qu'à l'intérieur
+  // du conteneur ciblé par scopeSelector).
+  const pageStyleCache = {};
+
+  async function applyRealPageStyles(filePath, scopeSelector, styleTagId) {
+    try {
+      let css = pageStyleCache[filePath];
+      if (css === undefined) {
+        const meta = await GitHubAPI.getFileMeta(cfg, filePath);
+        const html = GitHubAPI.base64ToUtf8(meta.content);
+        const match = html.match(/<style>([\s\S]*?)<\/style>/);
+        css = match ? match[1] : '';
+        pageStyleCache[filePath] = css;
+      }
+      let tag = document.getElementById(styleTagId);
+      if (!tag) {
+        tag = document.createElement('style');
+        tag.id = styleTagId;
+        document.head.appendChild(tag);
+      }
+      tag.textContent = css ? `@scope (${scopeSelector}) {\n${css}\n}` : '';
+    } catch (err) {
+      console.warn('Impossible de charger le style réel de la page :', err.message);
+    }
+  }
+
   // Crée le lien puis ajoute un title=url sur le <a> fraîchement inséré,
   // pour que l'adresse s'affiche en infobulle native au survol.
   function createLinkWithTooltip(editor, url) {
@@ -467,6 +495,20 @@
         });
       });
 
+      /* --- Alertes classement de fin de phase à renseigner --- */
+      const classificationNeeded = [];
+      teams.forEach((team) => {
+        const matches = team.matches || [];
+        if (matches.length === 0) return;
+        const lastMatchDate = matches.reduce((latest, m) => (m.date && m.date > latest ? m.date : latest), '');
+        if (!lastMatchDate || daysBetween(lastMatchDate) >= 0) return;
+        const c = team.classification || {};
+        const hasClassification = c.rank || c.status;
+        if (!hasClassification) {
+          classificationNeeded.push(`${team.name} (dernier match le ${lastMatchDate.split('-').reverse().join('/')})`);
+        }
+      });
+
       alertsEl.innerHTML = '';
 
       if (pendingResults.length > 0) {
@@ -474,6 +516,14 @@
           buildAlert('alert-warning', 'fa-table-tennis-paddle-ball',
             `${pendingResults.length} résultat${pendingResults.length > 1 ? 's' : ''} de match à saisir`,
             pendingResults)
+        );
+      }
+
+      if (classificationNeeded.length > 0) {
+        alertsEl.appendChild(
+          buildAlert('alert-warning', 'fa-ranking-star',
+            `${classificationNeeded.length} classement${classificationNeeded.length > 1 ? 's' : ''} de fin de phase à renseigner`,
+            classificationNeeded)
         );
       }
 
@@ -493,7 +543,7 @@
         );
       }
 
-      if (expired.length === 0 && soon.length === 0 && pendingResults.length === 0) {
+      if (expired.length === 0 && soon.length === 0 && pendingResults.length === 0 && classificationNeeded.length === 0) {
         alertsEl.appendChild(
           buildAlert('alert-success', 'fa-circle-check', 'Tout est à jour, rien à traiter pour le moment', [])
         );
@@ -1474,6 +1524,60 @@
     return DIVISION_ABBR[division] || division || '';
   }
 
+  // Classement du meilleur (0) au moins bon, dans l'ordre demandé
+  const DIVISION_ORDER = [
+    'Pro A', 'Pro B', 'Nationale 1A', 'Nationale 1', 'Nationale 2', 'Nationale 3',
+    'Pré Nationale', 'Régionale 1', 'Régionale 2', 'Régionale 3', 'Pré Régionale',
+    'Départementale 1', 'Départementale 2', 'Départementale 3', 'Départementale 4'
+  ];
+
+  function divisionRank(division) {
+    const idx = DIVISION_ORDER.indexOf(division);
+    return idx === -1 ? DIVISION_ORDER.length : idx;
+  }
+
+  function teamNumberFromName(name) {
+    const m = (name || '').match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  // Recrée automatiquement la catégorie "Équipes" du menu à partir de la liste actuelle des
+  // équipes, triées par division (meilleure en premier) puis par numéro d'équipe.
+  async function syncTeamsInMenu(teams) {
+    try {
+      if (!fileState[NAV_PATH]) await readFile(NAV_PATH);
+      const items = fileState[NAV_PATH].json.items.map((it) =>
+        it.type === 'dropdown' ? Object.assign({}, it, { children: (it.children || []).slice() }) : Object.assign({}, it)
+      );
+
+      const sorted = teams.slice().sort((a, b) => {
+        const divDiff = divisionRank(a.division) - divisionRank(b.division);
+        if (divDiff !== 0) return divDiff;
+        return teamNumberFromName(a.name) - teamNumberFromName(b.name);
+      });
+
+      const children = sorted.map((t) => ({
+        id: t.id,
+        label: `${t.name} (${divisionAbbr(t.division)})`,
+        link: `./equipe.html?id=${t.id}`
+      }));
+
+      let category = items.find((it) => it.id === 'equipes' && it.type === 'dropdown');
+      if (!category) {
+        category = { id: 'equipes', label: 'Équipes', type: 'dropdown', children: [] };
+        items.push(category);
+      }
+      category.children = children;
+
+      const result = await GitHubAPI.saveJSON(
+        cfg, NAV_PATH, { items }, fileState[NAV_PATH].sha, 'Admin : synchronisation des équipes dans le menu'
+      );
+      fileState[NAV_PATH] = { json: { items }, sha: result.content.sha };
+    } catch (err) {
+      console.warn('Impossible de synchroniser les équipes dans le menu :', err.message);
+    }
+  }
+
   const HOMEPAGE_SETTINGS_PATH = 'data/homepage-settings.json';
 
   const teamsList = document.getElementById('teamsList');
@@ -1880,6 +1984,7 @@
       }
 
       await loadTeamsView();
+      await syncTeamsInMenu(currentTeamsCache);
       teamEditorCard.classList.add('hidden');
       setStatus(teamEditorStatus, 'success', 'Équipe enregistrée ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
     } catch (err) {
@@ -1915,6 +2020,7 @@
       fileState[TEAMS_INDEX_PATH] = { json: { teamIds }, sha: indexResult.content.sha };
 
       await loadTeamsView();
+      await syncTeamsInMenu(currentTeamsCache);
     } catch (err) {
       alert('Erreur lors de la suppression : ' + err.message);
     }
@@ -3527,6 +3633,8 @@ ${items}
     pageCodeEditor.value = '';
     slugManuallyEdited = false;
 
+    applyRealPageStyles('page.html', '#pageRichtextEditor', 'pageRealStylePreview');
+
     // Revient toujours en mode visuel à l'ouverture, quel que soit le mode précédent
     pageEditorMode = 'visual';
     pageVisualEditorWrap.classList.remove('hidden');
@@ -3921,6 +4029,10 @@ ${items}
     document.querySelectorAll('#staticPageModeSwitch .mode-switch-btn').forEach((btn) => {
       btn.classList.toggle('is-active', btn.dataset.mode === 'visual');
     });
+
+    if (page.file) {
+      applyRealPageStyles(page.file, '#staticPageRichtextEditor', 'staticPageRealStylePreview');
+    }
 
     document.getElementById('staticPageEditKey').value = key;
     document.getElementById('staticPageEditorTitle').textContent = 'Modifier : ' + (page.label || key);
