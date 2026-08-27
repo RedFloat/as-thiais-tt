@@ -42,6 +42,118 @@
     }
   }
 
+  /* ---------- Vérification des liens/images internes & recherche d'usages sur le site ---------- */
+
+  function isInternalPath(value) {
+    if (!value) return false;
+    return !/^(https?:|mailto:|tel:|#)/i.test(value);
+  }
+
+  function normalizeInternalPath(value) {
+    let p = value.split('?')[0].split('#')[0];
+    p = p.replace(/^(\.\.\/|\.\/)+/, '');
+    return p;
+  }
+
+  // Extrait tous les liens <a href> et images <img src> présents dans un bloc de HTML donné.
+  function extractPageReferences(bodyHtml) {
+    const container = document.createElement('div');
+    container.innerHTML = bodyHtml || '';
+    const refs = [];
+    container.querySelectorAll('a[href]').forEach((a) => {
+      const href = a.getAttribute('href');
+      if (href) refs.push({ type: 'lien', value: href, text: a.textContent.trim().slice(0, 50) });
+    });
+    container.querySelectorAll('img[src]').forEach((img) => {
+      const src = img.getAttribute('src');
+      if (src && !src.startsWith('data:')) refs.push({ type: 'image', value: src, text: img.getAttribute('alt') || '' });
+    });
+    return refs;
+  }
+
+  // Vérifie qu'un chemin interne pointe bien vers un fichier qui existe encore dans le dépôt.
+  // Renvoie true / false, ou null si le lien est externe (non vérifiable depuis ici).
+  async function checkReferenceExists(value) {
+    if (!isInternalPath(value)) return null;
+    const path = normalizeInternalPath(value);
+    if (!path) return null;
+    try {
+      await GitHubAPI.getFileMeta(cfg, path);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  // Liste des fichiers de données passés au crible lors d'une recherche d'usages sur le site.
+  const SCANNABLE_DATA_FILES = [
+    { path: 'data/news.json', label: 'Actualités' },
+    { path: 'data/pages.json', label: 'Pages' },
+    { path: 'data/page-content.json', label: 'Contenu du site' },
+    { path: 'data/sponsors.json', label: 'Sponsors' },
+    { path: 'data/documents.json', label: 'Documents' },
+    { path: 'data/liens-utiles.json', label: 'Liens utiles' },
+    { path: 'data/albums.json', label: 'Albums photo' },
+    { path: 'data/videos.json', label: 'Galerie vidéo' },
+    { path: 'data/homepage-settings.json', label: 'Réglages de l\'accueil' },
+    { path: 'data/navigation.json', label: 'Ordre des pages' },
+    { path: 'data/site-config.json', label: 'Réglages globaux' }
+  ];
+
+  // Cherche partout sur le site (fiches équipes comprises) où une adresse/chemin donné est utilisé.
+  // excludePath permet d'ignorer le fichier en cours d'édition (pour ne pas se signaler lui-même).
+  async function scanSiteForUsages(needle, excludePath) {
+    if (!needle) return [];
+    const results = [];
+
+    for (const { path, label } of SCANNABLE_DATA_FILES) {
+      if (path === excludePath) continue;
+      try {
+        const data = await readFile(path);
+        if (JSON.stringify(data).includes(needle)) {
+          results.push({ label, path });
+        }
+      } catch (err) { /* fichier absent ou illisible : ignoré */ }
+    }
+
+    try {
+      const teamsIndex = await readFile(TEAMS_INDEX_PATH);
+      for (const id of (teamsIndex.teamIds || [])) {
+        const path = teamPath(id);
+        if (path === excludePath) continue;
+        try {
+          const team = await readFile(path);
+          if (JSON.stringify(team).includes(needle)) {
+            results.push({ label: `Équipe : ${team.name || id}`, path });
+          }
+        } catch (err) { /* équipe illisible : ignorée */ }
+      }
+    } catch (err) { /* index des équipes indisponible */ }
+
+    return results;
+  }
+
+  // Demande confirmation avant une suppression, en prévenant si le fichier/lien est
+  // utilisé ailleurs sur le site. excludePath ignore le fichier de données en cours d'édition.
+  async function confirmDeleteWithUsageCheck(value, excludePath, itemLabel) {
+    let usages = [];
+    if (value && isInternalPath(value)) {
+      try {
+        usages = await scanSiteForUsages(value, excludePath);
+      } catch (err) { /* le scan a échoué : on continue sans bloquer la suppression */ }
+    }
+
+    if (usages.length === 0) {
+      return showConfirmModal(`Supprimer ${itemLabel} ? Cette action est immédiate.`);
+    }
+
+    const list = usages.map((u) => `• ${u.label}`).join('\n');
+    return showConfirmModal(
+      `Attention : ce fichier est aussi utilisé ailleurs sur le site :\n${list}\n\nLe supprimer va casser son affichage à ces endroits. Continuer quand même ?`,
+      { danger: true, confirmLabel: 'Supprimer quand même' }
+    );
+  }
+
   // Crée le lien puis ajoute un title=url sur le <a> fraîchement inséré,
   // pour que l'adresse s'affiche en infobulle native au survol.
   function createLinkWithTooltip(editor, url) {
@@ -451,6 +563,47 @@
     today.setHours(0, 0, 0, 0);
     return Math.round((target - today) / 86400000);
   }
+
+  document.getElementById('checkSiteLinksBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('checkSiteLinksBtn');
+    const resultEl = document.getElementById('siteLinksCheckResult');
+    btn.disabled = true;
+    resultEl.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.85rem;"><i class="fa-solid fa-spinner fa-spin"></i> Analyse en cours, ça peut prendre quelques instants…</p>';
+
+    try {
+      const sources = [];
+
+      const pagesData = await readFile('data/pages.json').catch(() => ({ pages: [] }));
+      (pagesData.pages || []).forEach((p) => sources.push({ label: `Page : ${p.title}`, body: p.body }));
+
+      const contentData = await readFile(STATIC_CONTENT_PATH).catch(() => ({ pages: {} }));
+      Object.values(contentData.pages || {}).forEach((p) => sources.push({ label: `Contenu du site : ${p.label}`, body: p.body }));
+
+      const broken = [];
+      for (const source of sources) {
+        const refs = extractPageReferences(source.body);
+        for (const ref of refs) {
+          const exists = await checkReferenceExists(ref.value);
+          if (exists === false) {
+            broken.push(`${source.label} → ${ref.type} introuvable : ${ref.value}`);
+          }
+        }
+      }
+
+      resultEl.innerHTML = '';
+      if (broken.length === 0) {
+        resultEl.appendChild(buildAlert('alert-success', 'fa-circle-check', 'Aucun lien ni image cassé trouvé', []));
+      } else {
+        resultEl.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation',
+          `${broken.length} lien${broken.length > 1 ? 's' : ''}/image${broken.length > 1 ? 's' : ''} introuvable${broken.length > 1 ? 's' : ''}`, broken));
+      }
+    } catch (err) {
+      resultEl.innerHTML = '';
+      resultEl.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Erreur pendant l\'analyse', [err.message]));
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   async function loadDashboard() {
     const alertsEl = document.getElementById('dashboardAlerts');
@@ -1102,12 +1255,16 @@
   });
 
   async function deleteDoc(categoryId, docId) {
-    if (!(await showConfirmModal('Supprimer ce document ? Cette action est immédiate.'))) return;
+    if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
+    const current = fileState[DOCS_PATH].json;
+    const category = current.categories.find((c) => c.id === categoryId);
+    const doc = category ? (category.documents || []).find((d) => d.id === docId) : null;
+
+    const confirmed = await confirmDeleteWithUsageCheck(doc ? doc.file : null, DOCS_PATH, 'ce document');
+    if (!confirmed) return;
 
     setStatus(docStatus, 'loading', 'Suppression en cours…');
     try {
-      if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
-      const current = fileState[DOCS_PATH].json;
       const categories = current.categories.map((c) => {
         if (c.id !== categoryId) return c;
         return Object.assign({}, c, { documents: (c.documents || []).filter((d) => d.id !== docId) });
@@ -3627,6 +3784,41 @@ ${items}
 
   /* --- Ouverture de l'éditeur --- */
 
+  // Analyse le contenu d'une page et affiche ses liens/images avec un indicateur d'existence.
+  async function renderReferencesPanel(panelEl, listEl, bodyHtml) {
+    const refs = extractPageReferences(bodyHtml);
+    if (refs.length === 0) {
+      panelEl.classList.add('hidden');
+      return;
+    }
+    panelEl.classList.remove('hidden');
+    listEl.innerHTML = refs.map(() =>
+      `<div class="reference-row"><span class="reference-status unknown"><i class="fa-solid fa-circle-notch fa-spin"></i></span><span class="reference-text"></span></div>`
+    ).join('');
+
+    const rows = listEl.querySelectorAll('.reference-row');
+    refs.forEach(async (ref, i) => {
+      const row = rows[i];
+      const statusEl = row.querySelector('.reference-status');
+      const textEl = row.querySelector('.reference-text');
+      const icon = ref.type === 'image' ? 'fa-image' : 'fa-link';
+      textEl.innerHTML = `<i class="fa-solid ${icon}"></i> ${ref.text ? ref.text + ' — ' : ''}${ref.value}`;
+
+      const exists = await checkReferenceExists(ref.value);
+      if (exists === null) {
+        statusEl.className = 'reference-status unknown';
+        statusEl.innerHTML = '<i class="fa-solid fa-circle-question" title="Lien externe, non vérifiable"></i>';
+      } else if (exists) {
+        statusEl.className = 'reference-status ok';
+        statusEl.innerHTML = '<i class="fa-solid fa-circle-check" title="Le fichier existe"></i>';
+      } else {
+        statusEl.className = 'reference-status broken';
+        statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" title="Introuvable !"></i>';
+        row.style.color = '#dc2626';
+      }
+    });
+  }
+
   function openPageEditor(page) {
     pageEditorForm.reset();
     pageRichtextEditor.innerHTML = '';
@@ -3669,10 +3861,17 @@ ${items}
         menuLabelInput.value = found.entry.label || '';
         menuCategorySelect.value = found.parentId || '';
       }
+
+      renderReferencesPanel(
+        document.getElementById('pageReferencesPanel'),
+        document.getElementById('pageReferencesList'),
+        page.body
+      );
     } else {
       document.getElementById('pageEditId').value = '';
       pageSaveLabel.textContent = 'Créer la page';
       document.getElementById('pageEditorTitle').textContent = 'Créer une page';
+      document.getElementById('pageReferencesPanel').classList.add('hidden');
     }
 
     pageEditorCard.classList.remove('hidden');
@@ -4034,6 +4233,12 @@ ${items}
       applyRealPageStyles(page.file, '#staticPageRichtextEditor', 'staticPageRealStylePreview');
     }
 
+    renderReferencesPanel(
+      document.getElementById('staticPageReferencesPanel'),
+      document.getElementById('staticPageReferencesList'),
+      page.body
+    );
+
     document.getElementById('staticPageEditKey').value = key;
     document.getElementById('staticPageEditorTitle').textContent = 'Modifier : ' + (page.label || key);
     hideStatus(staticPageEditorStatus);
@@ -4296,16 +4501,49 @@ ${items}
     });
   });
 
-  function deleteSelectedImage() {
+  async function deleteSelectedImage() {
     if (!selectedImg) return;
+    const img = selectedImg;
+    const src = img.getAttribute('src') || '';
+    const isRealUploadedImage = isInternalPath(src) && !src.startsWith('data:') && !img.dataset.pending;
+
+    if (!(await showConfirmModal('Retirer cette image ?'))) return;
+
+    // On retire d'abord l'image de cette page, dans tous les cas
     if (resizeWrapper) {
       resizeWrapper.remove();
       resizeWrapper = null;
     } else {
-      selectedImg.remove();
+      img.remove();
     }
     selectedImg = null;
     imgFloatToolbar.classList.remove('is-open');
+
+    if (!isRealUploadedImage) return;
+
+    // Le fichier a réellement été envoyé sur GitHub : on vérifie s'il sert ailleurs
+    // avant de proposer de le supprimer pour de bon.
+    try {
+      const path = normalizeInternalPath(src);
+      const usages = await scanSiteForUsages(src);
+      if (usages.length > 0) {
+        const list = usages.map((u) => `• ${u.label}`).join('\n');
+        await showConfirmModal(
+          `Image retirée de cette page.\n\nElle reste utilisée ailleurs sur le site :\n${list}\n\nLe fichier n'a donc pas été supprimé, pour ne rien casser à ces autres endroits.`,
+          { confirmLabel: 'Compris' }
+        );
+        return;
+      }
+      const deleteToo = await showConfirmModal(
+        'Image retirée de cette page. Elle ne semble utilisée nulle part ailleurs sur le site : veux-tu aussi supprimer le fichier du site ?',
+        { danger: true, confirmLabel: 'Supprimer le fichier' }
+      );
+      if (deleteToo) {
+        await deleteFileIfExists(path);
+      }
+    } catch (err) {
+      console.warn('Vérification des usages de l\'image impossible :', err.message);
+    }
   }
 
   document.getElementById('imgDeleteBtn').addEventListener('click', deleteSelectedImage);

@@ -130,6 +130,17 @@
         </div>
 
         <div class="admin-card">
+          <h2><i class="fa-solid fa-link-slash"></i> Liens & images du site</h2>
+          <p style="color:var(--color-text-muted); font-size:0.85rem; margin-bottom:1rem;">
+            Passe en revue les pages du site (Pages personnalisées + Contenu du site) à la recherche de liens ou d'images qui pointent vers un fichier qui n'existe plus.
+          </p>
+          <button type="button" class="btn btn-ghost" id="checkSiteLinksBtn">
+            <i class="fa-solid fa-magnifying-glass"></i> Vérifier les liens du site
+          </button>
+          <div id="siteLinksCheckResult" style="margin-top:1rem;"></div>
+        </div>
+
+        <div class="admin-card">
           <h2><i class="fa-solid fa-circle-info"></i> À propos de cet espace admin</h2>
           <p style="color:var(--color-text-muted); font-size:0.88rem; line-height:1.7;">
             Toutes les modifications faites ici sont enregistrées automatiquement. Le site se met à jour
@@ -969,6 +980,12 @@
 
         <div class="admin-card hidden" id="pageEditorCard">
           <h2><i class="fa-solid fa-pen"></i> <span id="pageEditorTitle">Créer une page</span></h2>
+
+          <div id="pageReferencesPanel" class="references-panel hidden">
+            <strong><i class="fa-solid fa-link"></i> Liens & images de cette page</strong>
+            <div id="pageReferencesList"></div>
+          </div>
+
           <form id="pageEditorForm">
             <input type="hidden" id="pageEditId">
 
@@ -1084,6 +1101,12 @@
 
         <div class="admin-card hidden" id="staticPageEditorCard">
           <h2><i class="fa-solid fa-pen"></i> <span id="staticPageEditorTitle">Modifier la page</span></h2>
+
+          <div id="staticPageReferencesPanel" class="references-panel hidden">
+            <strong><i class="fa-solid fa-link"></i> Liens & images de cette page</strong>
+            <div id="staticPageReferencesList"></div>
+          </div>
+
           <form id="staticPageEditorForm">
             <input type="hidden" id="staticPageEditKey">
 
