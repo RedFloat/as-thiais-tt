@@ -18,9 +18,24 @@
       "type": "dropdown",
       "children": [
         {
+          "id": "test",
+          "label": "TEST (Pro A)",
+          "link": "./equipe.html?id=test"
+        },
+        {
           "id": "equipe-1",
-          "label": "Équipe 1 (N3)",
+          "label": "Équipe 1 - Masculine (N1)",
           "link": "./equipe.html?id=equipe-1"
+        },
+        {
+          "id": "equipe-1f",
+          "label": "Equipe 1 - Féminine (PN)",
+          "link": "./equipe.html?id=equipe-1f"
+        },
+        {
+          "id": "equipe-46",
+          "label": "Equipe 46 (PR)",
+          "link": "./equipe.html?id=equipe-46"
         }
       ]
     },
