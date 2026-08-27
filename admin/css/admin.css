@@ -985,16 +985,16 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
 .richtext-editor img[style*="width"] { max-width: none; }
 .richtext-editor h2 { color: var(--color-navy); margin: 0.8rem 0 0.5rem; }
 .richtext-editor a {
-  color: var(--color-navy);
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: var(--color-gold);
-  text-underline-offset: 2px;
+  background-color: rgba(210, 169, 91, 0.28) !important;
+  border-bottom: 2px solid var(--color-gold) !important;
+  text-decoration: none !important;
+  color: inherit !important;
   cursor: pointer;
+  padding: 0.05em 0.15em;
+  border-radius: 3px;
 }
 .richtext-editor a:hover {
-  background: var(--color-gold-light);
-  text-decoration-style: solid;
+  background-color: rgba(210, 169, 91, 0.5) !important;
 }
 .richtext-editor ul, .richtext-editor ol {
   margin: 0 0 0.8rem 1.4rem;
