@@ -15,15 +15,6 @@
           "updatedDate": "2026-08-27"
         },
         {
-          "id": "reglement-interieur",
-          "title": "Règlement intérieur",
-          "description": "Règlement intérieur officiel régissant la vie du club et des installations.",
-          "file": "./docs/reglement_interieur.pdf",
-          "icon": "fa-file-lines",
-          "expirationDate": null,
-          "updatedDate": "2026-08-27"
-        },
-        {
           "id": "planning-2025-2026",
           "title": "Planning 2025 - 2026",
           "description": "Planning des horaires et créneaux d'entraînements de la saison.",
@@ -58,6 +49,15 @@
           "icon": "fa-file-medical",
           "updatedDate": "2026-08-01",
           "expirationDate": "2027-06-30"
+        },
+        {
+          "id": "reglement-interieur",
+          "title": "Règlement intérieur",
+          "description": "Règlement intérieur officiel régissant la vie du club et des installations.",
+          "file": "./docs/reglement_interieur.pdf",
+          "icon": "fa-file-lines",
+          "updatedDate": "2026-08-01",
+          "expirationDate": "2027-07-01"
         }
       ]
     },
