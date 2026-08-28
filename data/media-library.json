@@ -69,6 +69,17 @@
       "folder": "docs",
       "uploadedDate": "2026-08-28",
       "showInDocuments": false
+    },
+    {
+      "id": "media-1787947166802",
+      "filename": "questionnaire_sante_mineur.pdf",
+      "path": "./docs/questionnaire_sante_mineur.pdf",
+      "type": "document",
+      "title": "questionnaire_sante_mineur.pdf",
+      "folder": "docs",
+      "uploadedDate": "2026-08-28",
+      "showInDocuments": true,
+      "linkedDocId": "questionnaire-sante-mineur-pdf"
     }
   ]
 }
