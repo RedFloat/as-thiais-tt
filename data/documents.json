@@ -99,6 +99,15 @@
           "icon": "fa-file-arrow-down",
           "updatedDate": "2026-08-28",
           "expirationDate": null
+        },
+        {
+          "id": "questionnaire-sante-mineur-pdf",
+          "title": "questionnaire_sante_mineur.pdf",
+          "description": "",
+          "file": "./docs/questionnaire_sante_mineur.pdf",
+          "icon": "fa-file-arrow-down",
+          "updatedDate": "2026-08-28",
+          "expirationDate": null
         }
       ]
     }
