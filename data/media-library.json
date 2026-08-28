@@ -25,7 +25,8 @@
       "type": "document",
       "title": "Certificat_medical.pdf",
       "uploadedDate": "2026-08-28",
-      "showInDocuments": false
+      "showInDocuments": false,
+      "folder": "docs"
     }
   ]
 }
