@@ -80,6 +80,16 @@
       "uploadedDate": "2026-08-28",
       "showInDocuments": true,
       "linkedDocId": "questionnaire-sante-mineur-pdf"
+    },
+    {
+      "id": "media-1787947176834",
+      "filename": "reglement_interieur.pdf",
+      "path": "./docs/reglement_interieur.pdf",
+      "type": "document",
+      "title": "reglement_interieur.pdf",
+      "folder": "docs",
+      "uploadedDate": "2026-08-28",
+      "showInDocuments": false
     }
   ]
 }
