@@ -15,15 +15,6 @@
           "updatedDate": "2026-08-27"
         },
         {
-          "id": "planning-2025-2026",
-          "title": "Planning 2025 - 2026",
-          "description": "Planning des horaires et créneaux d'entraînements de la saison.",
-          "file": "./docs/entrainements-horaires.pdf",
-          "icon": "fa-calendar-days",
-          "expirationDate": null,
-          "updatedDate": "2026-08-27"
-        },
-        {
           "id": "mutation-2026",
           "title": "Mutation 2026",
           "description": "Mutations ordinaires des joueurs, du 15 mai au 30 juin 2026.<br>Merci de transmettre vos documents à Fabrice Couturas : <a href=\"mailto:asthiaistt94@gmail.com\" style=\"color:var(--color-navy); font-weight:600; text-decoration:underline;\">asthiaistt94@gmail.com</a>",
@@ -58,6 +49,15 @@
           "icon": "fa-file-lines",
           "updatedDate": "2026-08-01",
           "expirationDate": "2027-07-01"
+        },
+        {
+          "id": "planning-2025-2026",
+          "title": "Planning 2025 - 2026",
+          "description": "Planning des horaires et créneaux d'entraînements de la saison.",
+          "file": "./docs/entrainements-horaires.pdf",
+          "icon": "fa-calendar-days",
+          "updatedDate": "2025-08-15",
+          "expirationDate": "2026-06-30"
         }
       ]
     },
