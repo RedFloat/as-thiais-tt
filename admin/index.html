@@ -1204,6 +1204,20 @@
               <input type="text" id="mediaTitleInput" placeholder="Ex : Affiche tournoi interne 2026" required>
             </div>
 
+            <div class="form-row">
+              <div class="form-group">
+                <label for="mediaFolderSelect">Dossier</label>
+                <select id="mediaFolderSelect">
+                  <option value="">Non classé</option>
+                  <option value="__new__">+ Nouveau dossier…</option>
+                </select>
+              </div>
+              <div class="form-group hidden" id="mediaNewFolderWrap">
+                <label for="mediaNewFolderInput">Nom du nouveau dossier</label>
+                <input type="text" id="mediaNewFolderInput" placeholder="Ex : Tournois">
+              </div>
+            </div>
+
             <div class="form-group">
               <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem;">
                 <input type="checkbox" id="mediaShowInDocuments" style="width:auto; transform:scale(1.2);">

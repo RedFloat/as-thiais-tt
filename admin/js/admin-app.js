@@ -349,7 +349,7 @@
         document.removeEventListener('keydown', onKeydown);
         resolve(result);
       }
-      function onConfirm() { cleanup(isPrompt ? (input.value.trim() || null) : true); }
+      function onConfirm() { cleanup(isPrompt ? input.value.trim() : true); }
       function onCancel() { cleanup(isPrompt ? null : false); }
       function onOverlayClick(e) { if (e.target === overlay) onCancel(); }
       function onKeydown(e) {
@@ -2678,12 +2678,30 @@
   }
 
   async function deleteNews(id, title) {
-    if (!(await showConfirmModal(`Supprimer la news "${title}" ? Ses photos associées seront aussi supprimées. Cette action est immédiate.`))) return;
+    if (!(await showConfirmModal(`Supprimer la news "${title}" ? Cette action est immédiate.`))) return;
 
     setStatus(newsEditorStatus, 'loading', 'Suppression en cours…');
     try {
       if (!fileState[NEWS_PATH]) await readFile(NEWS_PATH);
       const itemToDelete = fileState[NEWS_PATH].json.news.find((n) => n.id === id);
+
+      let imagesToDelete = [];
+      if (itemToDelete) {
+        for (const imgPath of collectNewsImagePaths(itemToDelete)) {
+          const usages = await scanSiteForUsages('./' + imgPath, NEWS_PATH).catch(() => []);
+          if (usages.length === 0) imagesToDelete.push(imgPath);
+        }
+      }
+
+      let confirmDeleteImages = false;
+      if (imagesToDelete.length > 0) {
+        const list = imagesToDelete.map((p) => `• ${p}`).join('\n');
+        confirmDeleteImages = await showConfirmModal(
+          `Cette news contient ${imagesToDelete.length} image${imagesToDelete.length > 1 ? 's' : ''} qui ne semble${imagesToDelete.length > 1 ? 'nt' : ''} utilisée${imagesToDelete.length > 1 ? 's' : ''} nulle part ailleurs sur le site :\n${list}\n\nLes supprimer aussi du site ?`,
+          { danger: true, confirmLabel: 'Supprimer aussi ces images' }
+        );
+      }
+
       const updatedArray = fileState[NEWS_PATH].json.news.filter((n) => n.id !== id);
       const updated = { news: updatedArray };
 
@@ -2691,14 +2709,10 @@
       const result = await GitHubAPI.saveJSON(cfg, NEWS_PATH, updated, sha, `Admin : suppression de la news "${title}"`);
       fileState[NEWS_PATH] = { json: updated, sha: result.content.sha };
 
-      // Nettoyage des images uploadées qui ne servent plus à rien
-      if (itemToDelete) {
-        const imagePaths = collectNewsImagePaths(itemToDelete);
-        for (const imgPath of imagePaths) {
-          const usages = await scanSiteForUsages('./' + imgPath, NEWS_PATH).catch(() => []);
-          if (usages.length === 0) {
-            await deleteFileIfExists(imgPath);
-          }
+      // Nettoyage des images uploadées, seulement si confirmé
+      if (confirmDeleteImages) {
+        for (const imgPath of imagesToDelete) {
+          await deleteFileIfExists(imgPath);
         }
       }
 
@@ -4149,22 +4163,39 @@ ${items}
   }
 
   async function deletePage(id, title) {
-    if (!(await showConfirmModal(`Supprimer la page "${title}" ? Ses images éventuelles seront aussi supprimées de GitHub. Cette action est immédiate.`))) return;
+    if (!(await showConfirmModal(`Supprimer la page "${title}" ? Cette action est immédiate.`))) return;
 
     try {
       if (!fileState[PAGES_PATH]) await readFile(PAGES_PATH);
       const pageToDelete = fileState[PAGES_PATH].json.pages.find((p) => p.id === id);
-      const updatedPages = fileState[PAGES_PATH].json.pages.filter((p) => p.id !== id);
 
+      // Détermine à l'avance les images concernées, pour demander une confirmation dédiée
+      let imagesToDelete = [];
+      if (pageToDelete) {
+        for (const imgPath of collectPageImagePaths(pageToDelete)) {
+          const usages = await scanSiteForUsages('./' + imgPath, PAGES_PATH).catch(() => []);
+          if (usages.length === 0) imagesToDelete.push(imgPath);
+        }
+      }
+
+      let confirmDeleteImages = false;
+      if (imagesToDelete.length > 0) {
+        const list = imagesToDelete.map((p) => `• ${p}`).join('\n');
+        confirmDeleteImages = await showConfirmModal(
+          `Cette page contient ${imagesToDelete.length} image${imagesToDelete.length > 1 ? 's' : ''} qui ne semble${imagesToDelete.length > 1 ? 'nt' : ''} utilisée${imagesToDelete.length > 1 ? 's' : ''} nulle part ailleurs sur le site :\n${list}\n\nLes supprimer aussi du site ?`,
+          { danger: true, confirmLabel: 'Supprimer aussi ces images' }
+        );
+      }
+
+      const updatedPages = fileState[PAGES_PATH].json.pages.filter((p) => p.id !== id);
       const updated = { pages: updatedPages };
       const sha = fileState[PAGES_PATH].sha;
       const result = await GitHubAPI.saveJSON(cfg, PAGES_PATH, updated, sha, `Admin : suppression de la page "${title}"`);
       fileState[PAGES_PATH] = { json: updated, sha: result.content.sha };
 
       if (pageToDelete) {
-        for (const imgPath of collectPageImagePaths(pageToDelete)) {
-          const usages = await scanSiteForUsages('./' + imgPath, PAGES_PATH).catch(() => []);
-          if (usages.length === 0) {
+        if (confirmDeleteImages) {
+          for (const imgPath of imagesToDelete) {
             await deleteFileIfExists(imgPath);
           }
         }
@@ -4663,6 +4694,7 @@ ${items}
       const data = await readFile(MEDIA_LIBRARY_PATH);
       currentMediaFiles = data.files || [];
       renderMediaFilesList(currentMediaFiles);
+      populateMediaFolderSelect(currentMediaFiles);
     } catch (err) {
       listEl.innerHTML = '';
       listEl.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger la médiathèque', [err.message]));
@@ -4725,10 +4757,15 @@ ${items}
     if (!title) return;
 
     try {
+      const existingFolders = [...new Set(currentMediaFiles.map((f) => f.folder).filter(Boolean))].sort();
+      const hint = existingFolders.length > 0 ? ` (dossiers existants : ${existingFolders.join(', ')})` : '';
+      const folder = await showPromptModal(`Dans quel dossier le ranger ?${hint} Laisse vide pour "Non classé".`, '');
+      if (folder === null) return;
+
       const showInDocuments = await showConfirmModal('Faire aussi apparaître ce fichier sur la page "Documents" du site ?');
       const today = new Date().toISOString().slice(0, 10);
       const id = 'media-' + Date.now();
-      const mediaEntry = { id, filename: path.split('/').pop(), path: './' + path, type, title, uploadedDate: today, showInDocuments };
+      const mediaEntry = { id, filename: path.split('/').pop(), path: './' + path, type, title, folder, uploadedDate: today, showInDocuments };
 
       if (showInDocuments) {
         if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
@@ -4772,6 +4809,20 @@ ${items}
     }
   }
 
+  function populateMediaFolderSelect(files) {
+    const select = document.getElementById('mediaFolderSelect');
+    const currentValue = select.value;
+    const folders = [...new Set(files.map((f) => f.folder).filter(Boolean))].sort();
+    select.innerHTML = '<option value="">Non classé</option>' +
+      folders.map((f) => `<option value="${f}">${f}</option>`).join('') +
+      '<option value="__new__">+ Nouveau dossier…</option>';
+    if (folders.includes(currentValue)) select.value = currentValue;
+  }
+
+  document.getElementById('mediaFolderSelect').addEventListener('change', (e) => {
+    document.getElementById('mediaNewFolderWrap').classList.toggle('hidden', e.target.value !== '__new__');
+  });
+
   function renderMediaFilesList(files) {
     const listEl = document.getElementById('mediaFilesList');
     const query = (document.getElementById('mediaSearchInput').value || '').toLowerCase().trim();
@@ -4785,26 +4836,70 @@ ${items}
       return;
     }
 
-    filtered.slice().sort((a, b) => (b.uploadedDate || '').localeCompare(a.uploadedDate || '')).forEach((file) => {
-      const row = document.createElement('div');
-      row.className = 'admin-list-item media-file-row';
-      const dateLabel = file.uploadedDate ? file.uploadedDate.split('-').reverse().join('/') : '';
-      row.innerHTML = `
-        ${file.type === 'image'
-          ? `<img class="media-file-thumb" src="${adminAssetPath(file.path)}" alt="">`
-          : `<div class="admin-list-thumb"><i class="fa-solid fa-file-lines" style="color:var(--color-navy);"></i></div>`}
-        <div class="admin-list-info">
-          <strong>${file.title || file.filename}</strong>
-          <span>${file.filename} · envoyé le ${dateLabel}${file.showInDocuments ? ' · <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> sur la page Documents' : ''}</span>
-        </div>
-        <div class="admin-list-actions">
-          <a href="${adminAssetPath(file.path)}" target="_blank" rel="noopener" class="view-link-btn" title="Ouvrir"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      `;
-      row.querySelector('.delete-btn').addEventListener('click', () => deleteMediaFile(file));
-      listEl.appendChild(row);
+    // Regroupement par dossier (les non-classés en dernier)
+    const groups = {};
+    filtered.forEach((f) => {
+      const key = f.folder || '';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(f);
     });
+    const folderNames = Object.keys(groups).filter((k) => k).sort();
+    if (groups['']) folderNames.push('');
+
+    folderNames.forEach((folderName) => {
+      const title = document.createElement('div');
+      title.className = 'admin-list-category-title';
+      title.innerHTML = `<i class="fa-solid fa-folder" style="color:var(--color-gold);"></i> ${folderName || 'Non classé'} (${groups[folderName].length})`;
+      listEl.appendChild(title);
+
+      groups[folderName].slice().sort((a, b) => (b.uploadedDate || '').localeCompare(a.uploadedDate || '')).forEach((file) => {
+        listEl.appendChild(buildMediaFileRow(file));
+      });
+    });
+  }
+
+  function buildMediaFileRow(file) {
+    const row = document.createElement('div');
+    row.className = 'admin-list-item media-file-row';
+    const dateLabel = file.uploadedDate ? file.uploadedDate.split('-').reverse().join('/') : '';
+    row.innerHTML = `
+      ${file.type === 'image'
+        ? `<img class="media-file-thumb" src="${adminAssetPath(file.path)}" alt="">`
+        : `<div class="admin-list-thumb"><i class="fa-solid fa-file-lines" style="color:var(--color-navy);"></i></div>`}
+      <div class="admin-list-info">
+        <strong>${file.title || file.filename}</strong>
+        <span>${file.filename} · envoyé le ${dateLabel}${file.showInDocuments ? ' · <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> sur la page Documents' : ''}</span>
+      </div>
+      <div class="admin-list-actions">
+        <a href="${adminAssetPath(file.path)}" target="_blank" rel="noopener" class="view-link-btn" title="Ouvrir"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        <button type="button" class="move-btn" title="Déplacer vers un dossier"><i class="fa-solid fa-folder-tree"></i></button>
+        <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    `;
+    row.querySelector('.move-btn').addEventListener('click', () => moveMediaFile(file));
+    row.querySelector('.delete-btn').addEventListener('click', () => deleteMediaFile(file));
+    return row;
+  }
+
+  async function moveMediaFile(file) {
+    const existingFolders = [...new Set(currentMediaFiles.map((f) => f.folder).filter(Boolean))].sort();
+    const hint = existingFolders.length > 0 ? ` (dossiers existants : ${existingFolders.join(', ')})` : '';
+    const newFolder = await showPromptModal(`Dans quel dossier ranger "${file.title || file.filename}" ?${hint} Laisse vide pour "Non classé".`, file.folder || '');
+    if (newFolder === null) return;
+
+    try {
+      if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH);
+      const updatedFiles = fileState[MEDIA_LIBRARY_PATH].json.files.map((f) =>
+        f.id === file.id ? Object.assign({}, f, { folder: newFolder.trim() }) : f
+      );
+      const result = await GitHubAPI.saveJSON(cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, fileState[MEDIA_LIBRARY_PATH].sha, `Admin : déplacement de "${file.title}" dans la médiathèque`);
+      fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedFiles }, sha: result.content.sha };
+      currentMediaFiles = updatedFiles;
+      renderMediaFilesList(currentMediaFiles);
+      populateMediaFolderSelect(currentMediaFiles);
+    } catch (err) {
+      alert('Erreur : ' + err.message);
+    }
   }
 
   document.getElementById('mediaSearchInput').addEventListener('input', () => {
@@ -4830,6 +4925,10 @@ ${items}
     try {
       const title = document.getElementById('mediaTitleInput').value.trim();
       const showInDocuments = document.getElementById('mediaShowInDocuments').checked;
+      const folderSelectValue = document.getElementById('mediaFolderSelect').value;
+      const folder = folderSelectValue === '__new__'
+        ? document.getElementById('mediaNewFolderInput').value.trim()
+        : folderSelectValue;
       const type = mediaFileType(file.name);
       const id = 'media-' + Date.now();
       const ext = (file.name.split('.').pop() || '').toLowerCase();
@@ -4839,7 +4938,7 @@ ${items}
       await GitHubAPI.uploadFile(cfg, path, file, `Admin : ajout du fichier "${title}" à la médiathèque`);
 
       const mediaEntry = {
-        id, filename: file.name, path: './' + path, type, title, uploadedDate: today, showInDocuments
+        id, filename: file.name, path: './' + path, type, title, folder, uploadedDate: today, showInDocuments
       };
 
       if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH).catch(() => {});
@@ -4885,8 +4984,10 @@ ${items}
       currentMediaFiles = updatedFiles;
 
       renderMediaFilesList(currentMediaFiles);
+      populateMediaFolderSelect(currentMediaFiles);
       document.getElementById('mediaUploadForm').reset();
       document.getElementById('mediaDocumentsOptions').classList.add('hidden');
+      document.getElementById('mediaNewFolderWrap').classList.add('hidden');
       setStatus(statusEl, 'success', 'Fichier ajouté à la médiathèque !');
     } catch (err) {
       setStatus(statusEl, 'error', 'Erreur : ' + err.message);
@@ -4993,7 +5094,8 @@ ${items}
       openMediaPicker((file) => {
         restoreEditorSelection(editor, savedRange);
         if (file.type === 'image') {
-          document.execCommand('insertHTML', false, `<img class="resizable-img" src="${file.path}" alt="${file.title || ''}">`);
+          document.execCommand('insertHTML', false,
+            `<img class="resizable-img" src="${adminAssetPath(file.path)}" data-final-src="${file.path}" alt="${file.title || ''}">`);
         } else {
           const sel2 = window.getSelection();
           const hasSelection = sel2.rangeCount > 0 && !sel2.getRangeAt(0).collapsed;
