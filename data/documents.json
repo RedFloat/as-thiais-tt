@@ -72,8 +72,8 @@
           "description": "Calendrier officiel des rencontres et compétitions du club.",
           "file": "./docs/calendrier_competitions.pdf",
           "icon": "fa-calendar-check",
-          "expirationDate": null,
-          "updatedDate": "2026-08-27"
+          "updatedDate": "2025-09-01",
+          "expirationDate": "2026-06-30"
         }
       ]
     },
