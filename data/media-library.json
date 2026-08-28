@@ -1,3 +1,22 @@
 {
-  "files": []
+  "files": [
+    {
+      "id": "media-1787945767609",
+      "filename": "inscription_ping_adapte.pdf",
+      "path": "./docs/inscription_ping_adapte.pdf",
+      "type": "document",
+      "title": "inscription_ping_adapte.pdf",
+      "uploadedDate": "2026-08-28",
+      "showInDocuments": false
+    },
+    {
+      "id": "media-1787945809897",
+      "filename": "1785482030251-1.jpg",
+      "path": "./imgs/albums/championnat-du-monde-veterans-2026/1785482030251-1.jpg",
+      "type": "image",
+      "title": "1785482030251-1.jpg",
+      "uploadedDate": "2026-08-28",
+      "showInDocuments": false
+    }
+  ]
 }
