@@ -111,6 +111,9 @@
         <li><button type="button" class="nav-btn" data-view="sitecontent">
           <i class="fa-solid fa-file-pen"></i> Contenu du site
         </button></li>
+        <li><button type="button" class="nav-btn" data-view="media">
+          <i class="fa-solid fa-photo-film"></i> Médiathèque
+        </button></li>
       </ul>
     </nav>
 
@@ -341,10 +344,17 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="docExpiration">Date de péremption (facultatif)</label>
-              <input type="date" id="docExpiration">
-              <span class="form-hint">Laisse vide si ce document n'a pas de date d'expiration. Tu seras alerté sur le tableau de bord 30 jours avant l'échéance.</span>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="docUpdatedDate">Date de mise à jour</label>
+                <input type="date" id="docUpdatedDate" required>
+                <span class="form-hint">Sert à trier les documents (le plus récent en premier) et à afficher la date en haut de la page.</span>
+              </div>
+              <div class="form-group">
+                <label for="docExpiration">Date de péremption (facultatif)</label>
+                <input type="date" id="docExpiration">
+                <span class="form-hint">Laisse vide si ce document n'a pas de date d'expiration. Alerte sur le tableau de bord 30 jours avant l'échéance.</span>
+              </div>
             </div>
 
             <div style="display:flex; gap:0.7rem; align-items:center;">
@@ -1063,6 +1073,7 @@
                   <span class="richtext-sep"></span>
                   <button type="button" id="pageRichtextLinkBtn" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
                   <button type="button" id="pageRichtextImageBtn" title="Insérer une image"><i class="fa-solid fa-image"></i></button>
+                  <button type="button" id="pageMediaLibraryBtn" title="Insérer depuis la médiathèque"><i class="fa-solid fa-photo-film"></i></button>
                 </div>
                 <div class="richtext-editor" id="pageRichtextEditor" contenteditable="true"></div>
                 <input type="file" id="pageRichtextImageInput" accept="image/*" class="hidden">
@@ -1150,6 +1161,7 @@
                   <span class="richtext-sep"></span>
                   <button type="button" id="staticPageLinkBtn" title="Insérer un lien"><i class="fa-solid fa-link"></i></button>
                   <button type="button" id="staticPageImageBtn" title="Insérer une image"><i class="fa-solid fa-image"></i></button>
+                  <button type="button" id="staticPageMediaLibraryBtn" title="Insérer depuis la médiathèque"><i class="fa-solid fa-photo-film"></i></button>
                 </div>
                 <div class="richtext-editor" id="staticPageRichtextEditor" contenteditable="true" style="min-height:400px;"></div>
                 <input type="file" id="staticPageImageInput" accept="image/*" class="hidden">
@@ -1173,6 +1185,67 @@
         </div>
       </section>
 
+      <section class="admin-view" id="view-media">
+        <div class="view-header">
+          <h1>Médiathèque</h1>
+          <p>Un espace dédié pour stocker des images et documents à utiliser sur le site (dans une page, un article...) — rangés proprement à l'écart du reste, sans jamais s'afficher automatiquement sur la page "Documents" publique sauf si tu le demandes explicitement.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-upload"></i> Ajouter un fichier</h2>
+          <form id="mediaUploadForm">
+            <div class="form-group">
+              <label for="mediaFileInput">Fichier (image ou document)</label>
+              <input type="file" id="mediaFileInput" required>
+            </div>
+
+            <div class="form-group">
+              <label for="mediaTitleInput">Nom / description courte</label>
+              <input type="text" id="mediaTitleInput" placeholder="Ex : Affiche tournoi interne 2026" required>
+            </div>
+
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem;">
+                <input type="checkbox" id="mediaShowInDocuments" style="width:auto; transform:scale(1.2);">
+                Faire apparaître ce fichier sur la page "Documents" du site
+              </label>
+            </div>
+
+            <div id="mediaDocumentsOptions" class="hidden" style="background:var(--color-bg-light); border-radius:8px; padding:1rem; margin-bottom:1.25rem;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="mediaDocCategory">Catégorie</label>
+                  <select id="mediaDocCategory">
+                    <option value="administratifs">Administratifs</option>
+                    <option value="sportifs">Sportifs</option>
+                    <option value="divers">Divers</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="mediaDocDescription">Description (affichée sur la page Documents)</label>
+                  <input type="text" id="mediaDocDescription" placeholder="Facultatif">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="mediaUploadBtn">
+              <i class="fa-solid fa-upload"></i> Envoyer le fichier
+            </button>
+            <div class="status-msg" id="mediaUploadStatus"></div>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-folder-open"></i> Fichiers de la médiathèque</h2>
+          <div class="form-group">
+            <input type="text" id="mediaSearchInput" placeholder="Rechercher par nom…">
+          </div>
+          <div id="mediaFilesList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -1190,6 +1263,18 @@
     <button type="button" data-align="right" title="Aligner à droite, texte autour"><i class="fa-solid fa-align-right"></i></button>
     <span class="img-toolbar-sep"></span>
     <button type="button" class="img-delete-btn" id="imgDeleteBtn" title="Supprimer l'image"><i class="fa-solid fa-trash"></i></button>
+  </div>
+
+  <!-- Sélecteur de médiathèque (insertion depuis un éditeur) -->
+  <div class="modal-overlay hidden" id="mediaPickerOverlay">
+    <div class="modal-box" style="max-width:640px;">
+      <h3>Insérer depuis la médiathèque</h3>
+      <input type="text" id="mediaPickerSearch" placeholder="Rechercher par nom…" style="margin-bottom:1rem;">
+      <div id="mediaPickerList" style="max-height:50vh; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:0.7rem;"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="mediaPickerCloseBtn">Fermer</button>
+      </div>
+    </div>
   </div>
 
   <!-- Fenêtre modale générique (remplace confirm/prompt du navigateur) -->

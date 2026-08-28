@@ -496,6 +496,7 @@
       if (btn.dataset.view === 'birthdays') loadBirthdaysView();
       if (btn.dataset.view === 'pages') loadPagesView();
       if (btn.dataset.view === 'sitecontent') loadStaticContentView();
+      if (btn.dataset.view === 'media') loadMediaView();
     });
   });
 
@@ -1150,6 +1151,7 @@
   const docsList = document.getElementById('docsList');
   const docCancelBtn = document.getElementById('docCancelBtn');
   const docSaveLabel = document.getElementById('docSaveLabel');
+  document.getElementById('docUpdatedDate').value = new Date().toISOString().slice(0, 10);
 
   async function loadDocumentsView() {
     docsList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
@@ -1177,7 +1179,7 @@
     let total = 0;
 
     categories.forEach((cat) => {
-      const docs = cat.documents || [];
+      const docs = (cat.documents || []).slice().sort((a, b) => (b.updatedDate || '').localeCompare(a.updatedDate || ''));
       total += docs.length;
 
       const title = document.createElement('div');
@@ -1196,11 +1198,12 @@
       docs.forEach((doc) => {
         const row = document.createElement('div');
         row.className = 'admin-list-item';
+        const updatedLabel = doc.updatedDate ? doc.updatedDate.split('-').reverse().join('/') : '—';
         row.innerHTML = `
           <div class="admin-list-thumb"><i class="fa-solid ${doc.icon || 'fa-file'}" style="color:var(--color-navy); font-size:1.3rem;"></i></div>
           <div class="admin-list-info">
             <strong>${doc.title} ${docStatusBadge(doc.expirationDate)}</strong>
-            <span>${doc.file}</span>
+            <span>${doc.file} · mis à jour le ${updatedLabel}</span>
           </div>
           <div class="admin-list-actions">
             <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
@@ -1226,6 +1229,7 @@
     document.getElementById('docFile').value = doc.file || '';
     document.getElementById('docIcon').value = doc.icon || 'fa-file';
     refreshDocIconPreview();
+    document.getElementById('docUpdatedDate').value = doc.updatedDate || new Date().toISOString().slice(0, 10);
     document.getElementById('docExpiration').value = doc.expirationDate || '';
     docSaveLabel.textContent = 'Enregistrer les modifications';
     docCancelBtn.classList.remove('hidden');
@@ -1238,6 +1242,7 @@
     document.getElementById('docId').value = '';
     document.getElementById('docIcon').value = 'fa-file';
     refreshDocIconPreview();
+    document.getElementById('docUpdatedDate').value = new Date().toISOString().slice(0, 10);
     docSaveLabel.textContent = 'Ajouter le document';
     docCancelBtn.classList.add('hidden');
     document.getElementById('docFormTitle').textContent = 'Ajouter un document';
@@ -1274,6 +1279,7 @@
       const description = document.getElementById('docDescription').value.trim();
       const file = document.getElementById('docFile').value.trim();
       const icon = document.getElementById('docIcon').value.trim() || 'fa-file';
+      const updatedDate = document.getElementById('docUpdatedDate').value || new Date().toISOString().slice(0, 10);
       const expirationDate = document.getElementById('docExpiration').value || null;
 
       // Retire le document de son ancienne catégorie si on est en train de le modifier
@@ -1284,7 +1290,7 @@
       }
 
       const id = editingId || generateDocId(title, categories);
-      const docEntry = { id, title, description, file, icon, expirationDate };
+      const docEntry = { id, title, description, file, icon, updatedDate, expirationDate };
 
       let targetCategory = categories.find((c) => c.id === targetCategoryId);
       if (!targetCategory) {
@@ -4617,6 +4623,270 @@ ${items}
       deleteSelectedImage();
     }
   });
+
+  /* ---------- Médiathèque ---------- */
+
+  const MEDIA_LIBRARY_PATH = 'data/media-library.json';
+  const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+
+  function mediaFileType(filename) {
+    const ext = (filename.split('.').pop() || '').toLowerCase();
+    return IMAGE_EXTENSIONS.includes(ext) ? 'image' : 'document';
+  }
+
+  function mediaFolder(type) {
+    return type === 'image' ? 'imgs/media' : 'docs/media';
+  }
+
+  let currentMediaFiles = [];
+
+  async function loadMediaView() {
+    const listEl = document.getElementById('mediaFilesList');
+    listEl.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(MEDIA_LIBRARY_PATH);
+      currentMediaFiles = data.files || [];
+      renderMediaFilesList(currentMediaFiles);
+    } catch (err) {
+      listEl.innerHTML = '';
+      listEl.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger la médiathèque', [err.message]));
+    }
+  }
+
+  function renderMediaFilesList(files) {
+    const listEl = document.getElementById('mediaFilesList');
+    const query = (document.getElementById('mediaSearchInput').value || '').toLowerCase().trim();
+    const filtered = query
+      ? files.filter((f) => (f.title || '').toLowerCase().includes(query) || (f.filename || '').toLowerCase().includes(query))
+      : files;
+
+    listEl.innerHTML = '';
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<p class="empty-list-msg">Aucun fichier trouvé.</p>';
+      return;
+    }
+
+    filtered.slice().sort((a, b) => (b.uploadedDate || '').localeCompare(a.uploadedDate || '')).forEach((file) => {
+      const row = document.createElement('div');
+      row.className = 'admin-list-item media-file-row';
+      const dateLabel = file.uploadedDate ? file.uploadedDate.split('-').reverse().join('/') : '';
+      row.innerHTML = `
+        ${file.type === 'image'
+          ? `<img class="media-file-thumb" src="${adminAssetPath(file.path)}" alt="">`
+          : `<div class="admin-list-thumb"><i class="fa-solid fa-file-lines" style="color:var(--color-navy);"></i></div>`}
+        <div class="admin-list-info">
+          <strong>${file.title || file.filename}</strong>
+          <span>${file.filename} · envoyé le ${dateLabel}${file.showInDocuments ? ' · <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> sur la page Documents' : ''}</span>
+        </div>
+        <div class="admin-list-actions">
+          <a href="${adminAssetPath(file.path)}" target="_blank" rel="noopener" class="view-link-btn" title="Ouvrir"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+      row.querySelector('.delete-btn').addEventListener('click', () => deleteMediaFile(file));
+      listEl.appendChild(row);
+    });
+  }
+
+  document.getElementById('mediaSearchInput').addEventListener('input', () => renderMediaFilesList(currentMediaFiles));
+
+  document.getElementById('mediaShowInDocuments').addEventListener('change', (e) => {
+    document.getElementById('mediaDocumentsOptions').classList.toggle('hidden', !e.target.checked);
+  });
+
+  document.getElementById('mediaUploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('mediaUploadBtn');
+    const statusEl = document.getElementById('mediaUploadStatus');
+    const fileInput = document.getElementById('mediaFileInput');
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    btn.disabled = true;
+    setStatus(statusEl, 'loading', 'Envoi en cours…');
+
+    try {
+      const title = document.getElementById('mediaTitleInput').value.trim();
+      const showInDocuments = document.getElementById('mediaShowInDocuments').checked;
+      const type = mediaFileType(file.name);
+      const id = 'media-' + Date.now();
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const path = `${mediaFolder(type)}/${id}.${ext}`;
+      const today = new Date().toISOString().slice(0, 10);
+
+      await GitHubAPI.uploadFile(cfg, path, file, `Admin : ajout du fichier "${title}" à la médiathèque`);
+
+      const mediaEntry = {
+        id, filename: file.name, path: './' + path, type, title, uploadedDate: today, showInDocuments
+      };
+
+      if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH).catch(() => {});
+      const currentFiles = (fileState[MEDIA_LIBRARY_PATH] ? fileState[MEDIA_LIBRARY_PATH].json.files : []) || [];
+
+      if (showInDocuments) {
+        setStatus(statusEl, 'loading', 'Ajout à la page Documents…');
+        if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
+        const docsJson = fileState[DOCS_PATH].json;
+        const categories = (docsJson.categories || []).map((c) => Object.assign({}, c, { documents: (c.documents || []).slice() }));
+        const targetCategoryId = document.getElementById('mediaDocCategory').value;
+        const description = document.getElementById('mediaDocDescription').value.trim();
+        const docIcon = type === 'image' ? 'fa-image' : 'fa-file-arrow-down';
+        const docId = generateDocId(title, categories);
+
+        let targetCategory = categories.find((c) => c.id === targetCategoryId);
+        if (!targetCategory) {
+          targetCategory = {
+            id: targetCategoryId,
+            label: CATEGORY_LABELS[targetCategoryId] || targetCategoryId,
+            icon: CATEGORY_ICONS[targetCategoryId] || 'fa-folder',
+            documents: []
+          };
+          categories.push(targetCategory);
+        }
+        targetCategory.documents.push({
+          id: docId, title, description, file: mediaEntry.path, icon: docIcon, updatedDate: today, expirationDate: null
+        });
+
+        const docsResult = await GitHubAPI.saveJSON(
+          cfg, DOCS_PATH, { categories }, fileState[DOCS_PATH].sha, `Admin : ajout du document "${title}" (médiathèque)`
+        );
+        fileState[DOCS_PATH] = { json: { categories }, sha: docsResult.content.sha };
+        mediaEntry.linkedDocId = docId;
+      }
+
+      const updatedFiles = currentFiles.concat(mediaEntry);
+      const sha = fileState[MEDIA_LIBRARY_PATH] ? fileState[MEDIA_LIBRARY_PATH].sha : undefined;
+      const result = await GitHubAPI.saveJSON(
+        cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, sha, `Admin : ajout du fichier "${title}" à la médiathèque`
+      );
+      fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedFiles }, sha: result.content.sha };
+      currentMediaFiles = updatedFiles;
+
+      renderMediaFilesList(currentMediaFiles);
+      document.getElementById('mediaUploadForm').reset();
+      document.getElementById('mediaDocumentsOptions').classList.add('hidden');
+      setStatus(statusEl, 'success', 'Fichier ajouté à la médiathèque !');
+    } catch (err) {
+      setStatus(statusEl, 'error', 'Erreur : ' + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  async function deleteMediaFile(file) {
+    const confirmed = await confirmDeleteWithUsageCheck(file.path, MEDIA_LIBRARY_PATH, `"${file.title || file.filename}"`);
+    if (!confirmed) return;
+
+    try {
+      // Retire aussi l'entrée liée sur la page Documents, le cas échéant
+      if (file.linkedDocId) {
+        if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
+        const categories = fileState[DOCS_PATH].json.categories.map((c) =>
+          Object.assign({}, c, { documents: (c.documents || []).filter((d) => d.id !== file.linkedDocId) })
+        );
+        const docsResult = await GitHubAPI.saveJSON(
+          cfg, DOCS_PATH, { categories }, fileState[DOCS_PATH].sha, `Admin : retrait du document lié au fichier supprimé "${file.title}"`
+        );
+        fileState[DOCS_PATH] = { json: { categories }, sha: docsResult.content.sha };
+      }
+
+      await deleteFileIfExists(toRepoPath(file.path));
+
+      const updatedFiles = currentMediaFiles.filter((f) => f.id !== file.id);
+      const result = await GitHubAPI.saveJSON(
+        cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, fileState[MEDIA_LIBRARY_PATH].sha, `Admin : suppression du fichier "${file.title}" de la médiathèque`
+      );
+      fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedFiles }, sha: result.content.sha };
+      currentMediaFiles = updatedFiles;
+      renderMediaFilesList(currentMediaFiles);
+    } catch (err) {
+      alert('Erreur lors de la suppression : ' + err.message);
+    }
+  }
+
+  /* --- Sélecteur de médiathèque, utilisable depuis un éditeur --- */
+
+  let mediaPickerCallback = null;
+
+  async function openMediaPicker(onSelect) {
+    mediaPickerCallback = onSelect;
+    const overlay = document.getElementById('mediaPickerOverlay');
+    const listEl = document.getElementById('mediaPickerList');
+    document.getElementById('mediaPickerSearch').value = '';
+    listEl.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.85rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    overlay.classList.remove('hidden');
+
+    try {
+      if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH);
+      currentMediaFiles = fileState[MEDIA_LIBRARY_PATH].json.files || [];
+      renderMediaPickerGrid(currentMediaFiles);
+    } catch (err) {
+      listEl.innerHTML = '<p class="empty-list-msg">Impossible de charger la médiathèque.</p>';
+    }
+  }
+
+  function renderMediaPickerGrid(files) {
+    const listEl = document.getElementById('mediaPickerList');
+    const query = (document.getElementById('mediaPickerSearch').value || '').toLowerCase().trim();
+    const filtered = query
+      ? files.filter((f) => (f.title || '').toLowerCase().includes(query) || (f.filename || '').toLowerCase().includes(query))
+      : files;
+
+    listEl.innerHTML = '';
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<p class="empty-list-msg">Aucun fichier. Ajoutes-en depuis l\'onglet Médiathèque.</p>';
+      return;
+    }
+
+    filtered.forEach((file) => {
+      const card = document.createElement('div');
+      card.className = 'media-picker-card';
+      card.innerHTML = file.type === 'image'
+        ? `<img src="${adminAssetPath(file.path)}" alt="">`
+        : `<div class="media-picker-icon"><i class="fa-solid fa-file-lines"></i></div>`;
+      const label = document.createElement('span');
+      label.textContent = file.title || file.filename;
+      card.appendChild(label);
+      card.addEventListener('click', () => {
+        document.getElementById('mediaPickerOverlay').classList.add('hidden');
+        if (mediaPickerCallback) mediaPickerCallback(file);
+      });
+      listEl.appendChild(card);
+    });
+  }
+
+  document.getElementById('mediaPickerSearch').addEventListener('input', () => renderMediaPickerGrid(currentMediaFiles));
+  document.getElementById('mediaPickerCloseBtn').addEventListener('click', () => {
+    document.getElementById('mediaPickerOverlay').classList.add('hidden');
+  });
+
+  // Câblage du bouton "Insérer depuis la médiathèque" pour un éditeur donné
+  function setupMediaLibraryInsertButton(btnId, editor) {
+    document.getElementById(btnId).addEventListener('click', () => {
+      const sel = window.getSelection();
+      const savedRange = (sel.rangeCount > 0 && editor.contains(sel.anchorNode))
+        ? sel.getRangeAt(0).cloneRange()
+        : null;
+
+      openMediaPicker((file) => {
+        restoreEditorSelection(editor, savedRange);
+        if (file.type === 'image') {
+          document.execCommand('insertHTML', false, `<img class="resizable-img" src="${file.path}" alt="${file.title || ''}">`);
+        } else {
+          const sel2 = window.getSelection();
+          const hasSelection = sel2.rangeCount > 0 && !sel2.getRangeAt(0).collapsed;
+          if (hasSelection) {
+            createLinkWithTooltip(editor, file.path);
+          } else {
+            document.execCommand('insertHTML', false, `<a href="${file.path}" title="${file.path}">${file.title || file.filename}</a>`);
+          }
+        }
+      });
+    });
+  }
+
+  setupMediaLibraryInsertButton('pageMediaLibraryBtn', pageRichtextEditor);
+  setupMediaLibraryInsertButton('staticPageMediaLibraryBtn', staticPageRichtextEditor);
 
   /* ---------- Démarrage ---------- */
 

@@ -257,6 +257,22 @@
 
     container.innerHTML = '';
 
+    // Bandeau "Dernière mise à jour" : la plus récente parmi tous les documents
+    const lastUpdatedEl = document.getElementById('documentsLastUpdated');
+    if (lastUpdatedEl) {
+      const allDates = data.categories
+        .flatMap((c) => (c.documents || []).map((d) => d.updatedDate))
+        .filter(Boolean)
+        .sort();
+      const mostRecent = allDates[allDates.length - 1];
+      if (mostRecent) {
+        lastUpdatedEl.textContent = 'Dernière mise à jour : ' + mostRecent.split('-').reverse().join('/');
+        lastUpdatedEl.style.display = '';
+      } else {
+        lastUpdatedEl.style.display = 'none';
+      }
+    }
+
     data.categories.forEach((category) => {
       if (!Array.isArray(category.documents) || category.documents.length === 0) return;
 
@@ -272,7 +288,11 @@
       const grid = document.createElement('div');
       grid.className = 'docs-grid';
 
-      category.documents.forEach((doc) => {
+      const sortedDocs = category.documents.slice().sort((a, b) =>
+        (b.updatedDate || '').localeCompare(a.updatedDate || '')
+      );
+
+      sortedDocs.forEach((doc) => {
         const card = document.createElement('div');
         card.className = 'doc-card';
 
