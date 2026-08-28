@@ -49,6 +49,16 @@
       "uploadedDate": "2026-08-28",
       "showInDocuments": true,
       "linkedDocId": "entrainements-horaires-pdf"
+    },
+    {
+      "id": "media-1787947148809",
+      "filename": "mutation.pdf",
+      "path": "./docs/mutation.pdf",
+      "type": "document",
+      "title": "mutation.pdf",
+      "folder": "docs",
+      "uploadedDate": "2026-08-28",
+      "showInDocuments": false
     }
   ]
 }
