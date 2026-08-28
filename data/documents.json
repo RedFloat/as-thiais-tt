@@ -92,15 +92,6 @@
           "updatedDate": "2026-08-27"
         },
         {
-          "id": "entrainements-horaires-pdf",
-          "title": "entrainements-horaires.pdf",
-          "description": "",
-          "file": "./docs/entrainements-horaires.pdf",
-          "icon": "fa-file-arrow-down",
-          "updatedDate": "2026-08-28",
-          "expirationDate": null
-        },
-        {
           "id": "questionnaire-sante-mineur-pdf",
           "title": "questionnaire_sante_mineur.pdf",
           "description": "",
