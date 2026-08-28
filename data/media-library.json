@@ -28,6 +28,16 @@
       "uploadedDate": "2026-08-28",
       "showInDocuments": false,
       "folder": "docs"
+    },
+    {
+      "id": "media-1787946833434",
+      "filename": "calendrier_competitions.pdf",
+      "path": "./docs/calendrier_competitions.pdf",
+      "type": "document",
+      "title": "calendrier_competitions.pdf",
+      "folder": "docs",
+      "uploadedDate": "2026-08-28",
+      "showInDocuments": false
     }
   ]
 }
