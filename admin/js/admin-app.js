@@ -1841,6 +1841,11 @@
       const teams = await Promise.all(ids.map((id) => readFile(teamPath(id)).catch(() => null)));
       currentTeamsCache = teams.filter(Boolean);
       renderTeamsList(currentTeamsCache);
+      const countLabel = document.getElementById('teamsCountLabel');
+      if (countLabel) {
+        const n = currentTeamsCache.length;
+        countLabel.textContent = n > 0 ? `les ${n} équipe${n > 1 ? 's' : ''}` : 'les équipes';
+      }
     } catch (err) {
       teamsList.innerHTML = '';
       teamsList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les équipes', [err.message]));
