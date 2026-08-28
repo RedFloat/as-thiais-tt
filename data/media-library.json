@@ -17,6 +17,15 @@
       "title": "1785482030251-1.jpg",
       "uploadedDate": "2026-08-28",
       "showInDocuments": false
+    },
+    {
+      "id": "media-1787946681337",
+      "filename": "Certificat_medical.pdf",
+      "path": "./docs/Certificat_medical.pdf",
+      "type": "document",
+      "title": "Certificat_medical.pdf",
+      "uploadedDate": "2026-08-28",
+      "showInDocuments": false
     }
   ]
 }
