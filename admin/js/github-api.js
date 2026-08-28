@@ -170,5 +170,18 @@ const GitHubAPI = (function () {
     return res.json();
   }
 
-  return { testConnection, getJSON, saveJSON, uploadFile, deleteFile, getFileMeta, utf8ToBase64, base64ToUtf8 };
+  /* ---------- Liste de tous les fichiers du dépôt, en un seul appel ---------- */
+  // Utile pour retrouver des fichiers déjà envoyés sur GitHub par un autre biais que l'admin.
+
+  async function getFullTree(cfg) {
+    const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/git/trees/${encodeURIComponent(cfg.branch)}?recursive=1&t=${Date.now()}`;
+    const res = await fetch(url, { headers: authHeaders(cfg.token) });
+    if (!res.ok) {
+      throw new Error('Impossible de lister les fichiers du dépôt : ' + (await parseError(res)));
+    }
+    const data = await res.json();
+    return (data.tree || []).filter((entry) => entry.type === 'blob').map((entry) => entry.path);
+  }
+
+  return { testConnection, getJSON, saveJSON, uploadFile, deleteFile, getFileMeta, getFullTree, utf8ToBase64, base64ToUtf8 };
 })();

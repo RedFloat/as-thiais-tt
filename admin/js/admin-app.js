@@ -2690,7 +2690,10 @@
       if (itemToDelete) {
         const imagePaths = collectNewsImagePaths(itemToDelete);
         for (const imgPath of imagePaths) {
-          await deleteFileIfExists(imgPath);
+          const usages = await scanSiteForUsages('./' + imgPath, NEWS_PATH).catch(() => []);
+          if (usages.length === 0) {
+            await deleteFileIfExists(imgPath);
+          }
         }
       }
 
@@ -4155,7 +4158,10 @@ ${items}
 
       if (pageToDelete) {
         for (const imgPath of collectPageImagePaths(pageToDelete)) {
-          await deleteFileIfExists(imgPath);
+          const usages = await scanSiteForUsages('./' + imgPath, PAGES_PATH).catch(() => []);
+          if (usages.length === 0) {
+            await deleteFileIfExists(imgPath);
+          }
         }
         await unpublishCleanUrlPage(pageToDelete.slug);
       }
@@ -4628,6 +4634,7 @@ ${items}
 
   const MEDIA_LIBRARY_PATH = 'data/media-library.json';
   const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+  const DOC_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv'];
 
   function mediaFileType(filename) {
     const ext = (filename.split('.').pop() || '').toLowerCase();
@@ -4639,10 +4646,14 @@ ${items}
   }
 
   let currentMediaFiles = [];
+  let currentUntrackedFiles = [];
 
   async function loadMediaView() {
     const listEl = document.getElementById('mediaFilesList');
+    const untrackedEl = document.getElementById('mediaUntrackedList');
     listEl.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    untrackedEl.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Recherche des fichiers déjà présents sur le serveur…</p>';
+
     try {
       const data = await readFile(MEDIA_LIBRARY_PATH);
       currentMediaFiles = data.files || [];
@@ -4650,6 +4661,109 @@ ${items}
     } catch (err) {
       listEl.innerHTML = '';
       listEl.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger la médiathèque', [err.message]));
+    }
+
+    try {
+      const allPaths = await GitHubAPI.getFullTree(cfg);
+      const trackedPaths = new Set(currentMediaFiles.map((f) => toRepoPath(f.path)));
+      const mediaExtensions = IMAGE_EXTENSIONS.concat(DOC_EXTENSIONS);
+      currentUntrackedFiles = allPaths.filter((path) => {
+        const ext = (path.split('.').pop() || '').toLowerCase();
+        return mediaExtensions.includes(ext) && !trackedPaths.has(path);
+      });
+      renderUntrackedFilesList(currentUntrackedFiles);
+    } catch (err) {
+      untrackedEl.innerHTML = '';
+      untrackedEl.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de lister les fichiers du dépôt', [err.message]));
+    }
+  }
+
+  function renderUntrackedFilesList(paths) {
+    const untrackedEl = document.getElementById('mediaUntrackedList');
+    const query = (document.getElementById('mediaSearchInput').value || '').toLowerCase().trim();
+    const filtered = query ? paths.filter((p) => p.toLowerCase().includes(query)) : paths;
+
+    untrackedEl.innerHTML = '';
+    if (filtered.length === 0) {
+      untrackedEl.innerHTML = paths.length === 0
+        ? '<p class="empty-list-msg">Rien d\'autre trouvé sur le serveur : tout est déjà répertorié ci-dessus.</p>'
+        : '<p class="empty-list-msg">Aucun résultat.</p>';
+      return;
+    }
+
+    filtered.forEach((path) => {
+      const type = mediaFileType(path);
+      const row = document.createElement('div');
+      row.className = 'admin-list-item media-file-row';
+      row.innerHTML = `
+        ${type === 'image'
+          ? `<img class="media-file-thumb" src="${adminAssetPath('./' + path)}" alt="">`
+          : `<div class="admin-list-thumb"><i class="fa-solid fa-file-lines" style="color:var(--color-navy);"></i></div>`}
+        <div class="admin-list-info">
+          <strong>${path.split('/').pop()}</strong>
+          <span>${path} · pas encore répertorié</span>
+        </div>
+        <div class="admin-list-actions">
+          <a href="${adminAssetPath('./' + path)}" target="_blank" rel="noopener" class="view-link-btn" title="Ouvrir"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <button type="button" class="adopt-btn" title="Ajouter à la médiathèque"><i class="fa-solid fa-plus"></i></button>
+          <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+      row.querySelector('.adopt-btn').addEventListener('click', () => adoptServerFile(path, type));
+      row.querySelector('.delete-btn').addEventListener('click', () => deleteUntrackedFile(path));
+      untrackedEl.appendChild(row);
+    });
+  }
+
+  async function adoptServerFile(path, type) {
+    const title = await showPromptModal('Nom / description courte de ce fichier', path.split('/').pop());
+    if (!title) return;
+
+    try {
+      const showInDocuments = await showConfirmModal('Faire aussi apparaître ce fichier sur la page "Documents" du site ?');
+      const today = new Date().toISOString().slice(0, 10);
+      const id = 'media-' + Date.now();
+      const mediaEntry = { id, filename: path.split('/').pop(), path: './' + path, type, title, uploadedDate: today, showInDocuments };
+
+      if (showInDocuments) {
+        if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
+        const categories = fileState[DOCS_PATH].json.categories.map((c) => Object.assign({}, c, { documents: (c.documents || []).slice() }));
+        let targetCategory = categories.find((c) => c.id === 'divers');
+        if (!targetCategory) {
+          targetCategory = { id: 'divers', label: CATEGORY_LABELS.divers, icon: CATEGORY_ICONS.divers, documents: [] };
+          categories.push(targetCategory);
+        }
+        const docId = generateDocId(title, categories);
+        targetCategory.documents.push({
+          id: docId, title, description: '', file: mediaEntry.path, icon: type === 'image' ? 'fa-image' : 'fa-file-arrow-down',
+          updatedDate: today, expirationDate: null
+        });
+        const docsResult = await GitHubAPI.saveJSON(cfg, DOCS_PATH, { categories }, fileState[DOCS_PATH].sha, `Admin : ajout du document "${title}" (récupéré du serveur)`);
+        fileState[DOCS_PATH] = { json: { categories }, sha: docsResult.content.sha };
+        mediaEntry.linkedDocId = docId;
+      }
+
+      if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH);
+      const updatedFiles = fileState[MEDIA_LIBRARY_PATH].json.files.concat(mediaEntry);
+      const result = await GitHubAPI.saveJSON(cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, fileState[MEDIA_LIBRARY_PATH].sha, `Admin : ajout à la médiathèque de "${title}" (récupéré du serveur)`);
+      fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedFiles }, sha: result.content.sha };
+      currentMediaFiles = updatedFiles;
+
+      await loadMediaView();
+    } catch (err) {
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  async function deleteUntrackedFile(path) {
+    const confirmed = await confirmDeleteWithUsageCheck('./' + path, null, `"${path}"`);
+    if (!confirmed) return;
+    try {
+      await deleteFileIfExists(path);
+      currentUntrackedFiles = currentUntrackedFiles.filter((p) => p !== path);
+      renderUntrackedFilesList(currentUntrackedFiles);
+    } catch (err) {
+      alert('Erreur lors de la suppression : ' + err.message);
     }
   }
 
@@ -4688,7 +4802,10 @@ ${items}
     });
   }
 
-  document.getElementById('mediaSearchInput').addEventListener('input', () => renderMediaFilesList(currentMediaFiles));
+  document.getElementById('mediaSearchInput').addEventListener('input', () => {
+    renderMediaFilesList(currentMediaFiles);
+    renderUntrackedFilesList(currentUntrackedFiles);
+  });
 
   document.getElementById('mediaShowInDocuments').addEventListener('change', (e) => {
     document.getElementById('mediaDocumentsOptions').classList.toggle('hidden', !e.target.checked);
