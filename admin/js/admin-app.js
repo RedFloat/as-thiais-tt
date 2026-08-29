@@ -1207,11 +1207,13 @@
           </div>
           <div class="admin-list-actions">
             <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
-            <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+            <button type="button" class="unlist-btn" title="Retirer de la page Documents (le fichier n'est pas supprimé)"><i class="fa-solid fa-eye-slash"></i></button>
+            <button type="button" class="delete-btn" title="Retirer de la page Documents ET supprimer le fichier du site"><i class="fa-solid fa-trash"></i></button>
           </div>
         `;
         row.querySelector('.edit-btn').addEventListener('click', () => startEditDoc(cat.id, doc));
-        row.querySelector('.delete-btn').addEventListener('click', () => deleteDoc(cat.id, doc.id));
+        row.querySelector('.unlist-btn').addEventListener('click', () => deleteDoc(cat.id, doc.id, false));
+        row.querySelector('.delete-btn').addEventListener('click', () => deleteDoc(cat.id, doc.id, true));
         docsList.appendChild(row);
       });
     });
@@ -1261,6 +1263,15 @@
     }
     return id;
   }
+
+  document.getElementById('docSearchServerBtn').addEventListener('click', () => {
+    openMediaPicker((file) => {
+      document.getElementById('docFile').value = file.path;
+      if (!document.getElementById('docTitle').value.trim() && file.title) {
+        document.getElementById('docTitle').value = file.title;
+      }
+    });
+  });
 
   docForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1322,13 +1333,18 @@
     }
   });
 
-  async function deleteDoc(categoryId, docId) {
+  async function deleteDoc(categoryId, docId, alsoDeleteFile) {
     if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
     const current = fileState[DOCS_PATH].json;
     const category = current.categories.find((c) => c.id === categoryId);
     const doc = category ? (category.documents || []).find((d) => d.id === docId) : null;
 
-    const confirmed = await confirmDeleteWithUsageCheck(doc ? doc.file : null, DOCS_PATH, 'ce document');
+    let confirmed;
+    if (alsoDeleteFile) {
+      confirmed = await confirmDeleteWithUsageCheck(doc ? doc.file : null, DOCS_PATH, 'ce document ET son fichier');
+    } else {
+      confirmed = await showConfirmModal('Retirer ce document de la page "Documents" ? Le fichier lui-même restera disponible sur le site (utile s\'il est aussi utilisé ailleurs).');
+    }
     if (!confirmed) return;
 
     setStatus(docStatus, 'loading', 'Suppression en cours…');
@@ -1341,12 +1357,33 @@
       const updated = { categories };
       const sha = fileState[DOCS_PATH] ? fileState[DOCS_PATH].sha : undefined;
       const result = await GitHubAPI.saveJSON(
-        cfg, DOCS_PATH, updated, sha, 'Admin : suppression d\'un document'
+        cfg, DOCS_PATH, updated, sha, alsoDeleteFile ? 'Admin : suppression d\'un document et de son fichier' : 'Admin : retrait d\'un document de la liste'
       );
 
       fileState[DOCS_PATH] = { json: updated, sha: result.content.sha };
+
+      // Garde la médiathèque cohérente si ce document provenait de là
+      if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH).catch(() => {});
+      const mediaFiles = fileState[MEDIA_LIBRARY_PATH] ? fileState[MEDIA_LIBRARY_PATH].json.files : null;
+      if (mediaFiles) {
+        const linkedEntry = mediaFiles.find((f) => f.linkedDocId === docId);
+        if (linkedEntry) {
+          const updatedMediaFiles = alsoDeleteFile
+            ? mediaFiles.filter((f) => f.id !== linkedEntry.id)
+            : mediaFiles.map((f) => f.id === linkedEntry.id ? Object.assign({}, f, { showInDocuments: false, linkedDocId: undefined }) : f);
+          const mediaResult = await GitHubAPI.saveJSON(
+            cfg, MEDIA_LIBRARY_PATH, { files: updatedMediaFiles }, fileState[MEDIA_LIBRARY_PATH].sha, 'Admin : mise à jour de la médiathèque suite à la suppression d\'un document'
+          );
+          fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedMediaFiles }, sha: mediaResult.content.sha };
+        }
+      }
+
+      if (alsoDeleteFile && doc && isInternalPath(doc.file)) {
+        await deleteFileIfExists(normalizeInternalPath(doc.file));
+      }
+
       renderDocsList(categories);
-      setStatus(docStatus, 'success', 'Document supprimé.');
+      setStatus(docStatus, 'success', alsoDeleteFile ? 'Document et fichier supprimés.' : 'Document retiré de la liste.');
     } catch (err) {
       setStatus(docStatus, 'error', 'Erreur : ' + err.message);
     }
@@ -4762,28 +4799,9 @@ ${items}
       const folder = await showPromptModal(`Dans quel dossier le ranger ?${hint} Laisse vide pour "Non classé".`, '');
       if (folder === null) return;
 
-      const showInDocuments = await showConfirmModal('Faire aussi apparaître ce fichier sur la page "Documents" du site ?');
       const today = new Date().toISOString().slice(0, 10);
       const id = 'media-' + Date.now();
-      const mediaEntry = { id, filename: path.split('/').pop(), path: './' + path, type, title, folder, uploadedDate: today, showInDocuments };
-
-      if (showInDocuments) {
-        if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
-        const categories = fileState[DOCS_PATH].json.categories.map((c) => Object.assign({}, c, { documents: (c.documents || []).slice() }));
-        let targetCategory = categories.find((c) => c.id === 'divers');
-        if (!targetCategory) {
-          targetCategory = { id: 'divers', label: CATEGORY_LABELS.divers, icon: CATEGORY_ICONS.divers, documents: [] };
-          categories.push(targetCategory);
-        }
-        const docId = generateDocId(title, categories);
-        targetCategory.documents.push({
-          id: docId, title, description: '', file: mediaEntry.path, icon: type === 'image' ? 'fa-image' : 'fa-file-arrow-down',
-          updatedDate: today, expirationDate: null
-        });
-        const docsResult = await GitHubAPI.saveJSON(cfg, DOCS_PATH, { categories }, fileState[DOCS_PATH].sha, `Admin : ajout du document "${title}" (récupéré du serveur)`);
-        fileState[DOCS_PATH] = { json: { categories }, sha: docsResult.content.sha };
-        mediaEntry.linkedDocId = docId;
-      }
+      const mediaEntry = { id, filename: path.split('/').pop(), path: './' + path, type, title, folder, uploadedDate: today, showInDocuments: false };
 
       if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH);
       const updatedFiles = fileState[MEDIA_LIBRARY_PATH].json.files.concat(mediaEntry);
@@ -4872,31 +4890,69 @@ ${items}
       </div>
       <div class="admin-list-actions">
         <a href="${adminAssetPath(file.path)}" target="_blank" rel="noopener" class="view-link-btn" title="Ouvrir"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-        <button type="button" class="move-btn" title="Déplacer vers un dossier"><i class="fa-solid fa-folder-tree"></i></button>
+        <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
         <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
       </div>
     `;
-    row.querySelector('.move-btn').addEventListener('click', () => moveMediaFile(file));
+    row.querySelector('.edit-btn').addEventListener('click', () => openMediaEditor(file));
     row.querySelector('.delete-btn').addEventListener('click', () => deleteMediaFile(file));
     return row;
   }
 
-  async function moveMediaFile(file) {
-    const existingFolders = [...new Set(currentMediaFiles.map((f) => f.folder).filter(Boolean))].sort();
-    const hint = existingFolders.length > 0 ? ` (dossiers existants : ${existingFolders.join(', ')})` : '';
-    const newFolder = await showPromptModal(`Dans quel dossier ranger "${file.title || file.filename}" ?${hint} Laisse vide pour "Non classé".`, file.folder || '');
-    if (newFolder === null) return;
+  function openMediaEditor(file) {
+    document.getElementById('mediaEditId').value = file.id;
+    document.getElementById('mediaFileInputWrap').classList.add('hidden');
+    document.getElementById('mediaFileInput').value = '';
+    document.getElementById('mediaTitleInput').value = file.title || '';
+    populateMediaFolderSelect(currentMediaFiles);
+    document.getElementById('mediaFolderSelect').value = file.folder || '';
+    document.getElementById('mediaNewFolderWrap').classList.add('hidden');
 
+    const warning = document.getElementById('mediaShowInDocsWarning');
+    warning.classList.toggle('hidden', !file.showInDocuments);
+    document.getElementById('mediaRemoveFromDocsBtn').onclick = () => removeMediaFromDocuments(file);
+
+    document.getElementById('mediaFormTitle').textContent = 'Modifier le fichier';
+    document.getElementById('mediaUploadBtnLabel').textContent = 'Enregistrer les modifications';
+    document.getElementById('mediaEditCancelBtn').classList.remove('hidden');
+    document.getElementById('mediaUploadForm').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetMediaForm() {
+    document.getElementById('mediaUploadForm').reset();
+    document.getElementById('mediaEditId').value = '';
+    document.getElementById('mediaFileInputWrap').classList.remove('hidden');
+    document.getElementById('mediaShowInDocsWarning').classList.add('hidden');
+    document.getElementById('mediaNewFolderWrap').classList.add('hidden');
+    document.getElementById('mediaFormTitle').textContent = 'Ajouter un fichier';
+    document.getElementById('mediaUploadBtnLabel').textContent = 'Envoyer le fichier';
+    document.getElementById('mediaEditCancelBtn').classList.add('hidden');
+  }
+
+  document.getElementById('mediaEditCancelBtn').addEventListener('click', resetMediaForm);
+
+  async function removeMediaFromDocuments(file) {
+    if (!(await showConfirmModal(`Retirer "${file.title || file.filename}" de la page "Documents" ? Le fichier restera dans la médiathèque.`))) return;
     try {
+      if (file.linkedDocId) {
+        if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
+        const categories = fileState[DOCS_PATH].json.categories.map((c) =>
+          Object.assign({}, c, { documents: (c.documents || []).filter((d) => d.id !== file.linkedDocId) })
+        );
+        const docsResult = await GitHubAPI.saveJSON(cfg, DOCS_PATH, { categories }, fileState[DOCS_PATH].sha, `Admin : retrait de "${file.title}" de la page Documents`);
+        fileState[DOCS_PATH] = { json: { categories }, sha: docsResult.content.sha };
+      }
+
       if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH);
       const updatedFiles = fileState[MEDIA_LIBRARY_PATH].json.files.map((f) =>
-        f.id === file.id ? Object.assign({}, f, { folder: newFolder.trim() }) : f
+        f.id === file.id ? Object.assign({}, f, { showInDocuments: false, linkedDocId: undefined }) : f
       );
-      const result = await GitHubAPI.saveJSON(cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, fileState[MEDIA_LIBRARY_PATH].sha, `Admin : déplacement de "${file.title}" dans la médiathèque`);
+      const result = await GitHubAPI.saveJSON(cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, fileState[MEDIA_LIBRARY_PATH].sha, `Admin : "${file.title}" retiré de la page Documents`);
       fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedFiles }, sha: result.content.sha };
       currentMediaFiles = updatedFiles;
+
       renderMediaFilesList(currentMediaFiles);
-      populateMediaFolderSelect(currentMediaFiles);
+      resetMediaForm();
     } catch (err) {
       alert('Erreur : ' + err.message);
     }
@@ -4907,88 +4963,57 @@ ${items}
     renderUntrackedFilesList(currentUntrackedFiles);
   });
 
-  document.getElementById('mediaShowInDocuments').addEventListener('change', (e) => {
-    document.getElementById('mediaDocumentsOptions').classList.toggle('hidden', !e.target.checked);
-  });
-
   document.getElementById('mediaUploadForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('mediaUploadBtn');
     const statusEl = document.getElementById('mediaUploadStatus');
+    const editId = document.getElementById('mediaEditId').value;
     const fileInput = document.getElementById('mediaFileInput');
-    const file = fileInput.files[0];
-    if (!file) return;
+    const newFile = fileInput.files[0];
+
+    if (!editId && !newFile) return;
 
     btn.disabled = true;
-    setStatus(statusEl, 'loading', 'Envoi en cours…');
+    setStatus(statusEl, 'loading', editId ? 'Enregistrement…' : 'Envoi en cours…');
 
     try {
       const title = document.getElementById('mediaTitleInput').value.trim();
-      const showInDocuments = document.getElementById('mediaShowInDocuments').checked;
       const folderSelectValue = document.getElementById('mediaFolderSelect').value;
       const folder = folderSelectValue === '__new__'
         ? document.getElementById('mediaNewFolderInput').value.trim()
         : folderSelectValue;
-      const type = mediaFileType(file.name);
-      const id = 'media-' + Date.now();
-      const ext = (file.name.split('.').pop() || '').toLowerCase();
-      const path = `${mediaFolder(type)}/${id}.${ext}`;
-      const today = new Date().toISOString().slice(0, 10);
-
-      await GitHubAPI.uploadFile(cfg, path, file, `Admin : ajout du fichier "${title}" à la médiathèque`);
-
-      const mediaEntry = {
-        id, filename: file.name, path: './' + path, type, title, folder, uploadedDate: today, showInDocuments
-      };
 
       if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH).catch(() => {});
       const currentFiles = (fileState[MEDIA_LIBRARY_PATH] ? fileState[MEDIA_LIBRARY_PATH].json.files : []) || [];
 
-      if (showInDocuments) {
-        setStatus(statusEl, 'loading', 'Ajout à la page Documents…');
-        if (!fileState[DOCS_PATH]) await readFile(DOCS_PATH);
-        const docsJson = fileState[DOCS_PATH].json;
-        const categories = (docsJson.categories || []).map((c) => Object.assign({}, c, { documents: (c.documents || []).slice() }));
-        const targetCategoryId = document.getElementById('mediaDocCategory').value;
-        const description = document.getElementById('mediaDocDescription').value.trim();
-        const docIcon = type === 'image' ? 'fa-image' : 'fa-file-arrow-down';
-        const docId = generateDocId(title, categories);
+      let updatedFiles;
+      if (editId) {
+        // Mode édition : seuls le titre et le dossier changent, le fichier reste le même
+        updatedFiles = currentFiles.map((f) => f.id === editId ? Object.assign({}, f, { title, folder }) : f);
+      } else {
+        const type = mediaFileType(newFile.name);
+        const id = 'media-' + Date.now();
+        const ext = (newFile.name.split('.').pop() || '').toLowerCase();
+        const path = `${mediaFolder(type)}/${id}.${ext}`;
+        const today = new Date().toISOString().slice(0, 10);
 
-        let targetCategory = categories.find((c) => c.id === targetCategoryId);
-        if (!targetCategory) {
-          targetCategory = {
-            id: targetCategoryId,
-            label: CATEGORY_LABELS[targetCategoryId] || targetCategoryId,
-            icon: CATEGORY_ICONS[targetCategoryId] || 'fa-folder',
-            documents: []
-          };
-          categories.push(targetCategory);
-        }
-        targetCategory.documents.push({
-          id: docId, title, description, file: mediaEntry.path, icon: docIcon, updatedDate: today, expirationDate: null
-        });
+        await GitHubAPI.uploadFile(cfg, path, newFile, `Admin : ajout du fichier "${title}" à la médiathèque`);
 
-        const docsResult = await GitHubAPI.saveJSON(
-          cfg, DOCS_PATH, { categories }, fileState[DOCS_PATH].sha, `Admin : ajout du document "${title}" (médiathèque)`
-        );
-        fileState[DOCS_PATH] = { json: { categories }, sha: docsResult.content.sha };
-        mediaEntry.linkedDocId = docId;
+        const mediaEntry = { id, filename: newFile.name, path: './' + path, type, title, folder, uploadedDate: today, showInDocuments: false };
+        updatedFiles = currentFiles.concat(mediaEntry);
       }
 
-      const updatedFiles = currentFiles.concat(mediaEntry);
       const sha = fileState[MEDIA_LIBRARY_PATH] ? fileState[MEDIA_LIBRARY_PATH].sha : undefined;
       const result = await GitHubAPI.saveJSON(
-        cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, sha, `Admin : ajout du fichier "${title}" à la médiathèque`
+        cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, sha, editId ? `Admin : modification de "${title}"` : `Admin : ajout du fichier "${title}" à la médiathèque`
       );
       fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedFiles }, sha: result.content.sha };
       currentMediaFiles = updatedFiles;
 
       renderMediaFilesList(currentMediaFiles);
       populateMediaFolderSelect(currentMediaFiles);
-      document.getElementById('mediaUploadForm').reset();
-      document.getElementById('mediaDocumentsOptions').classList.add('hidden');
-      document.getElementById('mediaNewFolderWrap').classList.add('hidden');
-      setStatus(statusEl, 'success', 'Fichier ajouté à la médiathèque !');
+      resetMediaForm();
+      setStatus(statusEl, 'success', editId ? 'Fichier modifié !' : 'Fichier ajouté à la médiathèque !');
     } catch (err) {
       setStatus(statusEl, 'error', 'Erreur : ' + err.message);
     } finally {
@@ -5036,13 +5061,27 @@ ${items}
     const overlay = document.getElementById('mediaPickerOverlay');
     const listEl = document.getElementById('mediaPickerList');
     document.getElementById('mediaPickerSearch').value = '';
-    listEl.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.85rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    listEl.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.85rem;"><i class="fa-solid fa-spinner fa-spin"></i> Recherche sur le serveur…</p>';
     overlay.classList.remove('hidden');
 
     try {
       if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH);
       currentMediaFiles = fileState[MEDIA_LIBRARY_PATH].json.files || [];
-      renderMediaPickerGrid(currentMediaFiles);
+
+      const trackedPaths = new Set(currentMediaFiles.map((f) => toRepoPath(f.path)));
+      const allPaths = await GitHubAPI.getFullTree(cfg).catch(() => []);
+      const mediaExtensions = IMAGE_EXTENSIONS.concat(DOC_EXTENSIONS);
+      const untracked = allPaths
+        .filter((p) => mediaExtensions.includes((p.split('.').pop() || '').toLowerCase()) && !trackedPaths.has(p))
+        .map((p) => ({
+          id: 'untracked-' + p,
+          path: './' + p,
+          filename: p.split('/').pop(),
+          title: p.split('/').pop(),
+          type: mediaFileType(p)
+        }));
+
+      renderMediaPickerGrid(currentMediaFiles.concat(untracked));
     } catch (err) {
       listEl.innerHTML = '<p class="empty-list-msg">Impossible de charger la médiathèque.</p>';
     }

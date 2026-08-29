@@ -418,7 +418,7 @@
     .doc-card {
       background: var(--color-white);
       border-radius: var(--radius-card);
-      padding: 1.5rem;
+      padding: 2.3rem 1.5rem 1.5rem;
       box-shadow: var(--shadow-subtle);
       border: 1px solid rgba(4, 74, 110, 0.08);
       border-left: 4px solid var(--color-navy);
@@ -426,6 +426,15 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      position: relative;
+    }
+
+    .doc-updated-date {
+      position: absolute;
+      top: 0.7rem;
+      right: 1.2rem;
+      font-size: 0.72rem;
+      color: #94a3b8;
     }
 
     .doc-card:hover {
@@ -739,9 +748,6 @@
      CONTENU PRINCIPAL : DOCUMENTS
      ========================================== -->
   <main class="page-content">
-    <div class="container">
-      <p id="documentsLastUpdated" style="text-align:left; color:var(--color-text-muted); font-size:0.85rem; margin-bottom:1.2rem; display:none;"></p>
-    </div>
     <div class="container" id="documentsContainer">
       <!-- Généré dynamiquement par js/site-data.js depuis data/documents.json -->
     </div>

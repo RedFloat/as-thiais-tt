@@ -328,8 +328,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="docFile">Lien du fichier</label>
-                <input type="text" id="docFile" placeholder="./docs/mon-fichier.pdf" required>
-                <span class="form-hint">Chemin local (ex : ./docs/fichier.pdf) ou lien complet.</span>
+                <div style="display:flex; gap:0.5rem;">
+                  <input type="text" id="docFile" placeholder="./docs/mon-fichier.pdf" required style="flex:1;">
+                  <button type="button" class="btn btn-ghost" id="docSearchServerBtn" title="Chercher un fichier déjà sur le serveur"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+                <span class="form-hint">Chemin local (ex : ./docs/fichier.pdf), lien complet, ou clique la loupe pour choisir un fichier déjà présent sur le serveur.</span>
               </div>
               <div class="form-group">
                 <label>Icône</label>
@@ -1192,11 +1195,13 @@
         </div>
 
         <div class="admin-card">
-          <h2><i class="fa-solid fa-upload"></i> Ajouter un fichier</h2>
+          <h2><i class="fa-solid fa-upload"></i> <span id="mediaFormTitle">Ajouter un fichier</span></h2>
           <form id="mediaUploadForm">
-            <div class="form-group">
+            <input type="hidden" id="mediaEditId">
+
+            <div class="form-group" id="mediaFileInputWrap">
               <label for="mediaFileInput">Fichier (image ou document)</label>
-              <input type="file" id="mediaFileInput" required>
+              <input type="file" id="mediaFileInput">
             </div>
 
             <div class="form-group">
@@ -1218,33 +1223,17 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label style="display:flex; align-items:center; gap:0.6rem; font-weight:600; font-size:0.88rem;">
-                <input type="checkbox" id="mediaShowInDocuments" style="width:auto; transform:scale(1.2);">
-                Faire apparaître ce fichier sur la page "Documents" du site
-              </label>
+            <div class="admin-card hidden" id="mediaShowInDocsWarning" style="background:#fff7ed; border-color:#fdba74; padding:1rem; margin-bottom:1.25rem;">
+              <p style="margin:0 0 0.7rem; font-size:0.85rem;"><i class="fa-solid fa-triangle-exclamation" style="color:#d97706;"></i> Ce fichier apparaît actuellement sur la page "Documents" du site.</p>
+              <button type="button" class="btn btn-ghost" id="mediaRemoveFromDocsBtn">Retirer de la page Documents</button>
             </div>
 
-            <div id="mediaDocumentsOptions" class="hidden" style="background:var(--color-bg-light); border-radius:8px; padding:1rem; margin-bottom:1.25rem;">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="mediaDocCategory">Catégorie</label>
-                  <select id="mediaDocCategory">
-                    <option value="administratifs">Administratifs</option>
-                    <option value="sportifs">Sportifs</option>
-                    <option value="divers">Divers</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="mediaDocDescription">Description (affichée sur la page Documents)</label>
-                  <input type="text" id="mediaDocDescription" placeholder="Facultatif">
-                </div>
-              </div>
+            <div style="display:flex; gap:0.7rem; align-items:center;">
+              <button type="submit" class="btn btn-primary" id="mediaUploadBtn">
+                <i class="fa-solid fa-upload"></i> <span id="mediaUploadBtnLabel">Envoyer le fichier</span>
+              </button>
+              <button type="button" class="btn btn-ghost hidden" id="mediaEditCancelBtn">Annuler</button>
             </div>
-
-            <button type="submit" class="btn btn-primary" id="mediaUploadBtn">
-              <i class="fa-solid fa-upload"></i> Envoyer le fichier
-            </button>
             <div class="status-msg" id="mediaUploadStatus"></div>
           </form>
         </div>
