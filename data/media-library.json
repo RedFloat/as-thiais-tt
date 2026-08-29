@@ -47,8 +47,7 @@
       "title": "entrainements-horaires.pdf",
       "folder": "docs",
       "uploadedDate": "2026-08-28",
-      "showInDocuments": true,
-      "linkedDocId": "entrainements-horaires-pdf"
+      "showInDocuments": false
     },
     {
       "id": "media-1787947148809",
@@ -78,8 +77,7 @@
       "title": "questionnaire_sante_mineur.pdf",
       "folder": "docs",
       "uploadedDate": "2026-08-28",
-      "showInDocuments": true,
-      "linkedDocId": "questionnaire-sante-mineur-pdf"
+      "showInDocuments": false
     },
     {
       "id": "media-1787947176834",
