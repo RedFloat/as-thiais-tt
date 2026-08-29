@@ -154,6 +154,30 @@
     );
   }
 
+  // Enregistre automatiquement un fichier tout juste uploadé (News, Sponsors, Équipes, Albums...)
+  // dans la médiathèque, pour que tout ce qui passe par l'admin soit centralisé sans y penser.
+  async function registerInMediaLibrary({ path, title, folder }) {
+    try {
+      const normalizedPath = path.startsWith('./') ? path : './' + path;
+      const type = mediaFileType(path);
+      if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH).catch(() => {});
+      const currentFiles = (fileState[MEDIA_LIBRARY_PATH] ? fileState[MEDIA_LIBRARY_PATH].json.files : []) || [];
+      const id = 'media-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+      const entry = {
+        id, filename: path.split('/').pop(), path: normalizedPath, type, title, folder,
+        uploadedDate: new Date().toISOString().slice(0, 10), showInDocuments: false
+      };
+      const updatedFiles = currentFiles.concat(entry);
+      const sha = fileState[MEDIA_LIBRARY_PATH] ? fileState[MEDIA_LIBRARY_PATH].sha : undefined;
+      const result = await GitHubAPI.saveJSON(
+        cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, sha, `Admin : "${title}" ajouté automatiquement à la médiathèque`
+      );
+      fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedFiles }, sha: result.content.sha };
+    } catch (err) {
+      console.warn('Impossible d\'ajouter automatiquement à la médiathèque :', err.message);
+    }
+  }
+
   // Certains liens/images sont parfois collés en adresse complète (plutôt qu'en chemin relatif),
   // ex : https://redfloat.github.io/as-thiais-tt/docs/x.pdf. On les détecte partout sur le site
   // et on vérifie que le fichier visé existe bien dans le dépôt.
@@ -1035,13 +1059,33 @@
   }
 
   let sponsorSlugManuallyEdited = false;
+  let pendingSponsorLogoFile = null;
+  let currentSponsorLogoPath = '';
+  const sponsorLogoInput = document.getElementById('sponsorLogoInput');
+  const sponsorLogoPreviewWrap = document.getElementById('sponsorLogoPreviewWrap');
+
+  function renderSponsorLogoPreview(src) {
+    sponsorLogoPreviewWrap.innerHTML = src ? `<img class="team-photo-preview" src="${src}" alt="">` : '';
+  }
+
+  sponsorLogoInput.addEventListener('change', () => {
+    const file = sponsorLogoInput.files[0];
+    if (!file) return;
+    pendingSponsorLogoFile = file;
+    const reader = new FileReader();
+    reader.onload = () => renderSponsorLogoPreview(reader.result);
+    reader.readAsDataURL(file);
+  });
 
   function startEditSponsor(sponsor) {
     document.getElementById('sponsorId').value = sponsor.id;
     document.getElementById('sponsorName').value = sponsor.name || '';
     document.getElementById('sponsorSlug').value = sponsor.id || '';
     sponsorSlugManuallyEdited = true;
-    document.getElementById('sponsorLogo').value = sponsor.logo || '';
+    sponsorLogoInput.value = '';
+    pendingSponsorLogoFile = null;
+    currentSponsorLogoPath = sponsor.logo || '';
+    renderSponsorLogoPreview(sponsor.logo ? adminAssetPath(sponsor.logo) : '');
     document.getElementById('sponsorLink').value = sponsor.link || '';
     document.getElementById('sponsorDescription').value = sponsor.description || '';
     sponsorSaveLabel.textContent = 'Enregistrer les modifications';
@@ -1054,6 +1098,9 @@
     sponsorForm.reset();
     document.getElementById('sponsorId').value = '';
     sponsorSlugManuallyEdited = false;
+    pendingSponsorLogoFile = null;
+    currentSponsorLogoPath = '';
+    renderSponsorLogoPreview('');
     sponsorSaveLabel.textContent = 'Ajouter le sponsor';
     sponsorCancelBtn.classList.add('hidden');
     document.getElementById('sponsorFormTitle').textContent = 'Ajouter un sponsor';
@@ -1083,13 +1130,26 @@
       const name = document.getElementById('sponsorName').value.trim();
       const slugInput = document.getElementById('sponsorSlug').value.trim();
       const slug = slugify(slugInput || name);
-      const logo = document.getElementById('sponsorLogo').value.trim();
       const link = document.getElementById('sponsorLink').value.trim();
       const description = document.getElementById('sponsorDescription').value.trim();
 
       const slugTaken = sponsors.some((s) => s.id === slug && s.id !== editingId);
       if (slugTaken) {
         throw new Error('Cette adresse est déjà utilisée par un autre sponsor.');
+      }
+
+      if (!editingId && !pendingSponsorLogoFile) {
+        throw new Error('Choisis un logo pour ce sponsor.');
+      }
+
+      let logo = currentSponsorLogoPath;
+      if (pendingSponsorLogoFile) {
+        setStatus(sponsorStatus, 'loading', 'Envoi du logo…');
+        const ext = (pendingSponsorLogoFile.name.split('.').pop() || 'png').toLowerCase();
+        const logoPath = `imgs/sponsors/${slug}.${ext}`;
+        await GitHubAPI.uploadFile(cfg, logoPath, pendingSponsorLogoFile, `Admin : logo du sponsor "${name}"`);
+        logo = './' + logoPath;
+        await registerInMediaLibrary({ path: logoPath, title: `${name} (logo)`, folder: 'Sponsors' });
       }
 
       if (editingId) {
@@ -1233,6 +1293,8 @@
     refreshDocIconPreview();
     document.getElementById('docUpdatedDate').value = doc.updatedDate || new Date().toISOString().slice(0, 10);
     document.getElementById('docExpiration').value = doc.expirationDate || '';
+    document.getElementById('docReplaceFileInput').value = '';
+    document.getElementById('docReplaceFileWrap').classList.toggle('hidden', !isInternalPath(doc.file));
     docSaveLabel.textContent = 'Enregistrer les modifications';
     docCancelBtn.classList.remove('hidden');
     document.getElementById('docFormTitle').textContent = 'Modifier le document';
@@ -1245,6 +1307,7 @@
     document.getElementById('docIcon').value = 'fa-file';
     refreshDocIconPreview();
     document.getElementById('docUpdatedDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('docReplaceFileWrap').classList.add('hidden');
     docSaveLabel.textContent = 'Ajouter le document';
     docCancelBtn.classList.add('hidden');
     document.getElementById('docFormTitle').textContent = 'Ajouter un document';
@@ -1292,6 +1355,14 @@
       const icon = document.getElementById('docIcon').value.trim() || 'fa-file';
       const updatedDate = document.getElementById('docUpdatedDate').value || new Date().toISOString().slice(0, 10);
       const expirationDate = document.getElementById('docExpiration').value || null;
+
+      // Mise à jour du fichier en place, si un nouveau fichier a été choisi
+      const replaceInput = document.getElementById('docReplaceFileInput');
+      const replaceFile = replaceInput.files[0];
+      if (replaceFile && isInternalPath(file)) {
+        setStatus(docStatus, 'loading', 'Envoi du nouveau fichier…');
+        await GitHubAPI.uploadFile(cfg, normalizeInternalPath(file), replaceFile, `Admin : mise à jour du fichier "${title}"`);
+      }
 
       // Retire le document de son ancienne catégorie si on est en train de le modifier
       if (editingId) {
@@ -2212,6 +2283,7 @@
         const photoPath = `imgs/teams/${id}.${ext}`;
         await GitHubAPI.uploadFile(cfg, photoPath, pendingTeamPhotoFile, `Admin : photo de l'équipe "${name}"`);
         photo = './' + photoPath;
+        await registerInMediaLibrary({ path: photoPath, title: `${name} (photo équipe)`, folder: 'Équipes' });
       }
 
       const showPlayers = document.getElementById('teamShowPlayers').checked;
@@ -2591,13 +2663,15 @@
 
     setStatus(newsEditorStatus, 'loading', 'Envoi de l\'image en arrière-plan…');
     const uploadPromise = GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une news`)
-      .then(() => {
+      .then(async () => {
         const img = richtextEditor.querySelector('#' + tempId);
         if (img) {
           img.dataset.finalSrc = `./${path}`;
           img.removeAttribute('data-pending');
         }
         hideStatus(newsEditorStatus);
+        const newsTitleForMedia = document.getElementById('newsTitle').value.trim() || newsId;
+        await registerInMediaLibrary({ path, title: `${newsTitleForMedia} (image)`, folder: 'News' });
       })
       .catch((err) => {
         const img = richtextEditor.querySelector('#' + tempId);
@@ -2625,6 +2699,8 @@
       const id = document.getElementById('newsEditId').value;
       const isNew = !newsArray.some((n) => n.id === id);
 
+      const newsTitleValue = document.getElementById('newsTitle').value.trim();
+
       let image = currentNewsCoverPath;
       if (pendingNewsCoverFile) {
         setStatus(newsEditorStatus, 'loading', 'Envoi de la photo de couverture…');
@@ -2632,6 +2708,7 @@
         const coverPath = `imgs/news/${id}-cover.${ext}`;
         await GitHubAPI.uploadFile(cfg, coverPath, pendingNewsCoverFile, `Admin : photo de couverture de la news "${id}"`);
         image = './' + coverPath;
+        await registerInMediaLibrary({ path: coverPath, title: `${newsTitleValue || id} (couverture)`, folder: 'News' });
       }
 
       setStatus(newsEditorStatus, 'loading', 'Finalisation des images du contenu…');

@@ -258,8 +258,10 @@
             </div>
 
             <div class="form-group">
-              <label for="sponsorLogo">Lien du logo (image)</label>
-              <input type="url" id="sponsorLogo" placeholder="https://..." required>
+              <label for="sponsorLogoInput">Logo</label>
+              <input type="file" id="sponsorLogoInput" accept="image/*">
+              <span class="form-hint">Facultatif si tu ne changes pas le logo actuel. Envoyé automatiquement à l'enregistrement.</span>
+              <div id="sponsorLogoPreviewWrap" style="margin-top:0.6rem; display:flex; align-items:center; gap:0.8rem;"></div>
             </div>
 
             <div class="form-group">
@@ -345,6 +347,12 @@
                   <div class="icon-picker-panel hidden" id="docIconPanel"></div>
                 </div>
               </div>
+            </div>
+
+            <div class="form-group hidden" id="docReplaceFileWrap" style="background:var(--color-bg-light); border-radius:8px; padding:1rem;">
+              <label for="docReplaceFileInput"><i class="fa-solid fa-rotate"></i> Mettre à jour le fichier (remplace le fichier actuel, même emplacement)</label>
+              <input type="file" id="docReplaceFileInput">
+              <span class="form-hint">Utile pour un document qui revient chaque année (règlement, calendrier...) : le nouveau fichier remplace l'ancien à la même adresse, tous les liens déjà partagés continuent de fonctionner.</span>
             </div>
 
             <div class="form-row">
