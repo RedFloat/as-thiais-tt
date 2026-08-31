@@ -42,15 +42,6 @@
           "expirationDate": "2027-07-01"
         },
         {
-          "id": "planning-2025-2026",
-          "title": "Planning 2025 - 2026",
-          "description": "Planning des horaires et créneaux d'entraînements de la saison.",
-          "file": "./docs/entrainements-horaires.pdf",
-          "icon": "fa-calendar-days",
-          "updatedDate": "2025-08-15",
-          "expirationDate": "2026-06-30"
-        },
-        {
           "id": "pouvoir-ag-2026",
           "title": "Pouvoir AG 2026",
           "description": "Document de pouvoir pour l'Assemblée Générale de l'association.",
@@ -58,6 +49,15 @@
           "icon": "fa-file-word",
           "updatedDate": "2026-05-01",
           "expirationDate": "2027-05-01"
+        },
+        {
+          "id": "planning-2025-2026",
+          "title": "Planning 2025 - 2026",
+          "description": "Planning des horaires et créneaux d'entraînements de la saison.",
+          "file": "./docs/entrainements-horaires.pdf",
+          "icon": "fa-calendar-days",
+          "updatedDate": "2026-08-31",
+          "expirationDate": "2027-07-01"
         }
       ]
     },
