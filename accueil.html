@@ -1152,29 +1152,10 @@
       </div>
 
       <!-- Calendrier -->
-      <div class="widget-box">
+      <div class="widget-box" id="upcomingEventsWidget">
         <h3><i class="fa-solid fa-calendar-days"></i> Prochains Événements</h3>
-        <ul class="event-list-mini">
-          <li>
-            <div class="event-date-badge">
-              <div class="day">25</div>
-              <div class="month">Sep</div>
-            </div>
-            <div>
-              <strong>J1 Championnat de Paris</strong>
-              <div style="font-size:0.8rem; color:var(--color-text-muted);">Toutes équipes</div>
-            </div>
-          </li>
-          <li>
-            <div class="event-date-badge">
-              <div class="day">10</div>
-              <div class="month">Oct</div>
-            </div>
-            <div>
-              <strong>Critérium Fédéral (Tour 1)</strong>
-              <div style="font-size:0.8rem; color:var(--color-text-muted);">Individuels</div>
-            </div>
-          </li>
+        <ul class="event-list-mini" id="upcomingEventsList">
+          <!-- Généré dynamiquement par js/site-data.js depuis data/events.json -->
         </ul>
       </div>
 

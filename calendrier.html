@@ -414,7 +414,7 @@
       font-size: 1.1rem;
     }
 
-    /* Encadré d'information important (Alerte design) */
+    /* Encadré d'information important (Alerte design) — conservé pour un usage futur éventuel */
     .calendar-notice-modern {
       background: var(--color-gold-light);
       border-left: 4px solid var(--color-gold);
@@ -437,86 +437,287 @@
       flex-shrink: 0;
     }
 
-    /* Bouton toggle pour les conseils (Style épuré moderne) */
-    .calendar-toggle-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      background: transparent;
-      color: var(--color-navy);
-      padding: 0.6rem 0;
-      font-weight: 700;
-      font-size: 0.95rem;
-      border: none;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-bottom: 0.5rem;
-      border-bottom: 2px solid transparent;
-    }
+    /* ==========================================================================
+       CALENDRIER INTERACTIF (custom, remplace l'ancien embed Google Agenda)
+       ========================================================================== */
 
-    .calendar-toggle-btn:hover {
-      color: var(--color-gold);
-      border-bottom-color: var(--color-gold);
-    }
+    .event-calendar { margin-top: 1rem; }
 
-    .calendar-toggle-btn i {
-      color: var(--color-gold);
-      transition: transform 0.3s ease;
-    }
-
-    /* Bloc Conseils repliable redessiné */
-    #conseils {
-      display: none;
-      margin-top: 0.8rem;
-      margin-bottom: 2rem;
-      padding: 1.8rem;
-      background-color: var(--color-gold-light);
-      border: 1px solid rgba(210, 169, 91, 0.4);
-      color: var(--color-navy-dark);
-      border-radius: 12px;
-      animation: fadeIn 0.4s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    #conseils p {
-      margin: 0.8rem 0;
-      font-size: 0.95rem;
+    .event-calendar-toolbar {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .event-calendar-nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .event-calendar-nav h2 {
+      font-size: 1.3rem;
+      color: var(--color-navy);
+      min-width: 190px;
+      text-align: center;
+      text-transform: capitalize;
+    }
+
+    .event-calendar-nav button {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid #e2e8f0;
+      background: var(--color-white);
+      color: var(--color-navy);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .event-calendar-nav button:hover { background: var(--color-gold-light); border-color: var(--color-gold); }
+
+    .event-calendar-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .event-calendar-today-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      border: 1px solid var(--color-navy);
+      background: var(--color-white);
+      color: var(--color-navy);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .event-calendar-today-btn:hover { background: var(--color-navy); color: var(--color-white); }
+
+    .event-calendar-view-switch {
+      display: flex;
+      background: var(--color-bg-light);
+      border-radius: 50px;
+      padding: 0.25rem;
+      gap: 0.2rem;
+    }
+
+    .event-calendar-view-switch button {
+      padding: 0.45rem 1rem;
+      border-radius: 50px;
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .event-calendar-view-switch button.is-active {
+      background: var(--color-navy);
+      color: var(--color-white);
+    }
+
+    .event-calendar-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+    }
+
+    .event-calendar-legend span {
+      display: inline-flex;
+      align-items: center;
       gap: 0.4rem;
     }
 
-    #conseils img {
-      height: 28px;
-      width: auto;
-      vertical-align: middle;
-      border-radius: 4px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin: 0 0.3rem;
+    .event-calendar-legend .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
     }
 
-    /* Conteneur de l'Iframe Google Calendar avec effet shadow moderne */
-    .calendar-iframe-wrapper {
-      position: relative;
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
+    /* --- Vue mois --- */
+
+    .event-calendar-month {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .cal-weekday-label {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      padding-bottom: 0.5rem;
+    }
+
+    .cal-day-cell {
+      min-height: 92px;
+      border-radius: 10px;
       border: 1px solid #e2e8f0;
       background: var(--color-white);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-      margin-top: 1rem;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
     }
 
-    .calendar-iframe-wrapper iframe {
-      width: 100%;
-      height: 650px;
-      border: none;
-      display: block;
+    .cal-day-cell:hover { border-color: var(--color-gold); box-shadow: var(--shadow-subtle); }
+    .cal-day-cell.is-outside { opacity: 0.35; }
+    .cal-day-cell.is-today { border-color: var(--color-navy); border-width: 2px; }
+    .cal-day-cell.is-selected { background: var(--color-gold-light); border-color: var(--color-gold); }
+
+    .cal-day-number {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--color-navy);
+    }
+
+    .cal-day-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+
+    .cal-day-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .cal-day-pill {
+      font-size: 0.68rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      color: var(--color-white);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cal-day-more {
+      font-size: 0.68rem;
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    /* --- Vue semaine --- */
+
+    .event-calendar-week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .cal-week-day {
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: var(--color-white);
+      padding: 0.7rem;
+      min-height: 140px;
+    }
+
+    .cal-week-day.is-today { border-color: var(--color-navy); border-width: 2px; }
+
+    .cal-week-day-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-navy);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .cal-week-event {
+      background: var(--color-bg-light);
+      border-left: 3px solid var(--color-navy);
+      border-radius: 4px;
+      padding: 0.35rem 0.5rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.76rem;
+    }
+
+    .cal-week-event strong { display: block; color: var(--color-navy); font-size: 0.78rem; }
+    .cal-week-event span { color: var(--color-text-muted); }
+
+    /* --- Panneau détail du jour (vue mois) --- */
+
+    .event-calendar-daypanel {
+      margin-top: 1.3rem;
+      padding: 1.3rem;
+      background: var(--color-bg-light);
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .event-calendar-daypanel h3 {
+      color: var(--color-navy);
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+      text-transform: capitalize;
+    }
+
+    .cal-panel-event {
+      display: flex;
+      gap: 0.8rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .cal-panel-event:last-child { border-bottom: none; }
+
+    .cal-panel-event-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-top: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .cal-panel-event-title { font-weight: 700; color: var(--color-navy); font-size: 0.92rem; }
+    .cal-panel-event-meta { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.15rem; }
+    .cal-panel-event-desc { font-size: 0.85rem; margin-top: 0.4rem; color: var(--color-text-main); }
+
+    .cal-empty-msg {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* --- Adaptation téléphone --- */
+
+    @media (max-width: 680px) {
+      .event-calendar-toolbar { flex-direction: column; align-items: stretch; }
+      .event-calendar-nav { justify-content: space-between; }
+      .event-calendar-controls { justify-content: space-between; }
+
+      .cal-weekday-label { font-size: 0.65rem; }
+      .cal-day-cell { min-height: 56px; padding: 0.3rem; gap: 0.2rem; }
+      .cal-day-number { font-size: 0.75rem; }
+      .cal-day-pill { display: none; } /* trop étroit : seuls les points restent visibles */
+      .cal-day-dots { justify-content: center; }
+
+      .event-calendar-week {
+        grid-template-columns: 1fr;
+      }
+      .cal-week-day { min-height: auto; }
     }
 
     /* ==========================================================================
@@ -756,39 +957,28 @@
           </div>
                 </div>
 
-        <div class="calendar-notice-modern">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <div>
-            <strong>Information importante :</strong> Les informations sur les compétitions (les lieux ou horaires) nous parviendront en cours de saison. Le calendrier interactif ci-dessous sera mis à jour dès réception des nouvelles informations.
+        <div class="event-calendar" id="eventCalendar">
+          <div class="event-calendar-toolbar">
+            <div class="event-calendar-nav">
+              <button type="button" id="calPrevBtn" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
+              <h2 id="calCurrentLabel">—</h2>
+              <button type="button" id="calNextBtn" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="event-calendar-controls">
+              <button type="button" class="event-calendar-today-btn" id="calTodayBtn">Aujourd'hui</button>
+              <div class="event-calendar-view-switch">
+                <button type="button" class="is-active" data-cal-view="month">Mois</button>
+                <button type="button" data-cal-view="week">Semaine</button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <button type="button" class="calendar-toggle-btn" onclick="toggleConseils()">
-          <i class="fa-solid fa-circle-question" id="conseilsIcon"></i> Conseils pour la navigation dans le calendrier interactif
-        </button>
+          <div class="event-calendar-legend" id="calLegend"></div>
 
-        <div id="conseils">
-          <p>
-            <i class="fa-solid fa-filter" style="color: var(--color-navy);"></i> 
-            Pour sélectionner le type d'événement à afficher (Jeunes, Adultes, Événements du club), utilisez l'icône : 
-            <img src="/public/9075/upload/images/Outils/Calendrier.png" alt="Icône Calendrier">
-          </p>
-          <p>
-            <i class="fa-solid fa-calendar-days" style="color: var(--color-navy);"></i> 
-            Vous pouvez changer la vue (calendrier ou planning) grâce à l'icône : 
-            <img src="/public/9075/upload/images/Outils/Vue.png" alt="Icône Vue">
-          </p>
-          <p style="font-size: 0.9rem; color: var(--color-text-muted); margin-top: 0.4rem;">
-            <em>Note : La vue planning n'affiche pas forcément tous les évènements (il y a une limite d'évènements affichés). Pour voir les suivants, pensez à avancer manuellement dans les dates.</em>
-          </p>
-          <p style="margin-top: 0.4rem;">
-            <i class="fa-solid fa-circle-info" style="color: var(--color-navy);"></i> 
-            Cliquez sur un événement spécifique pour afficher tous ses détails (lieux précis, équipes engagées, etc.).
-          </p>
-        </div>
+          <div id="calMonthView" class="event-calendar-month"></div>
+          <div id="calWeekView" class="event-calendar-week hidden"></div>
 
-        <div class="calendar-iframe-wrapper">
-          <iframe id="calendarEmbed" frameborder="0" height="600" scrolling="no" src="" style="border-width:0" width="800"></iframe>
+          <div class="event-calendar-daypanel hidden" id="calDayPanel"></div>
         </div>
 
       </div>
@@ -853,18 +1043,6 @@
      ========================================== -->
   <script src="./js/site-data.js"></script>
   <script>
-    function toggleConseils() {
-      var conseilsDiv = document.getElementById('conseils');
-      var icon = document.getElementById('conseilsIcon');
-      if (conseilsDiv.style.display === 'block') {
-        conseilsDiv.style.display = 'none';
-        icon.style.transform = 'rotate(0deg)';
-      } else {
-        conseilsDiv.style.display = 'block';
-        icon.style.transform = 'rotate(90deg)';
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       const mobileBtn = document.getElementById('mobileMenuBtn');
       const navWrapper = document.getElementById('navWrapper');

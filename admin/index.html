@@ -78,29 +78,29 @@
         <li><button type="button" class="nav-btn" data-view="settings">
           <i class="fa-solid fa-sliders"></i> Réglages globaux
         </button></li>
-        <li><button type="button" class="nav-btn" data-view="sponsors">
-          <i class="fa-solid fa-handshake"></i> Sponsors
-        </button></li>
-        <li><button type="button" class="nav-btn" data-view="documents">
-          <i class="fa-solid fa-file-lines"></i> Documents
-        </button></li>
-        <li><button type="button" class="nav-btn" data-view="navigation">
-          <i class="fa-solid fa-bars"></i> Ordre des Pages
+        <li><button type="button" class="nav-btn" data-view="news">
+          <i class="fa-solid fa-newspaper"></i> News
         </button></li>
         <li><button type="button" class="nav-btn" data-view="teams">
           <i class="fa-solid fa-people-group"></i> Équipes & matchs
         </button></li>
-        <li><button type="button" class="nav-btn" data-view="news">
-          <i class="fa-solid fa-newspaper"></i> News
-        </button></li>
-        <li><button type="button" class="nav-btn" data-view="links">
-          <i class="fa-solid fa-link"></i> Liens Utiles
+        <li><button type="button" class="nav-btn" data-view="calendar">
+          <i class="fa-solid fa-calendar-days"></i> Calendrier
         </button></li>
         <li><button type="button" class="nav-btn" data-view="albums">
           <i class="fa-solid fa-images"></i> Albums Photo
         </button></li>
         <li><button type="button" class="nav-btn" data-view="videos">
           <i class="fa-solid fa-video"></i> Galerie Vidéo
+        </button></li>
+        <li><button type="button" class="nav-btn" data-view="documents">
+          <i class="fa-solid fa-file-lines"></i> Documents
+        </button></li>
+        <li><button type="button" class="nav-btn" data-view="links">
+          <i class="fa-solid fa-link"></i> Liens Utiles
+        </button></li>
+        <li><button type="button" class="nav-btn" data-view="sponsors">
+          <i class="fa-solid fa-handshake"></i> Sponsors
         </button></li>
         <li><button type="button" class="nav-btn" data-view="birthdays">
           <i class="fa-solid fa-cake-candles"></i> Anniversaires
@@ -110,6 +110,9 @@
         </button></li>
         <li><button type="button" class="nav-btn" data-view="sitecontent">
           <i class="fa-solid fa-file-pen"></i> Contenu du site
+        </button></li>
+        <li><button type="button" class="nav-btn" data-view="navigation">
+          <i class="fa-solid fa-bars"></i> Ordre des Pages
         </button></li>
         <li><button type="button" class="nav-btn" data-view="media">
           <i class="fa-solid fa-photo-film"></i> Médiathèque
@@ -191,14 +194,6 @@
                 entraînements, calendrier, règlement intérieur).
               </span>
             </div>
-
-            <div class="form-group">
-              <label for="settingsCalendarUrl">Lien de l'embed du calendrier Google</label>
-              <textarea id="settingsCalendarUrl" rows="3" placeholder="https://calendar.google.com/calendar/embed?..." required></textarea>
-              <span class="form-hint">
-                Utilisé sur la page "Calendrier". Colle ici l'URL complète du champ "src" fournie par Google Agenda
-                (menu Paramètres → Intégrer l'agenda).
-              </span>
             </div>
 
             <button type="submit" class="btn btn-primary" id="settingsSaveBtn">
@@ -787,6 +782,85 @@
         </div>
       </section>
 
+      <section class="admin-view" id="view-calendar">
+        <div class="view-header">
+          <h1>Calendrier</h1>
+          <p>Crée les événements du club (matchs, entraînements, tournois, réunions...). Ils apparaissent sur la page Calendrier du site et dans "Événements à venir" sur l'accueil.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-pen"></i> <span id="eventFormTitle">Ajouter un événement</span></h2>
+          <form id="eventForm">
+            <input type="hidden" id="eventId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="eventTitle">Titre</label>
+                <input type="text" id="eventTitle" placeholder="Tournoi interne, Réunion de rentrée..." required>
+              </div>
+              <div class="form-group">
+                <label for="eventCategory">Catégorie</label>
+                <select id="eventCategory">
+                  <option value="match">Match</option>
+                  <option value="entrainement">Entraînement</option>
+                  <option value="tournoi">Tournoi</option>
+                  <option value="reunion">Réunion</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="eventDate">Date</label>
+                <input type="date" id="eventDate" required>
+              </div>
+              <div class="form-group">
+                <label for="eventEndDate">Date de fin (facultatif, si plusieurs jours)</label>
+                <input type="date" id="eventEndDate">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="eventStartTime">Heure de début (facultatif)</label>
+                <input type="time" id="eventStartTime">
+              </div>
+              <div class="form-group">
+                <label for="eventEndTime">Heure de fin (facultatif)</label>
+                <input type="time" id="eventEndTime">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="eventLocation">Lieu (facultatif)</label>
+              <input type="text" id="eventLocation" placeholder="Palais Omnisports de Thiais">
+            </div>
+
+            <div class="form-group">
+              <label for="eventDescription">Description (facultatif)</label>
+              <textarea id="eventDescription" rows="3" placeholder="Détails, équipes engagées, informations pratiques..."></textarea>
+            </div>
+
+            <div style="display:flex; gap:0.7rem; align-items:center;">
+              <button type="submit" class="btn btn-primary" id="eventSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> <span id="eventSaveLabel">Ajouter l'événement</span>
+              </button>
+              <button type="button" class="btn btn-ghost hidden" id="eventCancelBtn">Annuler</button>
+            </div>
+
+            <div class="status-msg" id="eventStatus"></div>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Événements</h2>
+          <div id="eventsList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+      </section>
+
       <section class="admin-view" id="view-albums">
         <div class="view-header">
           <h1>Albums Photo</h1>
@@ -1287,6 +1361,13 @@
   </div>
 
   <!-- Sélecteur de médiathèque (insertion depuis un éditeur) -->
+  <!-- Indicateur instantané pour toute action qui vérifie des choses en tâche de fond
+       avant d'afficher une confirmation (ex : suppression) — évite l'impression que
+       le clic n'a rien fait pendant que ça travaille en silence. -->
+  <div class="quick-loading-toast hidden" id="quickLoadingToast">
+    <i class="fa-solid fa-spinner fa-spin"></i> <span id="quickLoadingToastText"></span>
+  </div>
+
   <div class="modal-overlay hidden" id="mediaPickerOverlay">
     <div class="modal-box" style="max-width:640px;">
       <h3>Insérer depuis la médiathèque</h3>

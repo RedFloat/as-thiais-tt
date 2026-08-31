@@ -343,14 +343,6 @@
     });
   }
 
-  /* ---------- Embed calendrier ---------- */
-
-  function applyCalendarEmbed(config) {
-    const iframe = document.getElementById('calendarEmbed');
-    if (!iframe || !config || !config.calendarEmbedUrl) return;
-    iframe.src = config.calendarEmbedUrl;
-  }
-
   /* ---------- Équipes / matchs ---------- */
 
   function formatDateFR(isoDate) {
@@ -938,6 +930,303 @@
     renderAlbumProfile(album);
   }
 
+  /* ---------- Calendrier des événements (page calendrier.html + widget accueil) ---------- */
+
+  const EVENT_CATEGORIES = {
+    match: { label: 'Match', color: '#2563eb' },
+    entrainement: { label: 'Entraînement', color: '#16a34a' },
+    tournoi: { label: 'Tournoi', color: '#d97706' },
+    reunion: { label: 'Réunion', color: '#9333ea' },
+    autre: { label: 'Autre', color: '#64748b' }
+  };
+
+  const MONTH_NAMES = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const WEEKDAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+  function dateToStr(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function strToDate(s) {
+    const [y, m, d] = s.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function addDays(d, n) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  }
+
+  function getMondayOfWeek(d) {
+    const day = (d.getDay() + 6) % 7; // 0 = lundi
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() - day);
+  }
+
+  function getMonthGridDates(year, month) {
+    const firstOfMonth = new Date(year, month, 1);
+    const startWeekday = (firstOfMonth.getDay() + 6) % 7;
+    const gridStart = new Date(year, month, 1 - startWeekday);
+    const dates = [];
+    for (let i = 0; i < 42; i++) {
+      dates.push(new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i));
+    }
+    return dates;
+  }
+
+  function eventsForDate(events, dateStr) {
+    return events.filter((e) => dateStr >= e.date && dateStr <= (e.endDate || e.date));
+  }
+
+  function eventCat(ev) {
+    return EVENT_CATEGORIES[ev.category] || EVENT_CATEGORIES.autre;
+  }
+
+  async function initEventCalendar() {
+    const root = document.getElementById('eventCalendar');
+    if (!root) return;
+
+    const data = await loadJSON('./data/events.json');
+    const events = (data && Array.isArray(data.events)) ? data.events : [];
+
+    const state = { view: 'month', currentDate: new Date(), selectedDateStr: null, events };
+
+    renderCalLegend();
+    renderCalendar(state);
+
+    document.getElementById('calPrevBtn').addEventListener('click', () => {
+      state.currentDate = state.view === 'month'
+        ? new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() - 1, 1)
+        : addDays(state.currentDate, -7);
+      renderCalendar(state);
+    });
+
+    document.getElementById('calNextBtn').addEventListener('click', () => {
+      state.currentDate = state.view === 'month'
+        ? new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() + 1, 1)
+        : addDays(state.currentDate, 7);
+      renderCalendar(state);
+    });
+
+    document.getElementById('calTodayBtn').addEventListener('click', () => {
+      state.currentDate = new Date();
+      state.selectedDateStr = dateToStr(new Date());
+      renderCalendar(state);
+      if (state.view === 'month') renderCalDayPanel(state, state.selectedDateStr);
+    });
+
+    document.querySelectorAll('.event-calendar-view-switch button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.view = btn.dataset.calView;
+        document.querySelectorAll('.event-calendar-view-switch button').forEach((b) => b.classList.toggle('is-active', b === btn));
+        document.getElementById('calMonthView').classList.toggle('hidden', state.view !== 'month');
+        document.getElementById('calWeekView').classList.toggle('hidden', state.view !== 'week');
+        document.getElementById('calDayPanel').classList.add('hidden');
+        renderCalendar(state);
+      });
+    });
+  }
+
+  function renderCalLegend() {
+    const legend = document.getElementById('calLegend');
+    if (!legend) return;
+    legend.innerHTML = Object.values(EVENT_CATEGORIES).map((c) =>
+      `<span><span class="legend-dot" style="background:${c.color};"></span>${c.label}</span>`
+    ).join('');
+  }
+
+  function renderCalendar(state) {
+    const label = document.getElementById('calCurrentLabel');
+    if (state.view === 'month') {
+      label.textContent = MONTH_NAMES[state.currentDate.getMonth()] + ' ' + state.currentDate.getFullYear();
+      renderCalMonthView(state);
+    } else {
+      const monday = getMondayOfWeek(state.currentDate);
+      const sunday = addDays(monday, 6);
+      label.textContent = monday.getDate() + ' ' + MONTH_NAMES[monday.getMonth()].slice(0, 3) + ' – ' +
+        sunday.getDate() + ' ' + MONTH_NAMES[sunday.getMonth()].slice(0, 3);
+      renderCalWeekView(state);
+    }
+  }
+
+  function renderCalMonthView(state) {
+    const container = document.getElementById('calMonthView');
+    container.innerHTML = '';
+
+    WEEKDAY_LABELS.forEach((w) => {
+      const el = document.createElement('div');
+      el.className = 'cal-weekday-label';
+      el.textContent = w;
+      container.appendChild(el);
+    });
+
+    const year = state.currentDate.getFullYear();
+    const month = state.currentDate.getMonth();
+    const dates = getMonthGridDates(year, month);
+    const todayStr = dateToStr(new Date());
+
+    if (state.events.length === 0 && dates.every((d) => eventsForDate(state.events, dateToStr(d)).length === 0)) {
+      // Grille quand même affichée (vide) : pas de message bloquant, juste un calendrier sans points
+    }
+
+    dates.forEach((d) => {
+      const dStr = dateToStr(d);
+      const dayEvents = eventsForDate(state.events, dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+
+      const cell = document.createElement('div');
+      cell.className = 'cal-day-cell';
+      if (d.getMonth() !== month) cell.classList.add('is-outside');
+      if (dStr === todayStr) cell.classList.add('is-today');
+      if (dStr === state.selectedDateStr) cell.classList.add('is-selected');
+
+      const num = document.createElement('div');
+      num.className = 'cal-day-number';
+      num.textContent = d.getDate();
+      cell.appendChild(num);
+
+      if (dayEvents.length > 0) {
+        const dotsWrap = document.createElement('div');
+        dotsWrap.className = 'cal-day-dots';
+        dayEvents.slice(0, 4).forEach((ev) => {
+          const dot = document.createElement('span');
+          dot.className = 'cal-day-dot';
+          dot.style.background = eventCat(ev).color;
+          dotsWrap.appendChild(dot);
+        });
+        cell.appendChild(dotsWrap);
+
+        dayEvents.slice(0, 2).forEach((ev) => {
+          const pill = document.createElement('div');
+          pill.className = 'cal-day-pill';
+          pill.style.background = eventCat(ev).color;
+          pill.textContent = ev.title;
+          cell.appendChild(pill);
+        });
+        if (dayEvents.length > 2) {
+          const more = document.createElement('div');
+          more.className = 'cal-day-more';
+          more.textContent = '+' + (dayEvents.length - 2);
+          cell.appendChild(more);
+        }
+      }
+
+      cell.addEventListener('click', () => {
+        state.selectedDateStr = dStr;
+        renderCalMonthView(state);
+        renderCalDayPanel(state, dStr);
+      });
+
+      container.appendChild(cell);
+    });
+  }
+
+  function renderCalDayPanel(state, dStr) {
+    const panel = document.getElementById('calDayPanel');
+    const dayEvents = eventsForDate(state.events, dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+    const d = strToDate(dStr);
+    const label = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    if (dayEvents.length === 0) {
+      panel.innerHTML = `<h3>${label}</h3><p class="cal-empty-msg" style="padding:0.5rem 0;">Aucun événement ce jour-là.</p>`;
+    } else {
+      panel.innerHTML = `<h3>${label}</h3>` + dayEvents.map((ev) => {
+        const cat = eventCat(ev);
+        const time = ev.startTime ? ev.startTime + (ev.endTime ? '–' + ev.endTime : '') : '';
+        return `<div class="cal-panel-event">
+          <span class="cal-panel-event-dot" style="background:${cat.color};"></span>
+          <div>
+            <div class="cal-panel-event-title">${ev.title}</div>
+            <div class="cal-panel-event-meta">${cat.label}${time ? ' · ' + time : ''}${ev.location ? ' · ' + ev.location : ''}</div>
+            ${ev.description ? `<div class="cal-panel-event-desc">${ev.description}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+    panel.classList.remove('hidden');
+  }
+
+  function renderCalWeekView(state) {
+    const container = document.getElementById('calWeekView');
+    container.innerHTML = '';
+    const monday = getMondayOfWeek(state.currentDate);
+    const todayStr = dateToStr(new Date());
+
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(monday, i);
+      const dStr = dateToStr(d);
+      const dayEvents = eventsForDate(state.events, dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+
+      const col = document.createElement('div');
+      col.className = 'cal-week-day';
+      if (dStr === todayStr) col.classList.add('is-today');
+
+      const header = document.createElement('div');
+      header.className = 'cal-week-day-header';
+      header.textContent = WEEKDAY_LABELS[i] + ' ' + d.getDate();
+      col.appendChild(header);
+
+      if (dayEvents.length === 0) {
+        const empty = document.createElement('p');
+        empty.style.cssText = 'font-size:0.72rem; color:var(--color-text-muted); text-align:center;';
+        empty.textContent = '—';
+        col.appendChild(empty);
+      } else {
+        dayEvents.forEach((ev) => {
+          const cat = eventCat(ev);
+          const evEl = document.createElement('div');
+          evEl.className = 'cal-week-event';
+          evEl.style.borderLeftColor = cat.color;
+          const time = ev.startTime ? ev.startTime + (ev.endTime ? '–' + ev.endTime : '') : '';
+          evEl.innerHTML = `<strong>${ev.title}</strong><span>${time ? time + ' · ' : ''}${cat.label}</span>`;
+          col.appendChild(evEl);
+        });
+      }
+
+      container.appendChild(col);
+    }
+  }
+
+  /* --- Widget "Événements à venir" (page d'accueil) --- */
+
+  async function initUpcomingEventsWidget() {
+    const widget = document.getElementById('upcomingEventsWidget');
+    const container = document.getElementById('upcomingEventsList');
+    if (!widget || !container) return;
+
+    const data = await loadJSON('./data/events.json');
+    const events = (data && Array.isArray(data.events)) ? data.events : [];
+    const todayStr = dateToStr(new Date());
+
+    const upcoming = events
+      .filter((e) => (e.endDate || e.date) >= todayStr)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 4);
+
+    if (upcoming.length === 0) {
+      widget.classList.add('hidden');
+      return;
+    }
+
+    container.innerHTML = upcoming.map((ev) => {
+      const cat = eventCat(ev);
+      const d = strToDate(ev.date);
+      const time = ev.startTime ? ev.startTime + (ev.endTime ? '–' + ev.endTime : '') : '';
+      return `<li>
+        <a href="./calendrier.html" style="display:flex; gap:0.8rem; align-items:center; text-decoration:none; color:inherit; width:100%;">
+          <div class="event-date-badge" style="background:${cat.color};">
+            <div class="day">${d.getDate()}</div>
+            <div class="month">${MONTH_NAMES[d.getMonth()].slice(0, 3)}</div>
+          </div>
+          <div>
+            <strong>${ev.title}</strong>
+            <div style="font-size:0.8rem; color:var(--color-text-muted);">${cat.label}${time ? ' · ' + time : ''}${ev.location ? ' · ' + ev.location : ''}</div>
+          </div>
+        </a>
+      </li>`;
+    }).join('');
+  }
+
   /* ---------- Contenu éditable des pages du site (le_club, entrainements...) ---------- */
 
   async function initStaticPageContent() {
@@ -1464,7 +1753,6 @@
     ]);
 
     applySeason(config);
-    applyCalendarEmbed(config);
     applyLogo(config);
     applySocialLinks(config);
     buildNavigation(nav);
@@ -1479,6 +1767,8 @@
     initSponsorProfilePage();
     initCustomPage();
     initStaticPageContent();
+    initEventCalendar();
+    initUpcomingEventsWidget();
     initSponsorsFooterReminder();
     initAlbumsListPage();
     initAlbumProfilePage();

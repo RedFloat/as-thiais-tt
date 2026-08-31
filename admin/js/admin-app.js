@@ -135,12 +135,23 @@
 
   // Demande confirmation avant une suppression, en prévenant si le fichier/lien est
   // utilisé ailleurs sur le site. excludePath ignore le fichier de données en cours d'édition.
+  function showQuickLoading(message) {
+    document.getElementById('quickLoadingToastText').textContent = message;
+    document.getElementById('quickLoadingToast').classList.remove('hidden');
+  }
+
+  function hideQuickLoading() {
+    document.getElementById('quickLoadingToast').classList.add('hidden');
+  }
+
   async function confirmDeleteWithUsageCheck(value, excludePath, itemLabel) {
     let usages = [];
     if (value && isInternalPath(value)) {
+      showQuickLoading('Vérification des usages sur le site…');
       try {
         usages = await scanSiteForUsages(value, excludePath);
       } catch (err) { /* le scan a échoué : on continue sans bloquer la suppression */ }
+      hideQuickLoading();
     }
 
     if (usages.length === 0) {
@@ -521,6 +532,7 @@
       if (btn.dataset.view === 'pages') loadPagesView();
       if (btn.dataset.view === 'sitecontent') loadStaticContentView();
       if (btn.dataset.view === 'media') loadMediaView();
+      if (btn.dataset.view === 'calendar') loadEventsView();
     });
   });
 
@@ -858,7 +870,6 @@
     try {
       const config = await readFile('data/site-config.json');
       document.getElementById('settingsSeason').value = config.season || '';
-      document.getElementById('settingsCalendarUrl').value = config.calendarEmbedUrl || '';
       document.getElementById('settingsFacebook').value = config.facebookUrl || '';
       document.getElementById('settingsInstagram').value = config.instagramUrl || '';
       currentLogoPath = config.logoUrl || '';
@@ -924,14 +935,13 @@
       if (!fileState[path]) await readFile(path);
       const current = fileState[path].json;
       const updated = Object.assign({}, current, {
-        season: document.getElementById('settingsSeason').value.trim(),
-        calendarEmbedUrl: document.getElementById('settingsCalendarUrl').value.trim()
+        season: document.getElementById('settingsSeason').value.trim()
       });
 
       const sha = fileState[path] ? fileState[path].sha : undefined;
       const result = await GitHubAPI.saveJSON(
         cfg, path, updated, sha,
-        'Admin : mise à jour des réglages globaux (saison / calendrier)'
+        'Admin : mise à jour des réglages globaux (saison)'
       );
 
       fileState[path] = { json: updated, sha: result.content.sha };
@@ -2801,10 +2811,12 @@
 
       let imagesToDelete = [];
       if (itemToDelete) {
+        showQuickLoading('Vérification des images de la news…');
         for (const imgPath of collectNewsImagePaths(itemToDelete)) {
           const usages = await scanSiteForUsages('./' + imgPath, NEWS_PATH).catch(() => []);
           if (usages.length === 0) imagesToDelete.push(imgPath);
         }
+        hideQuickLoading();
       }
 
       let confirmDeleteImages = false;
@@ -4286,10 +4298,12 @@ ${items}
       // Détermine à l'avance les images concernées, pour demander une confirmation dédiée
       let imagesToDelete = [];
       if (pageToDelete) {
+        showQuickLoading('Vérification des images de la page…');
         for (const imgPath of collectPageImagePaths(pageToDelete)) {
           const usages = await scanSiteForUsages('./' + imgPath, PAGES_PATH).catch(() => []);
           if (usages.length === 0) imagesToDelete.push(imgPath);
         }
+        hideQuickLoading();
       }
 
       let confirmDeleteImages = false;
@@ -5227,6 +5241,182 @@ ${items}
 
   setupMediaLibraryInsertButton('pageMediaLibraryBtn', pageRichtextEditor);
   setupMediaLibraryInsertButton('staticPageMediaLibraryBtn', staticPageRichtextEditor);
+
+  /* ---------- Calendrier ---------- */
+
+  const EVENTS_PATH = 'data/events.json';
+
+  const EVENT_CATEGORIES = {
+    match: { label: 'Match', color: '#2563eb' },
+    entrainement: { label: 'Entraînement', color: '#16a34a' },
+    tournoi: { label: 'Tournoi', color: '#d97706' },
+    reunion: { label: 'Réunion', color: '#9333ea' },
+    autre: { label: 'Autre', color: '#64748b' }
+  };
+
+  const eventForm = document.getElementById('eventForm');
+  const eventStatus = document.getElementById('eventStatus');
+  const eventsList = document.getElementById('eventsList');
+  const eventCancelBtn = document.getElementById('eventCancelBtn');
+  const eventSaveLabel = document.getElementById('eventSaveLabel');
+
+  let currentEventsList = [];
+
+  async function loadEventsView() {
+    eventsList.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(EVENTS_PATH);
+      currentEventsList = data.events || [];
+      renderEventsList(currentEventsList);
+    } catch (err) {
+      eventsList.innerHTML = '';
+      eventsList.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les événements', [err.message]));
+    }
+  }
+
+  function renderEventsList(events) {
+    eventsList.innerHTML = '';
+    if (events.length === 0) {
+      eventsList.innerHTML = '<p class="empty-list-msg">Aucun événement pour le moment.</p>';
+      return;
+    }
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const sorted = events.slice().sort((a, b) => a.date.localeCompare(b.date));
+    const upcoming = sorted.filter((e) => (e.endDate || e.date) >= todayStr);
+    const past = sorted.filter((e) => (e.endDate || e.date) < todayStr).reverse();
+
+    const renderGroup = (label, list) => {
+      if (list.length === 0) return;
+      const title = document.createElement('div');
+      title.className = 'admin-list-category-title';
+      title.textContent = `${label} (${list.length})`;
+      eventsList.appendChild(title);
+      list.forEach((ev) => eventsList.appendChild(buildEventRow(ev)));
+    };
+
+    renderGroup('À venir', upcoming);
+    renderGroup('Passés', past);
+  }
+
+  function buildEventRow(ev) {
+    const cat = EVENT_CATEGORIES[ev.category] || EVENT_CATEGORIES.autre;
+    const dateLabel = ev.date.split('-').reverse().join('/') + (ev.endDate && ev.endDate !== ev.date ? ' → ' + ev.endDate.split('-').reverse().join('/') : '');
+    const timeLabel = ev.startTime ? ` · ${ev.startTime}${ev.endTime ? '–' + ev.endTime : ''}` : '';
+
+    const row = document.createElement('div');
+    row.className = 'admin-list-item';
+    row.innerHTML = `
+      <div class="admin-list-thumb" style="background:${cat.color}22;"><i class="fa-solid fa-calendar-day" style="color:${cat.color};"></i></div>
+      <div class="admin-list-info">
+        <strong>${ev.title} <span style="font-weight:400; font-size:0.76rem; color:${cat.color};">${cat.label}</span></strong>
+        <span>${dateLabel}${timeLabel}${ev.location ? ' · ' + ev.location : ''}</span>
+      </div>
+      <div class="admin-list-actions">
+        <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+        <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    `;
+    row.querySelector('.edit-btn').addEventListener('click', () => startEditEvent(ev));
+    row.querySelector('.delete-btn').addEventListener('click', () => deleteEvent(ev.id, ev.title));
+    return row;
+  }
+
+  function startEditEvent(ev) {
+    document.getElementById('eventId').value = ev.id;
+    document.getElementById('eventTitle').value = ev.title || '';
+    document.getElementById('eventCategory').value = ev.category || 'autre';
+    document.getElementById('eventDate').value = ev.date || '';
+    document.getElementById('eventEndDate').value = ev.endDate || '';
+    document.getElementById('eventStartTime').value = ev.startTime || '';
+    document.getElementById('eventEndTime').value = ev.endTime || '';
+    document.getElementById('eventLocation').value = ev.location || '';
+    document.getElementById('eventDescription').value = ev.description || '';
+    eventSaveLabel.textContent = 'Enregistrer les modifications';
+    eventCancelBtn.classList.remove('hidden');
+    document.getElementById('eventFormTitle').textContent = 'Modifier l\'événement';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetEventForm() {
+    eventForm.reset();
+    document.getElementById('eventId').value = '';
+    eventSaveLabel.textContent = 'Ajouter l\'événement';
+    eventCancelBtn.classList.add('hidden');
+    document.getElementById('eventFormTitle').textContent = 'Ajouter un événement';
+  }
+
+  eventCancelBtn.addEventListener('click', resetEventForm);
+
+  eventForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('eventSaveBtn');
+    saveBtn.disabled = true;
+    setStatus(eventStatus, 'loading', 'Enregistrement en cours…');
+
+    try {
+      if (!fileState[EVENTS_PATH]) await readFile(EVENTS_PATH);
+      const events = fileState[EVENTS_PATH].json.events.slice();
+
+      const editingId = document.getElementById('eventId').value;
+      const id = editingId || ('event-' + Date.now());
+
+      const eventData = {
+        id,
+        title: document.getElementById('eventTitle').value.trim(),
+        category: document.getElementById('eventCategory').value,
+        date: document.getElementById('eventDate').value,
+        endDate: document.getElementById('eventEndDate').value || null,
+        startTime: document.getElementById('eventStartTime').value || null,
+        endTime: document.getElementById('eventEndTime').value || null,
+        location: document.getElementById('eventLocation').value.trim(),
+        description: document.getElementById('eventDescription').value.trim()
+      };
+
+      if (eventData.endDate && eventData.endDate < eventData.date) {
+        throw new Error('La date de fin ne peut pas être avant la date de début.');
+      }
+
+      let updatedEvents;
+      if (editingId) {
+        updatedEvents = events.map((ev) => ev.id === editingId ? eventData : ev);
+      } else {
+        updatedEvents = events.concat(eventData);
+      }
+
+      const updated = { events: updatedEvents };
+      const sha = fileState[EVENTS_PATH].sha;
+      const result = await GitHubAPI.saveJSON(
+        cfg, EVENTS_PATH, updated, sha, editingId ? `Admin : modification de l'événement "${eventData.title}"` : `Admin : ajout de l'événement "${eventData.title}"`
+      );
+      fileState[EVENTS_PATH] = { json: updated, sha: result.content.sha };
+      currentEventsList = updatedEvents;
+
+      renderEventsList(updatedEvents);
+      resetEventForm();
+      setStatus(eventStatus, 'success', 'Événement enregistré !');
+    } catch (err) {
+      setStatus(eventStatus, 'error', 'Erreur : ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  async function deleteEvent(id, title) {
+    if (!(await showConfirmModal(`Supprimer l'événement "${title}" ? Cette action est immédiate.`))) return;
+
+    try {
+      if (!fileState[EVENTS_PATH]) await readFile(EVENTS_PATH);
+      const updatedEvents = fileState[EVENTS_PATH].json.events.filter((ev) => ev.id !== id);
+      const updated = { events: updatedEvents };
+      const result = await GitHubAPI.saveJSON(cfg, EVENTS_PATH, updated, fileState[EVENTS_PATH].sha, `Admin : suppression de l'événement "${title}"`);
+      fileState[EVENTS_PATH] = { json: updated, sha: result.content.sha };
+      currentEventsList = updatedEvents;
+      renderEventsList(updatedEvents);
+    } catch (err) {
+      alert('Erreur lors de la suppression : ' + err.message);
+    }
+  }
 
   /* ---------- Démarrage ---------- */
 

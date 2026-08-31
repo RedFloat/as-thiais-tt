@@ -667,6 +667,22 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   margin-left: 2.1rem;
 }
 
+.quick-loading-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--color-navy);
+  color: var(--color-white);
+  padding: 0.75rem 1.3rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-hover);
+  font-size: 0.85rem;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .media-picker-card {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
