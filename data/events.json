@@ -1,3 +1,15 @@
 {
-  "events": []
+  "events": [
+    {
+      "id": "event-1788192907053",
+      "title": "Reprise des entraînements",
+      "category": "entrainement",
+      "date": "2026-09-07",
+      "endDate": null,
+      "startTime": null,
+      "endTime": null,
+      "location": "Palais Omnisport de Thiais",
+      "description": "Référez vous au planning des entraînements, accessible sur le site internet"
+    }
+  ]
 }
