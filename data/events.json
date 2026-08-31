@@ -10,6 +10,17 @@
       "endTime": null,
       "location": "Palais Omnisport de Thiais",
       "description": "Référez vous au planning des entraînements, accessible sur le site internet"
+    },
+    {
+      "id": "event-1788193113704",
+      "title": "Forum des activités Thiaisiennes",
+      "category": "autre",
+      "date": "2026-09-05",
+      "endDate": null,
+      "startTime": "10:00",
+      "endTime": "17:00",
+      "location": "",
+      "description": "Plus d'informations ici : https://www.ville-thiais.fr/evenement/forum-des-activites-thiaisiennes-2026/"
     }
   ]
 }
