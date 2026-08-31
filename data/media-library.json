@@ -88,6 +88,26 @@
       "folder": "docs",
       "uploadedDate": "2026-08-28",
       "showInDocuments": false
+    },
+    {
+      "id": "media-1788195666859-0e97",
+      "filename": "news-3-cover.jpg",
+      "path": "./imgs/news/news-3-cover.jpg",
+      "type": "image",
+      "title": "Lucian et Denis, champions du monde Vétérans (couverture)",
+      "folder": "News",
+      "uploadedDate": "2026-08-31",
+      "showInDocuments": false
+    },
+    {
+      "id": "media-1788195963590-pbfg",
+      "filename": "news-4-cover.jpg",
+      "path": "./imgs/news/news-4-cover.jpg",
+      "type": "image",
+      "title": "Résultats des championnats de France (couverture)",
+      "folder": "News",
+      "uploadedDate": "2026-08-31",
+      "showInDocuments": false
     }
   ]
 }
