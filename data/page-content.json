@@ -24,6 +24,11 @@
       "label": "Calendrier (texte d'intro uniquement)",
       "file": "calendrier.html",
       "body": "<p>\n            Vous souhaitez consulter ou conserver le planning complet hors-ligne ? Téléchargez dès maintenant le calendrier officiel de la saison :\n          </p>\n          <div>\n            <a href=\"/public/9075/upload/files/2025-2026%20-%20Calendrier%20des%20manifestations1.pdf\" target=\"_blank\" class=\"btn-download\">\n              <i class=\"fa-solid fa-file-arrow-down\"></i> Télécharger le calendrier officiel (PDF)\n            </a>\n          </div>\n          <p>\n            Pour toute question relative aux rencontres ou aux convocations, rapprochez-vous de votre entraîneur ou écrivez-nous directement via la rubrique <a href=\"#contact\">Contact</a>.\n          </p>\n"
+    },
+    "contact": {
+      "label": "Contact et Plan",
+      "file": "contact.html",
+      "body": "<h2>AS Thiais Tennis de Table</h2>\n<p><strong>Palais Omnisports de Thiais</strong><br>Place Vincent Van Gogh<br>94320 Thiais</p>\n<p>Parking de plus de 100 places.</p>\n<ul class=\"contact-board-list\">\n  <li><strong>Président :</strong> Pierre Mathieu Germain — <a href=\"mailto:germain.pierremathieu@gmail.com\">germain.pierremathieu@gmail.com</a> — 06 66 48 25 24</li>\n  <li><strong>Vice-Président :</strong> Philippe Lewi — <a href=\"mailto:philippe.lewi@sfr.fr\">philippe.lewi@sfr.fr</a> — 06 81 61 21 24</li>\n  <li><strong>Trésorier :</strong> Emmanuel Montreuil — <a href=\"mailto:montreuil.emmanuel@orange.fr\">montreuil.emmanuel@orange.fr</a> — 06 83 96 40 67</li>\n  <li><strong>Secrétaire :</strong> Fabrice Couturas — <a href=\"mailto:fabcou@neuf.fr\">fabcou@neuf.fr</a> — 06 82 01 05 69</li>\n</ul>\n"
     }
   }
 }

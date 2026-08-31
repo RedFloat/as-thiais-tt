@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entraînements — AS Thiais Tennis de Table</title>
+  <title>Contact et Plan — AS Thiais Tennis de Table</title>
   
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Leaflet (carte du plan d'accès) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
   <style>
     /* ==========================================================================
@@ -1199,6 +1202,128 @@
       }
     }
 
+    /* ==========================================================================
+       CONTACT ET PLAN
+       ========================================================================== */
+
+    .contact-info-map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 900px) {
+      .contact-info-map-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .contact-info-block h2 {
+      color: var(--color-navy);
+      font-size: 1.6rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .contact-info-block p {
+      margin-bottom: 1rem;
+      color: var(--color-text-main);
+    }
+
+    .contact-board-list {
+      list-style: none;
+      margin: 1.2rem 0;
+      padding: 0;
+    }
+
+    .contact-board-list li {
+      padding: 0.7rem 0;
+      border-bottom: 1px dashed #e2e8f0;
+      font-size: 0.95rem;
+    }
+
+    .contact-board-list li:last-child { border-bottom: none; }
+
+    .contact-board-list a { color: var(--color-navy); font-weight: 600; }
+    .contact-board-list a:hover { color: var(--color-gold); }
+
+    .contact-map {
+      width: 100%;
+      height: 400px;
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(4, 74, 110, 0.08);
+    }
+
+    /* ---------- Formulaire de contact ---------- */
+
+    .contact-form-section {
+      background: var(--color-white);
+      border-radius: var(--radius-card);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(4, 74, 110, 0.08);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .contact-form-section h2 {
+      color: var(--color-navy);
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .contact-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 600px) {
+      .contact-form-row { grid-template-columns: 1fr; }
+    }
+
+    .form-field {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-field label {
+      display: block;
+      font-weight: 600;
+      color: var(--color-navy);
+      margin-bottom: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .form-field input,
+    .form-field textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus {
+      outline: none;
+      border-color: var(--color-gold);
+      box-shadow: 0 0 0 3px rgba(210, 169, 91, 0.15);
+    }
+
+    .contact-submit-btn {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      border: 1px solid rgba(210, 169, 91, 0.3);
+      cursor: pointer;
+      font-family: inherit;
+    }
+
     /* ---------- Rappel des partenaires (pied de page, ordinateur uniquement) ---------- */
     .sponsors-reminder-section {
       display: none;
@@ -1286,9 +1411,74 @@
     </div>
   </header>
 
-  <div id="staticPageBody" data-page-key="entrainements">
-    <p style="text-align:center; padding:3rem; color:var(--color-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
-  </div>
+  <!-- ==========================================
+     HERO CONTACT
+     ========================================== -->
+  <section class="page-hero">
+    <div class="container">
+      <span class="badge-gold">Nous contacter</span>
+      <h1>Contact et Plan</h1>
+      <p>Toutes les informations pour nous trouver, contacter le bureau du club, ou nous écrire directement.</p>
+    </div>
+  </section>
+
+  <!-- ==========================================
+     CONTENU PRINCIPAL : CONTACT ET PLAN
+     ========================================== -->
+  <main class="page-content">
+    <div class="container">
+
+      <div class="contact-info-map-grid">
+        <div class="contact-info-block">
+          <div id="staticPageBody" data-page-key="contact">
+            <p style="text-align:center; padding:3rem; color:var(--color-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+
+        <div class="contact-map-block">
+          <div id="contactMap" class="contact-map"></div>
+          <button type="button" class="btn-download" id="directionsBtn" style="width:100%; justify-content:center; margin-top:1rem;">
+            <i class="fa-solid fa-diamond-turn-right"></i> Ouvrir l'itinéraire
+          </button>
+        </div>
+      </div>
+
+      <div class="contact-form-section">
+        <h2>Formulaire de contact</h2>
+        <!-- Formulaire prêt pour Formspree : remplacer VOTRE_ID_FORMSPREE ci-dessous par l'identifiant du formulaire -->
+        <form id="contactForm" class="contact-form" action="https://formspree.io/f/VOTRE_ID_FORMSPREE" method="POST">
+          <div class="contact-form-row">
+            <div class="form-field">
+              <label for="contactNom">Nom *</label>
+              <input type="text" id="contactNom" name="nom" required>
+            </div>
+            <div class="form-field">
+              <label for="contactPrenom">Prénom *</label>
+              <input type="text" id="contactPrenom" name="prenom" required>
+            </div>
+          </div>
+          <div class="contact-form-row">
+            <div class="form-field">
+              <label for="contactEmail">Email *</label>
+              <input type="email" id="contactEmail" name="email" required>
+            </div>
+            <div class="form-field">
+              <label for="contactObjet">Objet *</label>
+              <input type="text" id="contactObjet" name="objet" required>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="contactMessage">Message *</label>
+            <textarea id="contactMessage" name="message" rows="6" required></textarea>
+          </div>
+          <button type="submit" class="btn-download contact-submit-btn">
+            <i class="fa-solid fa-paper-plane"></i> Envoyer
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </main>
 
   <section class="sponsors-reminder-section container">
     <p class="sponsors-reminder-title">Merci à nos partenaires, qui nous soutiennent dans nos projets :</p>
@@ -1343,7 +1533,39 @@
     </div>
   </footer>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="./js/site-data.js"></script>
+<script>
+    // ---------- Carte du plan d'accès + bouton itinéraire ----------
+    (function () {
+      const LAT = 48.769741967437604;
+      const LNG = 2.3880913830359005;
+
+      const mapEl = document.getElementById('contactMap');
+      if (mapEl && window.L) {
+        const map = L.map('contactMap').setView([LAT, LNG], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        L.marker([LAT, LNG]).addTo(map)
+          .bindPopup('<strong>Palais Omnisports de Thiais</strong><br>Place Vincent Van Gogh, 94320 Thiais')
+          .openPopup();
+      }
+
+      const directionsBtn = document.getElementById('directionsBtn');
+      if (directionsBtn) {
+        directionsBtn.addEventListener('click', () => {
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          const url = isIOS
+            ? `https://maps.apple.com/?daddr=${LAT},${LNG}`
+            : `https://www.google.com/maps/dir/?api=1&destination=${LAT},${LNG}`;
+          // Sur mobile (Android/iOS), ce lien ouvre directement l'application Plans/Maps installée.
+          // Sur ordinateur, il ouvre Google Maps dans un nouvel onglet.
+          window.open(url, '_blank');
+        });
+      }
+    })();
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
       // 0. Rotation du logo partenaire mis en avant (toutes les 3 secondes)

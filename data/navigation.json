@@ -1,32 +1,13 @@
 {
   "items": [
-    {
-      "id": "accueil",
-      "label": "Accueil",
-      "link": "./accueil.html",
-      "type": "link"
-    },
-    {
-      "id": "inscription",
-      "label": "Inscription",
-      "link": "./inscription.html",
-      "type": "link"
-    },
+    { "id": "accueil", "label": "Accueil", "link": "./accueil.html", "type": "link" },
+    { "id": "inscription", "label": "Inscription", "link": "./inscription.html", "type": "link" },
     {
       "id": "equipes",
       "label": "Équipes",
       "type": "dropdown",
       "children": [
-        {
-          "id": "equipe-1",
-          "label": "Équipe 1 - Masculine (N1)",
-          "link": "./equipe.html?id=equipe-1"
-        },
-        {
-          "id": "equipe-1f",
-          "label": "Equipe 1 - Féminine (PN)",
-          "link": "./equipe.html?id=equipe-1f"
-        }
+        { "id": "equipe-1", "label": "Équipe 1 (N3)", "link": "./equipe.html?id=equipe-1" }
       ]
     },
     {
@@ -34,26 +15,10 @@
       "label": "La vie du Club",
       "type": "dropdown",
       "children": [
-        {
-          "id": "news",
-          "label": "News",
-          "link": "./news.html"
-        },
-        {
-          "id": "evenements",
-          "label": "Événements",
-          "link": "#"
-        },
-        {
-          "id": "albums-photos",
-          "label": "Albums Photos",
-          "link": "./albums.html"
-        },
-        {
-          "id": "albums-videos",
-          "label": "Albums Vidéos",
-          "link": "./videos.html"
-        }
+        { "id": "news", "label": "News", "link": "./news.html" },
+        { "id": "evenements", "label": "Événements", "link": "#" },
+        { "id": "albums-photos", "label": "Albums Photos", "link": "./albums.html" },
+        { "id": "albums-videos", "label": "Albums Vidéos", "link": "./videos.html" }
       ]
     },
     {
@@ -61,48 +26,15 @@
       "label": "Infos pratiques",
       "type": "dropdown",
       "children": [
-        {
-          "id": "le-club",
-          "label": "Le club",
-          "link": "./le_club.html"
-        },
-        {
-          "id": "organigramme",
-          "label": "Organigramme",
-          "link": "#"
-        },
-        {
-          "id": "entrainements",
-          "label": "Entraînements",
-          "link": "./entrainements.html"
-        },
-        {
-          "id": "reglement",
-          "label": "Règlement intérieur",
-          "link": "./reglement_interieur.html"
-        },
-        {
-          "id": "calendrier",
-          "label": "Calendrier Sportif",
-          "link": "./calendrier.html"
-        },
-        {
-          "id": "liens-utiles",
-          "label": "Liens utiles",
-          "link": "./liens_utiles.html"
-        },
-        {
-          "id": "documents",
-          "label": "Documents",
-          "link": "./documents.html"
-        }
+        { "id": "le-club", "label": "Le club", "link": "./le_club.html" },
+        { "id": "organigramme", "label": "Organigramme", "link": "#" },
+        { "id": "entrainements", "label": "Entraînements", "link": "./entrainements.html" },
+        { "id": "reglement", "label": "Règlement intérieur", "link": "./reglement_interieur.html" },
+        { "id": "calendrier", "label": "Calendrier Sportif", "link": "./calendrier.html" },
+        { "id": "liens-utiles", "label": "Liens utiles", "link": "./liens_utiles.html" },
+        { "id": "documents", "label": "Documents", "link": "./documents.html" }
       ]
     },
-    {
-      "id": "contact",
-      "label": "Contact et plan",
-      "link": "#contact",
-      "type": "link"
-    }
+    { "id": "contact", "label": "Contact et plan", "link": "./contact.html", "type": "link" }
   ]
 }
