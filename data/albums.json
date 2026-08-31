@@ -1,3 +1,12 @@
 {
-  "albums": []
+  "albums": [
+    {
+      "id": "championnat-du-monde-veterans-2026",
+      "title": "Championnat du monde Vétérans 2026",
+      "date": "2026-06-13",
+      "season": "2025-2026",
+      "description": "",
+      "photos": []
+    }
+  ]
 }
