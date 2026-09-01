@@ -85,6 +85,11 @@
           "id": "documents",
           "label": "Documents",
           "link": "./documents.html"
+        },
+        {
+          "id": "organigramme",
+          "label": "Organigramme",
+          "link": "./organigramme/"
         }
       ]
     },
