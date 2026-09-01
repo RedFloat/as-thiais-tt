@@ -62,11 +62,6 @@
           "link": "./le_club.html"
         },
         {
-          "id": "organigramme",
-          "label": "Organigramme",
-          "link": "./organigramme/"
-        },
-        {
           "id": "entrainements",
           "label": "Entraînements",
           "link": "./entrainements.html"
@@ -90,6 +85,11 @@
           "id": "documents",
           "label": "Documents",
           "link": "./documents.html"
+        },
+        {
+          "id": "organigramme",
+          "label": "Organigramme",
+          "link": "./organigramme/"
         }
       ]
     },
