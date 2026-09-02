@@ -933,11 +933,9 @@
   /* ---------- Calendrier des événements (page calendrier.html + widget accueil) ---------- */
 
   const EVENT_CATEGORIES = {
-    match: { label: 'Match', color: '#2563eb' },
-    entrainement: { label: 'Entraînement', color: '#16a34a' },
-    tournoi: { label: 'Tournoi', color: '#d97706' },
-    reunion: { label: 'Réunion', color: '#9333ea' },
-    autre: { label: 'Autre', color: '#64748b' }
+    jeunes: { label: 'Jeunes', color: '#16a34a' },
+    adultes: { label: 'Adultes', color: '#2563eb' },
+    club: { label: 'Événements du club', color: '#d97706' }
   };
 
   const MONTH_NAMES = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -980,19 +978,55 @@
   }
 
   function eventCat(ev) {
-    return EVENT_CATEGORIES[ev.category] || EVENT_CATEGORIES.autre;
+    return EVENT_CATEGORIES[ev.category] || EVENT_CATEGORIES.club;
+  }
+
+  // Convertit les matchs saisis dans chaque équipe (Admin > Équipes & matchs) en
+  // événements du calendrier global, avec l'étiquette "Adultes" automatiquement.
+  function teamMatchesToEvents(teams) {
+    const events = [];
+    (teams || []).forEach((team) => {
+      (team.matches || []).forEach((m, i) => {
+        if (!m.date) return;
+        const scoreInfo = (m.status === 'played' && (m.result || m.score))
+          ? `Résultat : ${m.result ? m.result + ' ' : ''}${m.score ? '(' + m.score + ')' : ''}`.trim()
+          : '';
+        events.push({
+          id: `team-match-${team.id}-${m.date}-${i}`,
+          title: `${team.name} ${m.home ? 'reçoit' : 'se déplace à'} ${m.opponent || '?'}`,
+          category: 'adultes',
+          date: m.date,
+          endDate: null,
+          startTime: null,
+          endTime: null,
+          location: '',
+          description: scoreInfo
+        });
+      });
+    });
+    return events;
   }
 
   async function initEventCalendar() {
     const root = document.getElementById('eventCalendar');
     if (!root) return;
 
-    const data = await loadJSON('./data/events.json');
-    const events = (data && Array.isArray(data.events)) ? data.events : [];
+    const [data, teams] = await Promise.all([
+      loadJSON('./data/events.json'),
+      fetchAllTeams().catch(() => [])
+    ]);
+    const manualEvents = (data && Array.isArray(data.events)) ? data.events : [];
+    const events = manualEvents.concat(teamMatchesToEvents(teams));
 
-    const state = { view: 'month', currentDate: new Date(), selectedDateStr: null, events };
+    const state = {
+      view: 'month',
+      currentDate: new Date(),
+      selectedDateStr: null,
+      events,
+      activeCategories: new Set(Object.keys(EVENT_CATEGORIES))
+    };
 
-    renderCalLegend();
+    renderCalFilters(state);
     renderCalendar(state);
 
     document.getElementById('calPrevBtn').addEventListener('click', () => {
@@ -1028,12 +1062,28 @@
     });
   }
 
-  function renderCalLegend() {
-    const legend = document.getElementById('calLegend');
-    if (!legend) return;
-    legend.innerHTML = Object.values(EVENT_CATEGORIES).map((c) =>
-      `<span><span class="legend-dot" style="background:${c.color};"></span>${c.label}</span>`
-    ).join('');
+  function visibleEvents(state) {
+    return state.events.filter((e) => state.activeCategories.has(e.category));
+  }
+
+  function renderCalFilters(state) {
+    const container = document.getElementById('calLegend');
+    if (!container) return;
+    container.innerHTML = Object.entries(EVENT_CATEGORIES).map(([key, c]) => `
+      <label class="cal-filter-chip">
+        <input type="checkbox" value="${key}" checked>
+        <span class="legend-dot" style="background:${c.color};"></span>${c.label}
+      </label>
+    `).join('');
+
+    container.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+      input.addEventListener('change', () => {
+        if (input.checked) state.activeCategories.add(input.value);
+        else state.activeCategories.delete(input.value);
+        renderCalendar(state);
+        document.getElementById('calDayPanel').classList.add('hidden');
+      });
+    });
   }
 
   function renderCalendar(state) {
@@ -1065,14 +1115,11 @@
     const month = state.currentDate.getMonth();
     const dates = getMonthGridDates(year, month);
     const todayStr = dateToStr(new Date());
-
-    if (state.events.length === 0 && dates.every((d) => eventsForDate(state.events, dateToStr(d)).length === 0)) {
-      // Grille quand même affichée (vide) : pas de message bloquant, juste un calendrier sans points
-    }
+    const events = visibleEvents(state);
 
     dates.forEach((d) => {
       const dStr = dateToStr(d);
-      const dayEvents = eventsForDate(state.events, dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+      const dayEvents = eventsForDate(events, dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
       const cell = document.createElement('div');
       cell.className = 'cal-day-cell';
@@ -1115,6 +1162,9 @@
         state.selectedDateStr = dStr;
         renderCalMonthView(state);
         renderCalDayPanel(state, dStr);
+        // La page glisse toute seule jusqu'au détail du jour, sans action requise de l'utilisateur
+        const panel = document.getElementById('calDayPanel');
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
 
       container.appendChild(cell);
@@ -1123,7 +1173,7 @@
 
   function renderCalDayPanel(state, dStr) {
     const panel = document.getElementById('calDayPanel');
-    const dayEvents = eventsForDate(state.events, dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+    const dayEvents = eventsForDate(visibleEvents(state), dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
     const d = strToDate(dStr);
     const label = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 
@@ -1151,11 +1201,12 @@
     container.innerHTML = '';
     const monday = getMondayOfWeek(state.currentDate);
     const todayStr = dateToStr(new Date());
+    const events = visibleEvents(state);
 
     for (let i = 0; i < 7; i++) {
       const d = addDays(monday, i);
       const dStr = dateToStr(d);
-      const dayEvents = eventsForDate(state.events, dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+      const dayEvents = eventsForDate(events, dStr).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
       const col = document.createElement('div');
       col.className = 'cal-week-day';
@@ -1194,8 +1245,12 @@
     const container = document.getElementById('upcomingEventsList');
     if (!widget || !container) return;
 
-    const data = await loadJSON('./data/events.json');
-    const events = (data && Array.isArray(data.events)) ? data.events : [];
+    const [data, teams] = await Promise.all([
+      loadJSON('./data/events.json'),
+      fetchAllTeams().catch(() => [])
+    ]);
+    const manualEvents = (data && Array.isArray(data.events)) ? data.events : [];
+    const events = manualEvents.concat(teamMatchesToEvents(teams));
     const todayStr = dateToStr(new Date());
 
     const upcoming = events

@@ -527,16 +527,35 @@
     .event-calendar-legend {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.9rem;
+      gap: 0.6rem;
       margin-bottom: 1.2rem;
       font-size: 0.8rem;
       color: var(--color-text-muted);
     }
 
-    .event-calendar-legend span {
+    .cal-filter-chip {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 50px;
+      border: 1px solid #e2e8f0;
+      background: var(--color-white);
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .cal-filter-chip:hover { border-color: var(--color-gold); }
+
+    .cal-filter-chip input {
+      margin: 0;
+      accent-color: var(--color-navy);
+      cursor: pointer;
+    }
+
+    .cal-filter-chip:has(input:not(:checked)) {
+      opacity: 0.45;
     }
 
     .event-calendar-legend .legend-dot {
@@ -544,6 +563,7 @@
       height: 9px;
       border-radius: 50%;
       display: inline-block;
+      flex-shrink: 0;
     }
 
     /* --- Vue mois --- */
