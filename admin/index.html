@@ -108,9 +108,6 @@
         <li><button type="button" class="nav-btn" data-view="pages">
           <i class="fa-solid fa-file-circle-plus"></i> Pages
         </button></li>
-        <li><button type="button" class="nav-btn" data-view="sitecontent">
-          <i class="fa-solid fa-file-pen"></i> Contenu du site
-        </button></li>
         <li><button type="button" class="nav-btn" data-view="navigation">
           <i class="fa-solid fa-bars"></i> Ordre des Pages
         </button></li>
@@ -784,7 +781,10 @@
       <section class="admin-view" id="view-calendar">
         <div class="view-header">
           <h1>Calendrier</h1>
-          <p>Crée les événements du club (matchs, entraînements, tournois, réunions...). Ils apparaissent sur la page Calendrier du site et dans "Événements à venir" sur l'accueil.</p>
+          <p>Crée les événements du club (tournois, réunions, stages...). Ils apparaissent sur la page Calendrier du site et dans "Événements à venir" sur l'accueil.</p>
+          <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--color-text-muted);">
+            <i class="fa-solid fa-circle-info"></i> Les matchs saisis dans "Équipes & matchs" apparaissent automatiquement sur le calendrier (étiquette "Adultes") — inutile de les recréer ici.
+          </p>
         </div>
 
         <div class="admin-card">
@@ -800,11 +800,9 @@
               <div class="form-group">
                 <label for="eventCategory">Catégorie</label>
                 <select id="eventCategory">
-                  <option value="match">Match</option>
-                  <option value="entrainement">Entraînement</option>
-                  <option value="tournoi">Tournoi</option>
-                  <option value="reunion">Réunion</option>
-                  <option value="autre">Autre</option>
+                  <option value="jeunes">Jeunes</option>
+                  <option value="adultes">Adultes</option>
+                  <option value="club">Événements du club</option>
                 </select>
               </div>
             </div>
@@ -1059,11 +1057,11 @@
       <section class="admin-view" id="view-pages">
         <div class="view-header">
           <h1>Pages</h1>
-          <p>Crée et modifie des pages libres du site (mentions légales, partenariats, etc.). L'en-tête, le pied de page et la mise en forme générale restent identiques au reste du site — seul le contenu au centre est à toi.</p>
+          <p>Crée une page libre du site, ou modifie le contenu d'une page déjà construite (accueil, le club, entraînements...). L'en-tête, le pied de page et la mise en forme générale restent identiques au reste du site — seul le contenu au centre est à toi.</p>
         </div>
 
         <div class="admin-card">
-          <h2><i class="fa-solid fa-list"></i> Pages existantes</h2>
+          <h2><i class="fa-solid fa-list"></i> Pages personnalisées</h2>
           <button type="button" class="btn btn-primary" id="addPageBtn" style="margin-bottom:1rem;">
             <i class="fa-solid fa-plus"></i> Créer une page
           </button>
@@ -1179,16 +1177,12 @@
             <div class="status-msg" id="pageEditorStatus"></div>
           </form>
         </div>
-      </section>
-
-      <section class="admin-view" id="view-sitecontent">
-        <div class="view-header">
-          <h1>Contenu du site</h1>
-          <p>Modifie le contenu des pages déjà construites du site. L'en-tête, le pied de page et la mise en page générale restent identiques — seul le texte, les images et les liens à l'intérieur sont à toi.</p>
-        </div>
 
         <div class="admin-card">
           <h2><i class="fa-solid fa-list"></i> Pages du site</h2>
+          <p style="color:var(--color-text-muted); font-size:0.85rem; margin-bottom:1rem;">
+            Pages déjà construites (accueil, le club, entraînements...). L'en-tête, le pied de page et la mise en page générale restent identiques — seul le texte, les images et les liens à l'intérieur sont à toi.
+          </p>
           <div id="staticPagesList">
             <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
           </div>

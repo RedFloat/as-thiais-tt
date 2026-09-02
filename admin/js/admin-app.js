@@ -529,8 +529,7 @@
       if (btn.dataset.view === 'albums') loadAlbumsView();
       if (btn.dataset.view === 'videos') loadVideosView();
       if (btn.dataset.view === 'birthdays') loadBirthdaysView();
-      if (btn.dataset.view === 'pages') loadPagesView();
-      if (btn.dataset.view === 'sitecontent') loadStaticContentView();
+      if (btn.dataset.view === 'pages') { loadPagesView(); loadStaticContentView(); }
       if (btn.dataset.view === 'media') loadMediaView();
       if (btn.dataset.view === 'calendar') loadEventsView();
     });
@@ -5247,11 +5246,9 @@ ${items}
   const EVENTS_PATH = 'data/events.json';
 
   const EVENT_CATEGORIES = {
-    match: { label: 'Match', color: '#2563eb' },
-    entrainement: { label: 'Entraînement', color: '#16a34a' },
-    tournoi: { label: 'Tournoi', color: '#d97706' },
-    reunion: { label: 'Réunion', color: '#9333ea' },
-    autre: { label: 'Autre', color: '#64748b' }
+    jeunes: { label: 'Jeunes', color: '#16a34a' },
+    adultes: { label: 'Adultes', color: '#2563eb' },
+    club: { label: 'Événements du club', color: '#d97706' }
   };
 
   const eventForm = document.getElementById('eventForm');
@@ -5300,7 +5297,7 @@ ${items}
   }
 
   function buildEventRow(ev) {
-    const cat = EVENT_CATEGORIES[ev.category] || EVENT_CATEGORIES.autre;
+    const cat = EVENT_CATEGORIES[ev.category] || EVENT_CATEGORIES.club;
     const dateLabel = ev.date.split('-').reverse().join('/') + (ev.endDate && ev.endDate !== ev.date ? ' → ' + ev.endDate.split('-').reverse().join('/') : '');
     const timeLabel = ev.startTime ? ` · ${ev.startTime}${ev.endTime ? '–' + ev.endTime : ''}` : '';
 
