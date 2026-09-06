@@ -189,6 +189,27 @@
     }
   }
 
+  // Retire de la médiathèque toute entrée pointant vers l'un des chemins donnés (ex : quand
+  // les fichiers eux-mêmes viennent d'être supprimés en cascade, pour ne pas laisser d'entrées
+  // fantômes qui pointeraient vers un fichier qui n'existe plus).
+  async function unregisterMediaEntriesByPaths(paths) {
+    if (!paths || paths.length === 0) return;
+    try {
+      const normalized = new Set(paths.map((p) => (p.startsWith('./') ? p : './' + p)));
+      if (!fileState[MEDIA_LIBRARY_PATH]) await readFile(MEDIA_LIBRARY_PATH).catch(() => {});
+      const currentFiles = fileState[MEDIA_LIBRARY_PATH] ? fileState[MEDIA_LIBRARY_PATH].json.files : null;
+      if (!currentFiles) return;
+      const updatedFiles = currentFiles.filter((f) => !normalized.has(f.path));
+      if (updatedFiles.length === currentFiles.length) return;
+      const result = await GitHubAPI.saveJSON(
+        cfg, MEDIA_LIBRARY_PATH, { files: updatedFiles }, fileState[MEDIA_LIBRARY_PATH].sha, 'Admin : nettoyage de la médiathèque (fichiers supprimés en cascade)'
+      );
+      fileState[MEDIA_LIBRARY_PATH] = { json: { files: updatedFiles }, sha: result.content.sha };
+    } catch (err) {
+      console.warn('Impossible de nettoyer la médiathèque :', err.message);
+    }
+  }
+
   // Certains liens/images sont parfois collés en adresse complète (plutôt qu'en chemin relatif),
   // ex : https://redfloat.github.io/as-thiais-tt/docs/x.pdf. On les détecte partout sur le site
   // et on vérifie que le fichier visé existe bien dans le dépôt.
@@ -899,6 +920,7 @@
       const path = `imgs/logo.${ext}`;
       await GitHubAPI.uploadFile(cfg, path, pendingLogoFile, 'Admin : mise à jour du logo du club');
       const logoUrl = './' + path;
+      await registerInMediaLibrary({ path, title: 'Logo du club', folder: 'Site' });
 
       // Si l'ancien logo avait une extension différente, on nettoie le fichier devenu inutile
       if (currentLogoPath && currentLogoPath.includes('imgs/logo.') && toRepoPath(currentLogoPath) !== path) {
@@ -2839,6 +2861,7 @@
         for (const imgPath of imagesToDelete) {
           await deleteFileIfExists(imgPath);
         }
+        await unregisterMediaEntriesByPaths(imagesToDelete);
       }
 
       currentNewsList = updatedArray;
@@ -3394,6 +3417,7 @@ ${items}
         const path = `imgs/albums/${albumId}/${Date.now()}-${i}.${ext}`;
         setStatus(albumPhotosStatus, 'loading', `Envoi de la photo ${i + 1} / ${files.length}…`);
         await GitHubAPI.uploadFile(cfg, path, file, `Admin : ajout d'une photo à l'album "${albums[albumIndex].title}"`);
+        await registerInMediaLibrary({ path, title: `${albums[albumIndex].title} — photo ${i + 1}`, folder: albums[albumIndex].title });
         newPhotoPaths.push('./' + path);
       }
 
@@ -3474,6 +3498,7 @@ ${items}
         for (const photoPath of (albumToDelete.photos || [])) {
           await deleteFileIfExists(toRepoPath(photoPath));
         }
+        await unregisterMediaEntriesByPaths(albumToDelete.photos || []);
       }
 
       // Retire la référence à cet album dans les news qui le pointaient
@@ -4167,13 +4192,15 @@ ${items}
 
     setStatus(pageEditorStatus, 'loading', 'Envoi de l\'image en arrière-plan…');
     const uploadPromise = GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans une page`)
-      .then(() => {
+      .then(async () => {
         const img = pageRichtextEditor.querySelector('#' + tempId);
         if (img) {
           img.dataset.finalSrc = `./${path}`;
           img.removeAttribute('data-pending');
         }
         hideStatus(pageEditorStatus);
+        const pageTitle = document.getElementById('pageTitleInput').value.trim() || pageId;
+        await registerInMediaLibrary({ path, title: `${pageTitle} (image)`, folder: 'Pages' });
       })
       .catch((err) => {
         const img = pageRichtextEditor.querySelector('#' + tempId);
@@ -4325,6 +4352,7 @@ ${items}
           for (const imgPath of imagesToDelete) {
             await deleteFileIfExists(imgPath);
           }
+          await unregisterMediaEntriesByPaths(imagesToDelete);
         }
         await unpublishCleanUrlPage(pageToDelete.slug);
       }
@@ -4544,13 +4572,14 @@ ${items}
 
     setStatus(staticPageEditorStatus, 'loading', 'Envoi de l\'image en arrière-plan…');
     const uploadPromise = GitHubAPI.uploadFile(cfg, path, file, `Admin : image insérée dans "${key}"`)
-      .then(() => {
+      .then(async () => {
         const img = staticPageRichtextEditor.querySelector('#' + tempId);
         if (img) {
           img.dataset.finalSrc = `./${path}`;
           img.removeAttribute('data-pending');
         }
         hideStatus(staticPageEditorStatus);
+        await registerInMediaLibrary({ path, title: `${key} (image)`, folder: 'Contenu du site' });
       })
       .catch((err) => {
         const img = staticPageRichtextEditor.querySelector('#' + tempId);
@@ -4859,6 +4888,7 @@ ${items}
       const type = mediaFileType(path);
       const row = document.createElement('div');
       row.className = 'admin-list-item media-file-row';
+      const replaceInputId = 'replace-' + path.replace(/[^a-zA-Z0-9]/g, '-');
       row.innerHTML = `
         ${type === 'image'
           ? `<img class="media-file-thumb" src="${adminAssetPath('./' + path)}" alt="">`
@@ -4869,14 +4899,33 @@ ${items}
         </div>
         <div class="admin-list-actions">
           <a href="${adminAssetPath('./' + path)}" target="_blank" rel="noopener" class="view-link-btn" title="Ouvrir"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <input type="file" id="${replaceInputId}" class="hidden">
+          <button type="button" class="update-btn" title="Mettre à jour ce fichier (même emplacement)"><i class="fa-solid fa-rotate"></i></button>
           <button type="button" class="adopt-btn" title="Ajouter à la médiathèque"><i class="fa-solid fa-plus"></i></button>
           <button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
         </div>
       `;
+      const replaceInput = row.querySelector(`#${replaceInputId}`);
+      row.querySelector('.update-btn').addEventListener('click', () => replaceInput.click());
+      replaceInput.addEventListener('change', () => {
+        const file = replaceInput.files[0];
+        if (file) updateFileInPlace(path, file);
+      });
       row.querySelector('.adopt-btn').addEventListener('click', () => adoptServerFile(path, type));
       row.querySelector('.delete-btn').addEventListener('click', () => deleteUntrackedFile(path));
       untrackedEl.appendChild(row);
     });
+  }
+
+  async function updateFileInPlace(path, file) {
+    const filename = path.split('/').pop();
+    if (!(await showConfirmModal(`Remplacer "${filename}" par ce nouveau fichier ? L'ancien contenu sera définitivement écrasé, à la même adresse.`))) return;
+    try {
+      await GitHubAPI.uploadFile(cfg, path, file, `Admin : mise à jour du fichier "${filename}"`);
+      await showConfirmModal(`"${filename}" a bien été mis à jour ! Le site se mettra à jour d'ici 1 à 2 minutes.`, { confirmLabel: 'Compris' });
+    } catch (err) {
+      alert('Erreur lors de la mise à jour : ' + err.message);
+    }
   }
 
   async function adoptServerFile(path, type) {
@@ -4991,8 +5040,9 @@ ${items}
 
   function openMediaEditor(file) {
     document.getElementById('mediaEditId').value = file.id;
-    document.getElementById('mediaFileInputWrap').classList.add('hidden');
     document.getElementById('mediaFileInput').value = '';
+    document.getElementById('mediaFileInputLabel').textContent = 'Remplacer le fichier (facultatif, même emplacement)';
+    document.getElementById('mediaFileInputHint').textContent = 'Laisse vide pour ne garder que le fichier actuel. Si tu en choisis un nouveau, il remplace l\'ancien à la même adresse — les liens déjà utilisés ailleurs continuent de fonctionner.';
     document.getElementById('mediaTitleInput').value = file.title || '';
     populateMediaFolderSelect(currentMediaFiles);
     document.getElementById('mediaFolderSelect').value = file.folder || '';
@@ -5011,7 +5061,8 @@ ${items}
   function resetMediaForm() {
     document.getElementById('mediaUploadForm').reset();
     document.getElementById('mediaEditId').value = '';
-    document.getElementById('mediaFileInputWrap').classList.remove('hidden');
+    document.getElementById('mediaFileInputLabel').textContent = 'Fichier (image ou document)';
+    document.getElementById('mediaFileInputHint').textContent = 'Utile pour un fichier qui revient chaque année (planning, affiche...) : le nouveau remplace l\'ancien à la même adresse, tous les liens déjà utilisés ailleurs continuent de fonctionner.';
     document.getElementById('mediaShowInDocsWarning').classList.add('hidden');
     document.getElementById('mediaNewFolderWrap').classList.add('hidden');
     document.getElementById('mediaFormTitle').textContent = 'Ajouter un fichier';
@@ -5078,7 +5129,13 @@ ${items}
 
       let updatedFiles;
       if (editId) {
-        // Mode édition : seuls le titre et le dossier changent, le fichier reste le même
+        // Mode édition : titre et dossier changent toujours ; si un nouveau fichier a été
+        // choisi, il remplace l'ancien à la MÊME adresse (aucun lien existant n'est cassé).
+        const existing = currentFiles.find((f) => f.id === editId);
+        if (newFile && existing) {
+          setStatus(statusEl, 'loading', 'Envoi du nouveau fichier…');
+          await GitHubAPI.uploadFile(cfg, toRepoPath(existing.path), newFile, `Admin : mise à jour du fichier "${title}"`);
+        }
         updatedFiles = currentFiles.map((f) => f.id === editId ? Object.assign({}, f, { title, folder }) : f);
       } else {
         const type = mediaFileType(newFile.name);

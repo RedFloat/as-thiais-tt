@@ -1245,12 +1245,11 @@
     const container = document.getElementById('upcomingEventsList');
     if (!widget || !container) return;
 
-    const [data, teams] = await Promise.all([
-      loadJSON('./data/events.json'),
-      fetchAllTeams().catch(() => [])
-    ]);
-    const manualEvents = (data && Array.isArray(data.events)) ? data.events : [];
-    const events = manualEvents.concat(teamMatchesToEvents(teams));
+    // Les matchs d'équipe ne sont volontairement pas repris ici : ils ont leurs propres
+    // widgets dédiés par équipe sur l'accueil. Seuls les événements créés manuellement
+    // dans Admin > Calendrier apparaissent dans "Prochains Événements".
+    const data = await loadJSON('./data/events.json');
+    const events = (data && Array.isArray(data.events)) ? data.events : [];
     const todayStr = dateToStr(new Date());
 
     const upcoming = events
