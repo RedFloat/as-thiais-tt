@@ -19,8 +19,13 @@
       "children": [
         {
           "id": "equipe-1",
-          "label": "Équipe 1 (N3)",
+          "label": "Équipe 1 - Masculine (N1)",
           "link": "./equipe.html?id=equipe-1"
+        },
+        {
+          "id": "equipe-1f",
+          "label": "Equipe 1 - Féminine (PN)",
+          "link": "./equipe.html?id=equipe-1f"
         }
       ]
     },
@@ -62,6 +67,11 @@
           "link": "./le_club.html"
         },
         {
+          "id": "organigramme",
+          "label": "Organigramme",
+          "link": "#"
+        },
+        {
           "id": "entrainements",
           "label": "Entraînements",
           "link": "./entrainements.html"
@@ -85,11 +95,6 @@
           "id": "documents",
           "label": "Documents",
           "link": "./documents.html"
-        },
-        {
-          "id": "organigramme",
-          "label": "Organigramme",
-          "link": "./organigramme/"
         }
       ]
     },

@@ -1909,7 +1909,10 @@
   // équipes, triées par division (meilleure en premier) puis par numéro d'équipe.
   async function syncTeamsInMenu(teams) {
     try {
-      if (!fileState[NAV_PATH]) await readFile(NAV_PATH);
+      // Relecture systématique (jamais depuis le cache) : si l'admin est passé par "Ordre des
+      // Pages" juste avant, le menu a pu changer entretemps — utiliser une version périmée
+      // provoquerait un rejet silencieux de GitHub (conflit de version).
+      await readFile(NAV_PATH);
       const items = fileState[NAV_PATH].json.items.map((it) =>
         it.type === 'dropdown' ? Object.assign({}, it, { children: (it.children || []).slice() }) : Object.assign({}, it)
       );
@@ -1937,8 +1940,10 @@
         cfg, NAV_PATH, { items }, fileState[NAV_PATH].sha, 'Admin : synchronisation des équipes dans le menu'
       );
       fileState[NAV_PATH] = { json: { items }, sha: result.content.sha };
+      return true;
     } catch (err) {
       console.warn('Impossible de synchroniser les équipes dans le menu :', err.message);
+      return false;
     }
   }
 
@@ -2354,9 +2359,12 @@
       }
 
       await loadTeamsView();
-      await syncTeamsInMenu(currentTeamsCache);
+      const menuSynced = await syncTeamsInMenu(currentTeamsCache);
       teamEditorCard.classList.add('hidden');
-      setStatus(teamEditorStatus, 'success', 'Équipe enregistrée ! Le site se mettra à jour d\'ici 1 à 2 minutes.');
+      setStatus(teamEditorStatus, menuSynced ? 'success' : 'warning',
+        menuSynced
+          ? 'Équipe enregistrée ! Le site se mettra à jour d\'ici 1 à 2 minutes.'
+          : 'Équipe enregistrée, mais la mise à jour du menu a échoué — réessaie d\'enregistrer une équipe pour la relancer, ou préviens le développeur si ça persiste.');
     } catch (err) {
       setStatus(teamEditorStatus, 'error', 'Erreur : ' + err.message);
     } finally {
@@ -2390,7 +2398,10 @@
       fileState[TEAMS_INDEX_PATH] = { json: { teamIds }, sha: indexResult.content.sha };
 
       await loadTeamsView();
-      await syncTeamsInMenu(currentTeamsCache);
+      const menuSynced = await syncTeamsInMenu(currentTeamsCache);
+      if (!menuSynced) {
+        alert('L\'équipe a bien été supprimée, mais la mise à jour du menu a échoué. Réessaie en enregistrant une équipe pour relancer la synchronisation.');
+      }
     } catch (err) {
       alert('Erreur lors de la suppression : ' + err.message);
     }
