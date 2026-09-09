@@ -1538,16 +1538,36 @@
 <script>
     // ---------- Carte du plan d'accès + bouton itinéraire ----------
     (function () {
-      const LAT = 48.769741967437604;
-      const LNG = 2.3880913830359005;
+      const LAT = 48.770211;
+      const LNG = 2.388731;
 
       const mapEl = document.getElementById('contactMap');
       if (mapEl && window.L) {
-        const map = L.map('contactMap').setView([LAT, LNG], 16);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        const map = L.map('contactMap', { scrollWheelZoom: false }).setView([LAT, LNG], 16);
+
+        // Fond de carte CARTO Voyager (plus épuré que le rendu OSM par défaut, gratuit, sans compte)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          maxZoom: 19
         }).addTo(map);
-        L.marker([LAT, LNG]).addTo(map)
+
+        // Marqueur custom aux couleurs du club (navy / or)
+        const clubIcon = L.divIcon({
+          className: '',
+          html: `<div style="
+            width:36px; height:36px;
+            background:var(--color-gold, #D2A95B);
+            border:3px solid var(--color-navy, #044A6E);
+            border-radius:50% 50% 50% 0;
+            transform:rotate(-45deg);
+            box-shadow:0 2px 6px rgba(0,0,0,0.3);
+          "></div>`,
+          iconSize: [36, 36],
+          iconAnchor: [18, 36],
+          popupAnchor: [0, -36]
+        });
+
+        L.marker([LAT, LNG], { icon: clubIcon }).addTo(map)
           .bindPopup('<strong>Palais Omnisports de Thiais</strong><br>Place Vincent Van Gogh, 94320 Thiais')
           .openPopup();
       }
