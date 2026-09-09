@@ -704,6 +704,17 @@
 
     .widget-box h3 i { color: var(--color-gold); }
 
+    .widget-title-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: inherit;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .widget-title-link:hover { color: var(--color-gold); }
+
     .photo-mini-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1137,7 +1148,7 @@
       
       <!-- Galerie Photos -->
       <div class="widget-box">
-        <h3><i class="fa-solid fa-camera"></i> Galerie Photos</h3>
+        <h3><a href="./albums.html" class="widget-title-link"><i class="fa-solid fa-camera"></i> Galerie Photos</a></h3>
         <div class="photo-mini-grid" id="photoGalleryWidget">
           <!-- Généré dynamiquement par js/site-data.js depuis data/albums.json -->
         </div>
@@ -1145,7 +1156,7 @@
 
       <!-- Galerie Vidéo -->
       <div class="widget-box">
-        <h3><i class="fa-solid fa-video"></i> Galerie Vidéo</h3>
+        <h3><a href="./videos.html" class="widget-title-link"><i class="fa-solid fa-video"></i> Galerie Vidéo</a></h3>
         <div class="photo-mini-grid" id="videoGalleryWidget">
           <!-- Généré dynamiquement par js/site-data.js depuis data/videos.json -->
         </div>
