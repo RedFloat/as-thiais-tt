@@ -1354,7 +1354,18 @@
       }
     }
 
-    /* Contrôles Leaflet (zoom) restylés */
+    /* Attribution restylée (discrète, sans lien "Leaflet") */
+    .contact-map-wrapper .leaflet-control-attribution {
+      background: rgba(255, 255, 255, 0.65) !important;
+      backdrop-filter: blur(6px);
+      font-size: 0.68rem !important;
+      color: var(--color-text-muted) !important;
+      padding: 1px 6px !important;
+    }
+
+    .contact-map-wrapper .leaflet-control-attribution a {
+      color: var(--color-navy) !important;
+    }
     .contact-map-wrapper .leaflet-control-zoom {
       border: none !important;
       border-radius: 10px !important;
@@ -1718,13 +1729,16 @@
 
       const mapEl = document.getElementById('contactMap');
       if (mapEl && window.L) {
-        const map = L.map('contactMap', { scrollWheelZoom: false, zoomControl: false }).setView([LAT, LNG], 16);
+        const map = L.map('contactMap', { scrollWheelZoom: false, zoomControl: false, attributionControl: false }).setView([LAT, LNG], 16);
 
         // Position le zoom en bas à droite pour laisser la place à la carte flottante en bas à gauche
         L.control.zoom({ position: 'topright' }).addTo(map);
 
+        // Attribution obligatoire (OSM/CARTO) mais sans le lien "Leaflet" par défaut
+        L.control.attribution({ prefix: false, position: 'bottomright' }).addTo(map);
+
         // Fond de carte CARTO Positron (minimal, très clair) + voile navy en CSS pour un rendu "brandé" et moderne
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
           maxZoom: 19
         }).addTo(map);
