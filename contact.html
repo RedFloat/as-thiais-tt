@@ -1248,189 +1248,25 @@
     .contact-board-list a { color: var(--color-navy); font-weight: 600; }
     .contact-board-list a:hover { color: var(--color-gold); }
 
-    .contact-map-wrapper {
-      position: relative;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 16px 40px rgba(4, 74, 110, 0.16);
+    .contact-map {
+      width: 100%;
+      height: 400px;
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-subtle);
       border: 1px solid rgba(4, 74, 110, 0.08);
     }
 
-    .contact-map {
-      width: 100%;
-      height: 440px;
-      z-index: 1;
-    }
-
-    /* Léger voile aux couleurs du club posé sur le fond de carte, pour un rendu "brandé" plutôt que la carte brute */
-    .map-tint-overlay {
-      position: absolute;
-      inset: 0;
-      background: var(--color-navy);
-      opacity: 0.05;
-      mix-blend-mode: color;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    /* Carte flottante en verre dépoli, posée sur le plan */
-    .map-float-card {
-      position: absolute;
-      left: 1rem;
-      right: 1rem;
-      bottom: 1rem;
-      z-index: 3;
+    .contact-map-caption {
       display: flex;
       align-items: center;
-      gap: 0.9rem;
-      padding: 0.9rem 1rem;
-      background: rgba(255, 255, 255, 0.72);
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 16px;
-      box-shadow: 0 10px 28px rgba(4, 74, 110, 0.2);
-    }
-
-    .map-float-icon {
-      flex-shrink: 0;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-navy);
-      color: var(--color-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-    }
-
-    .map-float-text {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      line-height: 1.3;
-    }
-
-    .map-float-text strong {
+      gap: 0.5rem;
+      font-size: 0.88rem;
       color: var(--color-navy);
-      font-size: 0.92rem;
+      font-weight: 600;
+      margin: 0.9rem 0;
     }
 
-    .map-float-text span {
-      color: var(--color-text-muted);
-      font-size: 0.8rem;
-    }
-
-    .map-float-btn {
-      flex-shrink: 0;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--color-gold);
-      color: var(--color-navy-dark);
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.05rem;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .map-float-btn:hover {
-      background: #c2984a;
-      transform: scale(1.06);
-    }
-
-    @media (max-width: 480px) {
-      .map-float-card {
-        flex-wrap: wrap;
-      }
-      .map-float-text {
-        order: 2;
-        width: 100%;
-      }
-    }
-
-    /* Attribution restylée (discrète, sans lien "Leaflet") */
-    .contact-map-wrapper .leaflet-control-attribution {
-      background: rgba(255, 255, 255, 0.65) !important;
-      backdrop-filter: blur(6px);
-      font-size: 0.68rem !important;
-      color: var(--color-text-muted) !important;
-      padding: 1px 6px !important;
-    }
-
-    .contact-map-wrapper .leaflet-control-attribution a {
-      color: var(--color-navy) !important;
-    }
-    .contact-map-wrapper .leaflet-control-zoom {
-      border: none !important;
-      border-radius: 10px !important;
-      overflow: hidden;
-      box-shadow: 0 4px 14px rgba(4, 74, 110, 0.18) !important;
-    }
-
-    .contact-map-wrapper .leaflet-control-zoom a {
-      background: var(--color-white) !important;
-      color: var(--color-navy) !important;
-    }
-
-    .contact-map-wrapper .leaflet-control-zoom a:hover {
-      background: var(--color-gold-light) !important;
-      color: var(--color-navy-dark) !important;
-    }
-
-    /* Popup Leaflet restylée */
-    .contact-map-wrapper .leaflet-popup-content-wrapper {
-      border-radius: 14px !important;
-      box-shadow: 0 12px 32px rgba(4, 74, 110, 0.22) !important;
-    }
-
-    .contact-map-wrapper .leaflet-popup-content {
-      font-size: 0.85rem;
-      color: var(--color-text-main);
-    }
-
-    /* Marqueur custom avec halo pulsant */
-    .club-marker {
-      position: relative;
-      width: 26px;
-      height: 26px;
-    }
-
-    .club-marker-dot {
-      position: absolute;
-      inset: 0;
-      margin: auto;
-      width: 16px;
-      height: 16px;
-      background: var(--color-gold);
-      border: 3px solid var(--color-navy);
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-      z-index: 2;
-    }
-
-    .club-marker-pulse {
-      position: absolute;
-      inset: 0;
-      margin: auto;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--color-gold);
-      opacity: 0.55;
-      animation: clubMarkerPulse 2.2s ease-out infinite;
-      z-index: 1;
-    }
-
-    @keyframes clubMarkerPulse {
-      0% { transform: scale(1); opacity: 0.55; }
-      100% { transform: scale(3.4); opacity: 0; }
-    }
+    .contact-map-caption i { color: var(--color-gold); }
 
     /* ---------- Formulaire de contact ---------- */
 
@@ -1612,20 +1448,13 @@
         </div>
 
         <div class="contact-map-block">
-          <div class="contact-map-wrapper">
-            <div id="contactMap" class="contact-map"></div>
-            <div class="map-tint-overlay" aria-hidden="true"></div>
-            <div class="map-float-card">
-              <div class="map-float-icon"><i class="fa-solid fa-location-dot"></i></div>
-              <div class="map-float-text">
-                <strong>Palais Omnisports de Thiais</strong>
-                <span>Place Vincent Van Gogh, 94320 Thiais</span>
-              </div>
-              <button type="button" class="map-float-btn" id="directionsBtn" aria-label="Ouvrir l'itinéraire" title="Ouvrir l'itinéraire">
-                <i class="fa-solid fa-diamond-turn-right"></i>
-              </button>
-            </div>
-          </div>
+          <div id="contactMap" class="contact-map"></div>
+          <p class="contact-map-caption">
+            <i class="fa-solid fa-location-dot"></i> Palais Omnisports de Thiais — Place Vincent Van Gogh, 94320 Thiais
+          </p>
+          <button type="button" class="btn-download" id="directionsBtn" style="width:100%; justify-content:center;">
+            <i class="fa-solid fa-diamond-turn-right"></i> Ouvrir l'itinéraire
+          </button>
         </div>
       </div>
 
@@ -1724,39 +1553,40 @@
 <script>
     // ---------- Carte du plan d'accès + bouton itinéraire ----------
     (function () {
-      const LAT = 48.770211;
-      const LNG = 2.388731;
+      const LAT = 48.769741967437604;
+      const LNG = 2.3880913830359005;
 
       const mapEl = document.getElementById('contactMap');
       if (mapEl && window.L) {
-        const map = L.map('contactMap', { scrollWheelZoom: false, zoomControl: false, attributionControl: false }).setView([LAT, LNG], 16);
-
-        // Position le zoom en bas à droite pour laisser la place à la carte flottante en bas à gauche
-        L.control.zoom({ position: 'topright' }).addTo(map);
-
-        // Attribution obligatoire (OSM/CARTO) mais sans le lien "Leaflet" par défaut
-        L.control.attribution({ prefix: false, position: 'bottomright' }).addTo(map);
-
-        // Fond de carte CARTO Positron (minimal, très clair) + voile navy en CSS pour un rendu "brandé" et moderne
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          maxZoom: 19
-        }).addTo(map);
-
-        // Marqueur custom avec halo pulsant, aux couleurs du club
-        const clubIcon = L.divIcon({
-          className: '',
-          html: `<div class="club-marker">
-                   <span class="club-marker-pulse"></span>
-                   <span class="club-marker-dot"></span>
-                 </div>`,
-          iconSize: [26, 26],
-          iconAnchor: [13, 13],
-          popupAnchor: [0, -16]
+        // Icône du marqueur : on force les URLs (le chargement via CDN casse parfois le
+        // chemin par défaut de Leaflet, ce qui rend l'épingle invisible).
+        const markerIcon = L.icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
         });
 
-        L.marker([LAT, LNG], { icon: clubIcon }).addTo(map)
-          .bindPopup('<strong>Palais Omnisports de Thiais</strong><br>Place Vincent Van Gogh, 94320 Thiais');
+        const map = L.map('contactMap', { scrollWheelZoom: false }).setView([LAT, LNG], 17);
+
+        // Fond de carte CARTO Voyager : gratuit, sans clé, avec des rues et noms de lieux
+        // bien plus lisibles que le rendu OpenStreetMap brut.
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          maxZoom: 20
+        }).addTo(map);
+
+        L.marker([LAT, LNG], { icon: markerIcon }).addTo(map)
+          .bindPopup('<strong>Palais Omnisports de Thiais</strong><br>Place Vincent Van Gogh, 94320 Thiais')
+          .openPopup();
+
+        // Filet de sécurité : si la carte s'est initialisée avant que son conteneur ait
+        // vraiment sa taille finale, les tuiles peuvent rester grises tant qu'on ne force
+        // pas un recalcul.
+        setTimeout(() => map.invalidateSize(), 200);
       }
 
       const directionsBtn = document.getElementById('directionsBtn');
