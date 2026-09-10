@@ -1572,9 +1572,10 @@
 
         const map = L.map('contactMap', { scrollWheelZoom: false }).setView([LAT, LNG], 17);
 
-        // Fond de carte CARTO Voyager : gratuit, sans clé, avec des rues et noms de lieux
-        // bien plus lisibles que le rendu OpenStreetMap brut.
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        // Fond de carte CARTO "light_all" : le seul style CARTO confirmé pour ne jamais
+        // afficher de bandeau "API key required" sur leur offre gratuite (contrairement à
+        // "voyager" ou d'autres styles qui l'exigent). Gratuit, sans clé, rues et lieux lisibles.
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
           maxZoom: 20
         }).addTo(map);
