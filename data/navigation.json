@@ -13,6 +13,12 @@
       "type": "link"
     },
     {
+      "id": "sport-adapte",
+      "label": "Sport Adapté",
+      "link": "./sport-adapte.html",
+      "type": "link"
+    },
+    {
       "id": "equipes",
       "label": "Équipes",
       "type": "dropdown",
