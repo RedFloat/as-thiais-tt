@@ -37,6 +37,11 @@
           "id": "equipe-1f",
           "label": "Equipe 1 - Féminine (PN)",
           "link": "./equipe.html?id=equipe-1f"
+        },
+        {
+          "id": "equipe-3",
+          "label": "Equipe 3 - Masculine (R2)",
+          "link": "./equipe.html?id=equipe-3"
         }
       ]
     },
