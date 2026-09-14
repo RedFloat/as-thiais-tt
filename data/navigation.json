@@ -42,6 +42,11 @@
           "id": "equipe-3",
           "label": "Equipe 3 - Masculine (R2)",
           "link": "./equipe.html?id=equipe-3"
+        },
+        {
+          "id": "equipe-4",
+          "label": "Equipe 4 - Masculine (R3)",
+          "link": "./equipe.html?id=equipe-4"
         }
       ]
     },
