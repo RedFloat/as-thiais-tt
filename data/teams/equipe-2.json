@@ -1,0 +1,72 @@
+{
+  "id": "equipe-2",
+  "name": "Equipe 2 - Masculine (N3)",
+  "division": "Nationale 3",
+  "photo": "",
+  "description": "",
+  "showPlayers": false,
+  "players": [],
+  "classification": {
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
+  "matches": [
+    {
+      "date": "2026-09-19",
+      "opponent": "PARIS IX ATT 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-03",
+      "opponent": "PASSAGEOIS TT 2",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-17",
+      "opponent": "SAINTE PAZANNE 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-07",
+      "opponent": "FUTURO VALVERT TT 1",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-21",
+      "opponent": "BIARRITZ GOELANDS 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-05",
+      "opponent": "LE MANS SARTHE TT 2",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-12",
+      "opponent": "BOIS GUILLAUME US 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}
