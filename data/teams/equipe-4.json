@@ -1,0 +1,72 @@
+{
+  "id": "equipe-4",
+  "name": "Equipe 4 - Masculine",
+  "division": "Régionale 3",
+  "photo": "",
+  "description": "",
+  "showPlayers": false,
+  "players": [],
+  "classification": {
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
+  "matches": [
+    {
+      "date": "2026-09-19",
+      "opponent": "COURBEVOIE STT 7",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-03",
+      "opponent": "PONTHIERRY COMT 3",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-17",
+      "opponent": "CHARENTON TT 3",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-07",
+      "opponent": "LIMAY ALJ 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-21",
+      "opponent": "SAINT GRATIEN 2",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-05",
+      "opponent": "MONTREUIL ES 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-12",
+      "opponent": "ROMAINVILLOIS TT 1",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}

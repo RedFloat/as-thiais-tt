@@ -1,0 +1,72 @@
+{
+  "id": "equipe-3",
+  "name": "Equipe 3 - Masculine",
+  "division": "Régionale 2",
+  "photo": "",
+  "description": "",
+  "showPlayers": false,
+  "players": [],
+  "classification": {
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
+  "matches": [
+    {
+      "date": "2026-09-19",
+      "opponent": "CHESNAY 78 AS 4",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-03",
+      "opponent": "BOULOGNE BILLANCOURT 4",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-17",
+      "opponent": "LAGNY SMTT 1",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-07",
+      "opponent": "MENUCOURT 1",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-21",
+      "opponent": "MONTMAGNY-GROSLAY 1",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-05",
+      "opponent": "VERSAILLES SCTT 3",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-12",
+      "opponent": "PARIS IX ATT 2",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}
