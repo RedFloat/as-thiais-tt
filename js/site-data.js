@@ -396,50 +396,66 @@
         : `Les ${teams.length} Équipes du Club`;
     }
 
-    grid.innerHTML = '';
+    const RESULT_INFO = {
+      V: { cls: 'team-status-win', symbol: '✓', label: 'Victoire' },
+      D: { cls: 'team-status-loss', symbol: '✕', label: 'Défaite' },
+      N: { cls: 'team-status-draw', symbol: '=', label: 'Match nul' }
+    };
 
-    teams.forEach((team) => {
-      if (!team) return;
-      const card = document.createElement('div');
-      card.className = 'mini-team-card';
+    grid.innerHTML = teams.filter(Boolean).map((team) => {
+      const { last, next } = pickLastAndNext(team.matches);
 
-      const header = document.createElement('div');
-      header.className = 'mini-team-header';
-      header.innerHTML =
-        '<span class="mini-team-name">' + team.name + ' <span class="mini-team-div">(' + divisionAbbr(team.division) + ')</span></span>';
-      card.appendChild(header);
-
-      const form = computeForm(team.matches, 5);
-      if (form.length > 0) {
-        const formRow = document.createElement('div');
-        formRow.className = 'mini-team-form';
-        formRow.innerHTML = form
-          .map((m) => '<span class="form-badge form-' + m.result.toLowerCase() + '">' + m.result + '</span>')
-          .join('');
-        card.appendChild(formRow);
+      let resultHtml;
+      if (last && last.result && RESULT_INFO[last.result]) {
+        const info = RESULT_INFO[last.result];
+        const cleanScore = (last.score || '').replace(/^[VDN]\s*/i, '').trim();
+        resultHtml = `
+          <div class="team-status ${info.cls}">
+            <span class="team-status-symbol">${info.symbol}</span> ${info.label}
+          </div>
+          <span class="team-score">${cleanScore || '—'}</span>
+          <span class="team-opponent">vs ${last.opponent || '?'}</span>
+        `;
+      } else {
+        resultHtml = `
+          <div class="team-status team-status-none">
+            <span class="team-status-symbol">–</span> Aucun match
+          </div>
+          <span class="team-opponent">Saison à venir</span>
+        `;
       }
 
-      const { last, next } = pickLastAndNext(team.matches);
-      [last, next].forEach((match) => {
-        if (!match) return;
-        const badge = scoreBadge(match);
-        const line = document.createElement('div');
-        line.className = 'match-line';
-        line.innerHTML =
-          '<span class="match-date">' + formatDateFR(match.date) + '</span>' +
-          '<span class="match-details">' + match.opponent + '</span>' +
-          '<span class="score-badge ' + badge.cls + '">' + badge.label + '</span>';
-        card.appendChild(line);
-      });
+      let nextHtml;
+      if (next) {
+        nextHtml = `
+          <div class="team-next-title"><i class="fa-solid fa-calendar-days"></i> Prochain match</div>
+          <div class="team-next-date">${formatDateFR(next.date)}</div>
+          <div class="team-next-opp">vs ${next.opponent || '?'}</div>
+        `;
+      } else {
+        nextHtml = `
+          <div class="team-next-title"><i class="fa-solid fa-calendar-days"></i> Prochain match</div>
+          <div class="team-next-opp">Aucun match prévu</div>
+        `;
+      }
 
-      const link = document.createElement('a');
-      link.className = 'mini-team-link';
-      link.href = './equipe.html?id=' + team.id;
-      link.textContent = 'Voir la fiche équipe';
-      card.appendChild(link);
-
-      grid.appendChild(card);
-    });
+      return `
+        <a class="team-card-v2" href="./equipe.html?id=${team.id}">
+          <div class="team-card-head">
+            <i class="fa-solid fa-table-tennis-paddle-ball"></i>
+            <span class="team-card-title">${team.name}</span>
+            <span class="team-card-type">${divisionAbbr(team.division)}</span>
+          </div>
+          <div class="team-card-body">
+            <section class="team-card-result">${resultHtml}</section>
+            <section class="team-card-next">
+              ${nextHtml}
+              <div class="team-card-arrow">→</div>
+            </section>
+          </div>
+        </a>
+      `;
+    }).join('');
   }
 
   const STANDINGS_LABELS = {
