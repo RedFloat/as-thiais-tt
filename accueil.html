@@ -583,6 +583,10 @@
       min-width: 0;
       padding-right: 0.8rem;
       border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
 
     .team-card-next {
@@ -640,6 +644,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      width: 100%;
     }
 
     .team-next-title {
@@ -673,6 +678,16 @@
       white-space: nowrap;
     }
 
+    .team-next-venue {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--color-gold);
+      margin-top: 0.35rem;
+    }
+
     .team-card-arrow {
       text-align: right;
       color: var(--color-gold);
@@ -692,6 +707,7 @@
       .team-opponent, .team-next-opp { font-size: 0.64rem; }
       .team-next-title { font-size: 0.58rem; }
       .team-next-date { font-size: 0.74rem; }
+      .team-next-venue { font-size: 0.58rem; }
     }
 
     /* ---------- Tableau de classement (fin de phase) ---------- */
