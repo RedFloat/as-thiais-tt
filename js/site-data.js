@@ -431,6 +431,7 @@
           <div class="team-next-title"><i class="fa-solid fa-calendar-days"></i> Prochain match</div>
           <div class="team-next-date">${formatDateFR(next.date)}</div>
           <div class="team-next-opp">vs ${next.opponent || '?'}</div>
+          <div class="team-next-venue"><i class="fa-solid ${next.home ? 'fa-house' : 'fa-plane-departure'}"></i> ${next.home ? 'Domicile' : 'Extérieur'}</div>
         `;
       } else {
         nextHtml = `
