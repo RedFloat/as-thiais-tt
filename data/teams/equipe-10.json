@@ -1,0 +1,72 @@
+{
+  "id": "equipe-10",
+  "name": "Equipe 10 - Masculine",
+  "division": "Départementale 4",
+  "photo": "",
+  "description": "",
+  "showPlayers": false,
+  "players": [],
+  "classification": {
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
+  "matches": [
+    {
+      "date": "2026-09-25",
+      "opponent": "ORMESSON US 12",
+      "home": false,
+      "status": "played",
+      "result": "V",
+      "score": "20-0"
+    },
+    {
+      "date": "2026-10-02",
+      "opponent": "TT VINCENNOIS 10",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-16",
+      "opponent": "IVRY US 5",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-06",
+      "opponent": "NOGENT TT 8",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-20",
+      "opponent": "KREMLIN -BICETRE US 8",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-04",
+      "opponent": "VGA SAINT-MAUR US 13",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-11",
+      "opponent": "CRETEIL USTT 6",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}
