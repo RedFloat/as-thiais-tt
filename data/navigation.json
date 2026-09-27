@@ -82,6 +82,11 @@
           "id": "equipe-11",
           "label": "Equipe 11 - Masculine (D4)",
           "link": "./equipe.html?id=equipe-11"
+        },
+        {
+          "id": "equipe-12",
+          "label": "Equipe 12 - Masculine (D4)",
+          "link": "./equipe.html?id=equipe-12"
         }
       ]
     },
