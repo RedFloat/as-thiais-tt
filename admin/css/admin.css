@@ -523,6 +523,58 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
 
 /* ---------- Listes CRUD (sponsors, documents, etc.) ---------- */
 
+.quick-result-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+  background: var(--color-bg-light);
+}
+
+.quick-result-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.quick-result-info strong { display: block; color: var(--color-navy); font-size: 0.92rem; }
+.quick-result-info span { display: block; color: var(--color-text-muted); font-size: 0.78rem; }
+
+.quick-result-score-input {
+  width: 100px;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.quick-result-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.quick-result-btn {
+  padding: 0.55rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: var(--color-white);
+  color: var(--color-text-muted);
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.quick-result-btn:hover { border-color: var(--color-navy); }
+
+.quick-result-btn.is-selected-V { background: #059669; border-color: #059669; color: var(--color-white); }
+.quick-result-btn.is-selected-N { background: #d97706; border-color: #d97706; color: var(--color-white); }
+.quick-result-btn.is-selected-D { background: #dc2626; border-color: #dc2626; color: var(--color-white); }
+
 .admin-list-item {
   display: flex;
   align-items: center;

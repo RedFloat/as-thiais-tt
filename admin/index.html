@@ -1263,6 +1263,27 @@
         </div>
       </section>
 
+      <section class="admin-view" id="view-quickresults">
+        <div class="view-header">
+          <h1><i class="fa-solid fa-bolt"></i> Saisir les résultats</h1>
+          <p>Un score, un clic sur Victoire / Match nul / Défaite, pour chaque match passé. Enregistre tout d'un coup à la fin.</p>
+        </div>
+
+        <div class="admin-card">
+          <div id="quickResultsList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+
+          <div style="display:flex; gap:0.7rem; align-items:center; margin-top:1.2rem;">
+            <button type="button" class="btn btn-primary" id="quickResultsSaveBtn">
+              <i class="fa-solid fa-floppy-disk"></i> Enregistrer tout
+            </button>
+            <button type="button" class="btn btn-ghost" id="quickResultsBackBtn">Retour au tableau de bord</button>
+          </div>
+          <div class="status-msg" id="quickResultsStatus"></div>
+        </div>
+      </section>
+
       <section class="admin-view" id="view-media">
         <div class="view-header">
           <h1>Médiathèque</h1>

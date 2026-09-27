@@ -435,6 +435,7 @@
 
   let cfg = null; // { token, owner, repo, branch }
   const fileState = {}; // cache { path: { json, sha } } des fichiers déjà lus
+  let currentPendingResults = []; // résultats de matchs en attente, pour la saisie rapide
 
   /* ---------- Éléments DOM ---------- */
 
@@ -747,12 +748,20 @@
       /* --- Alertes résultats de matchs à saisir --- */
       const pendingResults = [];
       teams.forEach((team) => {
-        (team.matches || []).forEach((match) => {
+        (team.matches || []).forEach((match, matchIndex) => {
           if (match.status === 'upcoming' && match.date && daysBetween(match.date) < 0) {
-            pendingResults.push(`${team.name} vs ${match.opponent} (${match.date.split('-').reverse().join('/')})`);
+            pendingResults.push({
+              teamId: team.id,
+              teamName: team.name,
+              matchIndex,
+              opponent: match.opponent,
+              date: match.date,
+              home: match.home
+            });
           }
         });
       });
+      currentPendingResults = pendingResults;
 
       /* --- Alertes classement de fin de phase à renseigner --- */
       const classificationNeeded = [];
@@ -771,11 +780,21 @@
       alertsEl.innerHTML = '';
 
       if (pendingResults.length > 0) {
-        alertsEl.appendChild(
-          buildAlert('alert-warning', 'fa-table-tennis-paddle-ball',
-            `${pendingResults.length} résultat${pendingResults.length > 1 ? 's' : ''} de match à saisir`,
-            pendingResults)
-        );
+        const div = document.createElement('div');
+        div.className = 'alert-banner alert-warning';
+        const items = pendingResults.map((r) => `${r.teamName} vs ${r.opponent} (${r.date.split('-').reverse().join('/')})`);
+        div.innerHTML = `
+          <i class="fa-solid fa-table-tennis-paddle-ball"></i>
+          <div style="flex:1;">
+            <strong>${pendingResults.length} résultat${pendingResults.length > 1 ? 's' : ''} de match à saisir</strong>
+            <ul>${items.map((i) => `<li>${i}</li>`).join('')}</ul>
+            <button type="button" class="btn btn-primary" id="quickResultsBtn" style="margin-top:0.6rem;">
+              <i class="fa-solid fa-bolt"></i> Saisir les résultats en rapide
+            </button>
+          </div>
+        `;
+        alertsEl.appendChild(div);
+        div.querySelector('#quickResultsBtn').addEventListener('click', showQuickResultsView);
       }
 
       if (classificationNeeded.length > 0) {
@@ -5482,6 +5501,135 @@ ${items}
       alert('Erreur lors de la suppression : ' + err.message);
     }
   }
+
+  /* ---------- Saisie rapide des résultats ---------- */
+
+  const quickResultEntries = new Map(); // clé "teamId-matchIndex" -> { result, score }
+
+  function showQuickResultsView() {
+    document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('is-active'));
+    document.querySelectorAll('.admin-view').forEach((v) => v.classList.remove('is-active'));
+    document.getElementById('view-quickresults').classList.add('is-active');
+    renderQuickResultsList();
+  }
+
+  function renderQuickResultsList() {
+    const container = document.getElementById('quickResultsList');
+    quickResultEntries.clear();
+
+    if (currentPendingResults.length === 0) {
+      container.innerHTML = '<p class="empty-list-msg">Aucun résultat à saisir pour le moment — tout est à jour !</p>';
+      return;
+    }
+
+    container.innerHTML = '';
+    currentPendingResults.forEach((match) => {
+      const key = match.teamId + '-' + match.matchIndex;
+      const row = document.createElement('div');
+      row.className = 'quick-result-row';
+      row.dataset.key = key;
+      row.innerHTML = `
+        <div class="quick-result-info">
+          <strong>${match.teamName}</strong>
+          <span>${match.home ? 'Reçoit' : 'Se déplace à'} ${match.opponent} · ${match.date.split('-').reverse().join('/')}</span>
+        </div>
+        <input type="text" class="quick-result-score-input" placeholder="Score (ex : 10-4)">
+        <div class="quick-result-buttons">
+          <button type="button" class="quick-result-btn" data-result="V">Victoire</button>
+          <button type="button" class="quick-result-btn" data-result="N">Match nul</button>
+          <button type="button" class="quick-result-btn" data-result="D">Défaite</button>
+        </div>
+      `;
+
+      const scoreInput = row.querySelector('.quick-result-score-input');
+      scoreInput.addEventListener('input', () => {
+        const entry = quickResultEntries.get(key) || {};
+        entry.score = scoreInput.value.trim();
+        quickResultEntries.set(key, entry);
+      });
+
+      row.querySelectorAll('.quick-result-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const result = btn.dataset.result;
+          row.querySelectorAll('.quick-result-btn').forEach((b) => {
+            b.classList.remove('is-selected-V', 'is-selected-N', 'is-selected-D');
+          });
+          const entry = quickResultEntries.get(key) || {};
+          if (entry.result === result) {
+            // Reclic sur le même bouton : on désélectionne
+            delete entry.result;
+          } else {
+            entry.result = result;
+            btn.classList.add('is-selected-' + result);
+          }
+          quickResultEntries.set(key, entry);
+        });
+      });
+
+      container.appendChild(row);
+    });
+  }
+
+  document.getElementById('quickResultsBackBtn').addEventListener('click', () => {
+    document.querySelector('.nav-btn[data-view="dashboard"]').click();
+  });
+
+  document.getElementById('quickResultsSaveBtn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('quickResultsStatus');
+    const btn = document.getElementById('quickResultsSaveBtn');
+
+    const toSave = currentPendingResults.filter((match) => {
+      const entry = quickResultEntries.get(match.teamId + '-' + match.matchIndex);
+      return entry && entry.result;
+    });
+
+    if (toSave.length === 0) {
+      setStatus(statusEl, 'error', 'Sélectionne au moins un résultat (Victoire / Nul / Défaite) avant d\'enregistrer.');
+      return;
+    }
+
+    btn.disabled = true;
+    setStatus(statusEl, 'loading', 'Enregistrement en cours…');
+
+    try {
+      // Regroupe par équipe pour ne faire qu'un seul enregistrement par fiche équipe
+      const byTeam = {};
+      toSave.forEach((match) => {
+        if (!byTeam[match.teamId]) byTeam[match.teamId] = [];
+        byTeam[match.teamId].push(match);
+      });
+
+      for (const teamId of Object.keys(byTeam)) {
+        const path = teamPath(teamId);
+        await readFile(path); // toujours une lecture fraîche, pour ne jamais écraser avec un sha périmé
+        const teamData = fileState[path].json;
+        const matches = teamData.matches.slice();
+
+        byTeam[teamId].forEach((match) => {
+          const entry = quickResultEntries.get(match.teamId + '-' + match.matchIndex);
+          matches[match.matchIndex] = Object.assign({}, matches[match.matchIndex], {
+            status: 'played',
+            result: entry.result,
+            score: entry.score || null
+          });
+        });
+
+        const updatedTeam = Object.assign({}, teamData, { matches });
+        const result = await GitHubAPI.saveJSON(
+          cfg, path, updatedTeam, fileState[path].sha, `Admin : saisie rapide des résultats de "${teamData.name}"`
+        );
+        fileState[path] = { json: updatedTeam, sha: result.content.sha };
+      }
+
+      setStatus(statusEl, 'success', `${toSave.length} résultat${toSave.length > 1 ? 's' : ''} enregistré${toSave.length > 1 ? 's' : ''} !`);
+      await loadDashboard();
+      renderQuickResultsList();
+    } catch (err) {
+      setStatus(statusEl, 'error', 'Erreur : ' + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   /* ---------- Démarrage ---------- */
 
