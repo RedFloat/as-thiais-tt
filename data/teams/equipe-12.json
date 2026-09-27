@@ -1,0 +1,64 @@
+{
+  "id": "equipe-12",
+  "name": "Equipe 12 - Masculine",
+  "division": "Départementale 4",
+  "photo": "",
+  "description": "",
+  "showPlayers": false,
+  "players": [],
+  "classification": {
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
+  "matches": [
+    {
+      "date": "2026-09-25",
+      "opponent": "ALFORTVILLE US 5",
+      "home": false,
+      "status": "played",
+      "result": "D",
+      "score": "17-3"
+    },
+    {
+      "date": "2026-10-02",
+      "opponent": "TT VINCENNOIS 11",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-16",
+      "opponent": "BREVANNAISE AS 7",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-06",
+      "opponent": "IVRY US 4",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-20",
+      "opponent": "ELAN CHEVILLY 4",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-11",
+      "opponent": "ORMESSON US 11",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}
