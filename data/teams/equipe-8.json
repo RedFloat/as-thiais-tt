@@ -1,0 +1,72 @@
+{
+  "id": "equipe-8",
+  "name": "Equipe 8 - Masculine",
+  "division": "Départementale 1",
+  "photo": "",
+  "description": "",
+  "showPlayers": false,
+  "players": [],
+  "classification": {
+    "rank": null,
+    "totalTeams": null,
+    "status": null
+  },
+  "matches": [
+    {
+      "date": "2026-09-25",
+      "opponent": "ORMESSON US 5",
+      "home": false,
+      "status": "played",
+      "result": "N",
+      "score": "10-10"
+    },
+    {
+      "date": "2026-10-02",
+      "opponent": "CHARENTON TT 7",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-10-16",
+      "opponent": "NOGENT TT 4",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-06",
+      "opponent": "MAISONS-ALFORT TT 5",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-11-20",
+      "opponent": "TT VINCENNOIS 7",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-04",
+      "opponent": "CACHAN CO 3",
+      "home": true,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    },
+    {
+      "date": "2026-12-11",
+      "opponent": "PERREUX APP 4",
+      "home": false,
+      "status": "upcoming",
+      "result": null,
+      "score": null
+    }
+  ]
+}
