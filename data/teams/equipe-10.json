@@ -1,7 +1,7 @@
 {
-  "id": "equipe-4",
-  "name": "Equipe 4 - Masculine",
-  "division": "Régionale 3",
+  "id": "equipe-10",
+  "name": "Equipe 10 - Masculine",
+  "division": "Départementale 4",
   "photo": "",
   "description": "",
   "showPlayers": false,
@@ -13,56 +13,56 @@
   },
   "matches": [
     {
-      "date": "2026-09-19",
-      "opponent": "COURBEVOIE STT 7",
+      "date": "2026-09-25",
+      "opponent": "ORMESSON US 12",
       "home": false,
       "status": "played",
-      "result": "D",
-      "score": "10-4"
+      "result": "V",
+      "score": "20-0"
     },
     {
-      "date": "2026-10-03",
-      "opponent": "PONTHIERRY COMT 3",
+      "date": "2026-10-02",
+      "opponent": "TT VINCENNOIS 10",
       "home": true,
       "status": "played",
-      "result": "N",
-      "score": "7-7"
+      "result": "V",
+      "score": "15-5"
     },
     {
-      "date": "2026-10-17",
-      "opponent": "CHARENTON TT 3",
+      "date": "2026-10-16",
+      "opponent": "IVRY US 5",
       "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-11-07",
-      "opponent": "LIMAY ALJ 1",
+      "date": "2026-11-06",
+      "opponent": "NOGENT TT 8",
       "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-11-21",
-      "opponent": "SAINT GRATIEN 2",
+      "date": "2026-11-20",
+      "opponent": "KREMLIN -BICETRE US 8",
       "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-12-05",
-      "opponent": "MONTREUIL ES 1",
+      "date": "2026-12-04",
+      "opponent": "VGA SAINT-MAUR US 13",
       "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-12-12",
-      "opponent": "ROMAINVILLOIS TT 1",
+      "date": "2026-12-11",
+      "opponent": "CRETEIL USTT 6",
       "home": false,
       "status": "upcoming",
       "result": null,

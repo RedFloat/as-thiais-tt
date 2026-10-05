@@ -1,7 +1,7 @@
 {
-  "id": "equipe-4",
-  "name": "Equipe 4 - Masculine",
-  "division": "Régionale 3",
+  "id": "equipe-9",
+  "name": "Equipe 9 - Masculine",
+  "division": "Départementale 3",
   "photo": "",
   "description": "",
   "showPlayers": false,
@@ -13,56 +13,56 @@
   },
   "matches": [
     {
-      "date": "2026-09-19",
-      "opponent": "COURBEVOIE STT 7",
+      "date": "2026-09-25",
+      "opponent": "ORLY AS 1",
       "home": false,
-      "status": "played",
-      "result": "D",
-      "score": "10-4"
-    },
-    {
-      "date": "2026-10-03",
-      "opponent": "PONTHIERRY COMT 3",
-      "home": true,
       "status": "played",
       "result": "N",
-      "score": "7-7"
+      "score": "10-10"
     },
     {
-      "date": "2026-10-17",
-      "opponent": "CHARENTON TT 3",
+      "date": "2026-10-02",
+      "opponent": "PLESSIS P3T 6",
+      "home": true,
+      "status": "played",
+      "result": "V",
+      "score": "11-9"
+    },
+    {
+      "date": "2026-10-16",
+      "opponent": "VGA SAINT MAUR US 11",
       "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-11-07",
-      "opponent": "LIMAY ALJ 1",
+      "date": "2026-11-06",
+      "opponent": "IVRY US 3",
       "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-11-21",
-      "opponent": "SAINT GRATIEN 2",
+      "date": "2026-11-20",
+      "opponent": "ELAN CHEVILLY 3",
       "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-12-05",
-      "opponent": "MONTREUIL ES 1",
+      "date": "2026-12-04",
+      "opponent": "ES VILLIERS 6",
       "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-12-12",
-      "opponent": "ROMAINVILLOIS TT 1",
+      "date": "2026-12-11",
+      "opponent": "BOISSY SL ASTT 1",
       "home": false,
       "status": "upcoming",
       "result": null,

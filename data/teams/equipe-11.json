@@ -1,7 +1,7 @@
 {
-  "id": "equipe-2",
-  "name": "Equipe 2 - Masculine",
-  "division": "Nationale 3",
+  "id": "equipe-11",
+  "name": "Equipe 11 - Masculine",
+  "division": "Départementale 4",
   "photo": "",
   "description": "",
   "showPlayers": false,
@@ -13,56 +13,56 @@
   },
   "matches": [
     {
-      "date": "2026-09-19",
-      "opponent": "PARIS IX ATT 1",
+      "date": "2026-09-25",
+      "opponent": "FONTENAYSIENNE US TT 16",
       "home": true,
       "status": "played",
-      "result": "V",
-      "score": "8-1"
+      "result": "D",
+      "score": "12-8"
     },
     {
-      "date": "2026-10-03",
-      "opponent": "PASSAGEOIS TT 2",
+      "date": "2026-10-02",
+      "opponent": "KREMLIN-BICETRE US 7",
       "home": false,
       "status": "played",
       "result": "V",
-      "score": "8-2"
+      "score": "13-7"
     },
     {
-      "date": "2026-10-17",
-      "opponent": "SAINTE PAZANNE 1",
+      "date": "2026-10-16",
+      "opponent": "ST MAURICE TT 5",
       "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-11-07",
-      "opponent": "FUTURO VALVERT TT 1",
+      "date": "2026-11-06",
+      "opponent": "BRY PSC 5",
       "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-11-21",
-      "opponent": "BIARRITZ GOELANDS 1",
+      "date": "2026-11-20",
+      "opponent": "PERREUX APP 6",
       "home": true,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-12-05",
-      "opponent": "LE MANS SARTHE TT 2",
+      "date": "2026-12-04",
+      "opponent": "FRESNES AASF 5",
       "home": false,
       "status": "upcoming",
       "result": null,
       "score": null
     },
     {
-      "date": "2026-12-12",
-      "opponent": "BOIS GUILLAUME US 1",
+      "date": "2026-12-11",
+      "opponent": "VGA SAINT MAUR US 12",
       "home": true,
       "status": "upcoming",
       "result": null,

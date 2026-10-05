@@ -47,6 +47,46 @@
           "id": "equipe-4",
           "label": "Equipe 4 - Masculine (R3)",
           "link": "./equipe.html?id=equipe-4"
+        },
+        {
+          "id": "equipe-5",
+          "label": "Equipe 5 - Masculine (PR)",
+          "link": "./equipe.html?id=equipe-5"
+        },
+        {
+          "id": "equipe-6",
+          "label": "Equipe 6 - Masculine (PR)",
+          "link": "./equipe.html?id=equipe-6"
+        },
+        {
+          "id": "equipe-7",
+          "label": "Equipe 7 - Masculine (PR)",
+          "link": "./equipe.html?id=equipe-7"
+        },
+        {
+          "id": "equipe-8",
+          "label": "Equipe 8 - Masculine (D1)",
+          "link": "./equipe.html?id=equipe-8"
+        },
+        {
+          "id": "equipe-9",
+          "label": "Equipe 9 - Masculine (D3)",
+          "link": "./equipe.html?id=equipe-9"
+        },
+        {
+          "id": "equipe-10",
+          "label": "Equipe 10 - Masculine (D4)",
+          "link": "./equipe.html?id=equipe-10"
+        },
+        {
+          "id": "equipe-11",
+          "label": "Equipe 11 - Masculine (D4)",
+          "link": "./equipe.html?id=equipe-11"
+        },
+        {
+          "id": "equipe-12",
+          "label": "Equipe 12 - Masculine (D4)",
+          "link": "./equipe.html?id=equipe-12"
         }
       ]
     },
