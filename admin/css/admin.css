@@ -1,3 +1,15 @@
+
+.match-status-indicator {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.match-status-upcoming { background: #f1f5f9; color: var(--color-navy); border: 1px solid #cbd5e1; }
+.match-status-pending  { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.match-status-played   { background: #d1fae5; color: #059669; border: 1px solid #6ee7b7; }
+
 /* ==========================================================================
    ADMIN.CSS — AS Thiais Tennis de Table — Espace Admin
    Reprend les mêmes tokens de design que le site public pour rester cohérent.

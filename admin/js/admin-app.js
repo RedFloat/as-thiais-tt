@@ -2139,6 +2139,20 @@
 
   /* --- Lignes dynamiques : matchs --- */
 
+  function computeMatchStatus(match) {
+    if (!match || !match.date) return 'upcoming';
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (match.date >= todayStr) return 'upcoming';
+    return match.result ? 'played' : 'completed';
+  }
+
+  function matchStatusBadgeHtml(match) {
+    const s = computeMatchStatus(match);
+    if (s === 'upcoming') return '<span class="match-status-indicator match-status-upcoming">À venir</span>';
+    if (s === 'completed') return '<span class="match-status-indicator match-status-pending">Résultat à saisir</span>';
+    return '<span class="match-status-indicator match-status-played">Joué</span>';
+  }
+
   function addMatchRow(match) {
     match = match || {};
     const row = document.createElement('div');
@@ -2150,10 +2164,6 @@
         <option value="true" ${match.home !== false ? 'selected' : ''}>Domicile</option>
         <option value="false" ${match.home === false ? 'selected' : ''}>Extérieur</option>
       </select>
-      <select class="match-status-select">
-        <option value="upcoming" ${match.status !== 'played' ? 'selected' : ''}>À venir</option>
-        <option value="played" ${match.status === 'played' ? 'selected' : ''}>Joué</option>
-      </select>
       <select class="match-result-select">
         <option value="">Résultat</option>
         <option value="V" ${match.result === 'V' ? 'selected' : ''}>Victoire</option>
@@ -2161,9 +2171,16 @@
         <option value="D" ${match.result === 'D' ? 'selected' : ''}>Défaite</option>
       </select>
       <input type="text" class="match-score-input" placeholder="Score (ex : 8-4)" value="${match.score || ''}">
+      <span class="match-status-wrap">${matchStatusBadgeHtml(match)}</span>
       <button type="button" class="remove-row-btn" title="Retirer"><i class="fa-solid fa-xmark"></i></button>
     `;
     row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+    const refreshBadge = () => {
+      const cur = { date: row.querySelector('.match-date-input').value, result: row.querySelector('.match-result-select').value || null };
+      row.querySelector('.match-status-wrap').innerHTML = matchStatusBadgeHtml(cur);
+    };
+    row.querySelector('.match-date-input').addEventListener('change', refreshBadge);
+    row.querySelector('.match-result-select').addEventListener('change', refreshBadge);
     teamMatchesRows.appendChild(row);
   }
 
@@ -2308,7 +2325,7 @@
         .filter(Boolean);
 
       const matches = Array.from(teamMatchesRows.querySelectorAll('.match-row')).map((row) => {
-        const status = row.querySelector('.match-status-select').value;
+        const status = computeMatchStatus({ date: row.querySelector('.match-date-input').value, result: row.querySelector('.match-result-select').value || null });
         const result = row.querySelector('.match-result-select').value || null;
         const score = row.querySelector('.match-score-input').value.trim() || null;
         return {

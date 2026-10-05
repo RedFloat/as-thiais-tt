@@ -351,12 +351,17 @@
     return `${d}/${m}/${y}`;
   }
 
+  function computeMatchStatus(match) {
+    if (!match || !match.date) return 'upcoming';
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (match.date >= todayStr) return 'upcoming';
+    return match.result ? 'played' : 'completed';
+  }
+
   function scoreBadge(match) {
-    if (match.status === 'upcoming') {
-      return { cls: 'status-upcoming', label: 'À venir' };
-    }
-    // On retire une éventuelle lettre V/D/N déjà présente au début du score saisi,
-    // pour éviter un affichage du type "V V 8-4" si elle a été tapée par erreur.
+    const status = computeMatchStatus(match);
+    if (status === 'upcoming') return { cls: 'status-upcoming', label: 'À venir' };
+    if (status === 'completed') return { cls: 'status-completed', label: 'Résultat à venir' };
     const cleanScore = (match.score || '').replace(/^[VDN]\s*/i, '').trim();
     const scoreText = cleanScore ? ' ' + cleanScore : '';
     if (match.result === 'V') return { cls: 'score-win', label: 'V' + scoreText };
@@ -365,22 +370,19 @@
     return { cls: 'status-upcoming', label: scoreText.trim() || '—' };
   }
 
-  // Dernier match joué (le plus récent) + prochain match à venir (le plus proche),
-  // calculés automatiquement à partir du calendrier complet de l'équipe.
   function pickLastAndNext(matches) {
     const played = (matches || [])
-      .filter((m) => m.status === 'played')
+      .filter((m) => computeMatchStatus(m) === 'played')
       .sort((a, b) => (a.date < b.date ? 1 : -1));
     const upcoming = (matches || [])
-      .filter((m) => m.status === 'upcoming')
+      .filter((m) => computeMatchStatus(m) === 'upcoming')
       .sort((a, b) => (a.date > b.date ? 1 : -1));
     return { last: played[0] || null, next: upcoming[0] || null };
   }
 
-  // Forme sur les 5 derniers matchs joués (façon Flashscore), du plus ancien au plus récent.
   function computeForm(matches, count) {
     return (matches || [])
-      .filter((m) => m.status === 'played' && m.result)
+      .filter((m) => computeMatchStatus(m) === 'played' && m.result)
       .sort((a, b) => (a.date > b.date ? 1 : -1))
       .slice(-(count || 5));
   }
@@ -1005,7 +1007,7 @@
     (teams || []).forEach((team) => {
       (team.matches || []).forEach((m, i) => {
         if (!m.date) return;
-        const scoreInfo = (m.status === 'played' && (m.result || m.score))
+        const scoreInfo = (computeMatchStatus(m) === 'played' && (m.result || m.score))
           ? `Résultat : ${m.result ? m.result + ' ' : ''}${m.score ? '(' + m.score + ')' : ''}`.trim()
           : '';
         events.push({
@@ -1150,29 +1152,23 @@
       cell.appendChild(num);
 
       if (dayEvents.length > 0) {
-        const dotsWrap = document.createElement('div');
-        dotsWrap.className = 'cal-day-dots';
-        dayEvents.slice(0, 4).forEach((ev) => {
-          const dot = document.createElement('span');
-          dot.className = 'cal-day-dot';
-          dot.style.background = eventCat(ev).color;
-          dotsWrap.appendChild(dot);
+        // Regrouper par catégorie et afficher un cercle coloré avec le nombre par catégorie
+        const countByCategory = {};
+        dayEvents.forEach((ev) => {
+          const cat = ev.category || 'club';
+          countByCategory[cat] = (countByCategory[cat] || 0) + 1;
         });
-        cell.appendChild(dotsWrap);
-
-        dayEvents.slice(0, 2).forEach((ev) => {
-          const pill = document.createElement('div');
-          pill.className = 'cal-day-pill';
-          pill.style.background = eventCat(ev).color;
-          pill.textContent = ev.title;
-          cell.appendChild(pill);
+        const badgesWrap = document.createElement('div');
+        badgesWrap.className = 'cal-day-badges';
+        Object.entries(countByCategory).forEach(([cat, count]) => {
+          const badge = document.createElement('span');
+          badge.className = 'cal-day-badge';
+          badge.style.background = (EVENT_CATEGORIES[cat] || EVENT_CATEGORIES.club).color;
+          badge.textContent = count;
+          badge.title = (EVENT_CATEGORIES[cat] || EVENT_CATEGORIES.club).label + ' : ' + count + ' événement' + (count > 1 ? 's' : '');
+          badgesWrap.appendChild(badge);
         });
-        if (dayEvents.length > 2) {
-          const more = document.createElement('div');
-          more.className = 'cal-day-more';
-          more.textContent = '+' + (dayEvents.length - 2);
-          cell.appendChild(more);
-        }
+        cell.appendChild(badgesWrap);
       }
 
       cell.addEventListener('click', () => {
