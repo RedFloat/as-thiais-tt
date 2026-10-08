@@ -4,8 +4,8 @@
       "id": "admin",
       "name": "Administrateur",
       "role": "admin",
-      "passwordHash": ""
+      "passwordHash": "1e572a4102491737e7041ae47a7698a026977ea96f0c406611a4dfc3b63cfbca"
     }
   ],
-  "encryptedToken": ""
+  "encryptedToken": "VICFfGxpNgTHEOEKEndA88nWazBF1JIhr+zMEGoexeA1AiN8u1M2BroB5F2F0+1SS4IUytIC60c91n2EIlcAoBRcGl45TpfoqbdRK5JAoOS/wSBjwRsOwUziA6Anrf8Oc4tszO+sII19dZx5/4FFVNxD7HKfQiUPKg=="
 }
