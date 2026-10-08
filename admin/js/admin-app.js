@@ -560,8 +560,17 @@
       const pwdHash = await sha256(password);
       const encryptedToken = await encryptToken(token, password);
 
+      // Récupère le SHA du fichier users.json existant (nécessaire pour que GitHub accepte l'écriture)
+      let existingSha;
+      try {
+        const existing = await GitHubAPI.getJSON(testCfg, USERS_PATH);
+        existingSha = existing.sha;
+      } catch (e) {
+        existingSha = undefined; // fichier inexistant : première création
+      }
+
       const usersData = { users: [{ id: 'admin', name: 'Administrateur', role: 'admin', passwordHash: pwdHash }], encryptedToken };
-      await GitHubAPI.saveJSON(testCfg, USERS_PATH, usersData, null, 'Admin : initialisation des utilisateurs');
+      await GitHubAPI.saveJSON(testCfg, USERS_PATH, usersData, existingSha, 'Admin : initialisation des utilisateurs');
 
       firstSetupSection.classList.add('hidden');
       showLoginError('✓ Initialisation réussie ! Connecte-toi maintenant avec l\'identifiant "admin" et ton mot de passe.');
@@ -5725,12 +5734,22 @@ ${items}
 
   /* ---------- Crypto (SHA-256 + AES-256-GCM via Web Crypto API) ---------- */
 
+  // Web Crypto API — disponible uniquement en HTTPS ou localhost.
+  // Si indisponible (HTTP en local), on lève une erreur claire.
+  function ensureSecureContext() {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Ce navigateur ne supporte pas le chiffrement sécurisé en contexte non-HTTPS. Accède à l\'admin via HTTPS (ton site en ligne, pas en local).');
+    }
+  }
+
   async function sha256(text) {
+    ensureSecureContext();
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
     return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 
   async function deriveKey(password) {
+    ensureSecureContext();
     const raw = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveKey']);
     return crypto.subtle.deriveKey(
       { name: 'PBKDF2', salt: new TextEncoder().encode('as-thiais-tt-salt'), iterations: 200000, hash: 'SHA-256' },
@@ -5739,6 +5758,7 @@ ${items}
   }
 
   async function encryptToken(token, password) {
+    ensureSecureContext();
     const key = await deriveKey(password);
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(token));
@@ -5749,6 +5769,7 @@ ${items}
   }
 
   async function decryptToken(encryptedB64, password) {
+    ensureSecureContext();
     const combined = new Uint8Array(atob(encryptedB64).split('').map((c) => c.charCodeAt(0)));
     const iv = combined.slice(0, 12);
     const data = combined.slice(12);
