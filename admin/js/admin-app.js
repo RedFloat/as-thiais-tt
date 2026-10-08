@@ -452,20 +452,13 @@
   function loadStoredConfig() {
     const raw = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    try {
-      return JSON.parse(raw);
-    } catch (e) {
-      return null;
-    }
+    try { return JSON.parse(raw); } catch (e) { return null; }
   }
 
   function storeConfig(config, remember) {
     const raw = JSON.stringify(config);
-    if (remember) {
-      localStorage.setItem(STORAGE_KEY, raw);
-    } else {
-      sessionStorage.setItem(STORAGE_KEY, raw);
-    }
+    if (remember) localStorage.setItem(STORAGE_KEY, raw);
+    else sessionStorage.setItem(STORAGE_KEY, raw);
   }
 
   function clearStoredConfig() {
@@ -480,44 +473,120 @@
     loginError.classList.remove('hidden');
   }
 
-  function hideLoginError() {
-    loginError.classList.add('hidden');
+  function hideLoginError() { loginError.classList.add('hidden'); }
+
+  // Charge users.json depuis GitHub sans authentification (fichier public)
+  async function fetchUsersPublic() {
+    const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}/data/users.json`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Impossible de charger la configuration des utilisateurs.');
+    return res.json();
   }
 
-  async function attemptLogin(config, remember) {
-    loginSubmitBtn.disabled = true;
-    loginSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connexion...';
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('loginSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connexion…';
     hideLoginError();
 
     try {
+      const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+      const remember = document.getElementById('rememberMe').checked;
+
+      const usersData = await fetchUsersPublic();
+      const user = (usersData.users || []).find((u) => u.id === username);
+      if (!user) throw new Error('Identifiant ou mot de passe incorrect.');
+
+      const pwdHash = await sha256(password);
+      if (pwdHash !== user.passwordHash) throw new Error('Identifiant ou mot de passe incorrect.');
+
+      // Déchiffre le token avec le mot de passe
+      if (!usersData.encryptedToken) throw new Error('Token GitHub non configuré. Contacte l\'administrateur.');
+      const token = await decryptToken(usersData.encryptedToken, password);
+
+      const config = { token, owner: REPO_OWNER, repo: REPO_NAME, branch: REPO_BRANCH };
       await GitHubAPI.testConnection(config);
       cfg = config;
       storeConfig(config, remember);
+
+      currentUser = { id: user.id, name: user.name, role: user.role };
+      const userRaw = JSON.stringify(currentUser);
+      if (remember) localStorage.setItem(STORAGE_KEY + '_user', userRaw);
+      else sessionStorage.setItem(STORAGE_KEY + '_user', userRaw);
       enterAdminApp();
     } catch (err) {
       showLoginError(err.message || 'Connexion impossible.');
     } finally {
-      loginSubmitBtn.disabled = false;
-      loginSubmitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Se connecter';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Se connecter';
+    }
+  });
+
+  // Premier démarrage : initialise le compte admin et chiffre le token
+  const firstSetupSection = document.getElementById('firstSetupSection');
+  const firstSetupForm = document.getElementById('firstSetupForm');
+
+  async function checkFirstSetup() {
+    try {
+      const usersData = await fetchUsersPublic();
+      if (!usersData.encryptedToken) {
+        firstSetupSection.classList.remove('hidden');
+      }
+    } catch (err) {
+      firstSetupSection.classList.remove('hidden');
     }
   }
 
-  loginForm.addEventListener('submit', (e) => {
+  firstSetupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const config = {
-      token: document.getElementById('ghToken').value.trim(),
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      branch: REPO_BRANCH
-    };
-    const remember = document.getElementById('rememberMe').checked;
-    attemptLogin(config, remember);
+    const btn = document.getElementById('firstSetupBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Initialisation…';
+    hideLoginError();
+
+    try {
+      const token = document.getElementById('setupToken').value.trim();
+      const password = document.getElementById('setupPassword').value;
+      const confirm = document.getElementById('setupPasswordConfirm').value;
+      if (password !== confirm) throw new Error('Les deux mots de passe ne correspondent pas.');
+      if (password.length < 8) throw new Error('Le mot de passe doit faire au moins 8 caractères.');
+
+      // Tester le token avant de le chiffrer
+      const testCfg = { token, owner: REPO_OWNER, repo: REPO_NAME, branch: REPO_BRANCH };
+      await GitHubAPI.testConnection(testCfg);
+
+      const pwdHash = await sha256(password);
+      const encryptedToken = await encryptToken(token, password);
+
+      const usersData = { users: [{ id: 'admin', name: 'Administrateur', role: 'admin', passwordHash: pwdHash }], encryptedToken };
+      await GitHubAPI.saveJSON(testCfg, USERS_PATH, usersData, null, 'Admin : initialisation des utilisateurs');
+
+      firstSetupSection.classList.add('hidden');
+      showLoginError('✓ Initialisation réussie ! Connecte-toi maintenant avec l\'identifiant "admin" et ton mot de passe.');
+      loginError.style.color = '#059669';
+    } catch (err) {
+      showLoginError(err.message || 'Erreur lors de l\'initialisation.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i> Initialiser l\'accès';
+    }
   });
 
   logoutBtn.addEventListener('click', () => {
     clearStoredConfig();
+    localStorage.removeItem(STORAGE_KEY + '_user');
+    sessionStorage.removeItem(STORAGE_KEY + '_user');
     cfg = null;
+    currentUser = null;
     Object.keys(fileState).forEach((k) => delete fileState[k]);
+    // Réinitialise les droits pour la prochaine connexion
+    document.querySelectorAll('.nav-btn[data-view]').forEach((btn) => {
+      const li = btn.closest('li');
+      if (li) li.style.display = '';
+      btn.disabled = false;
+    });
     adminApp.classList.add('hidden');
     loginScreen.classList.remove('hidden');
   });
@@ -527,6 +596,10 @@
   function enterAdminApp() {
     loginScreen.classList.add('hidden');
     adminApp.classList.remove('hidden');
+    if (currentUser) {
+      applyRoleRestrictions(currentUser.role);
+      showCurrentUser();
+    }
     loadDashboard();
   }
 
@@ -554,6 +627,7 @@
       if (btn.dataset.view === 'pages') { loadPagesView(); loadStaticContentView(); }
       if (btn.dataset.view === 'media') loadMediaView();
       if (btn.dataset.view === 'calendar') loadEventsView();
+      if (btn.dataset.view === 'users') loadUsersView();
     });
   });
 
@@ -4872,6 +4946,7 @@ ${items}
   /* ---------- Médiathèque ---------- */
 
   const MEDIA_LIBRARY_PATH = 'data/media-library.json';
+  const USERS_PATH = 'data/users.json';
   const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
   const DOC_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv'];
 
@@ -5648,14 +5723,250 @@ ${items}
     }
   });
 
+  /* ---------- Crypto (SHA-256 + AES-256-GCM via Web Crypto API) ---------- */
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function deriveKey(password) {
+    const raw = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: new TextEncoder().encode('as-thiais-tt-salt'), iterations: 200000, hash: 'SHA-256' },
+      raw, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+    );
+  }
+
+  async function encryptToken(token, password) {
+    const key = await deriveKey(password);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(token));
+    const combined = new Uint8Array(iv.byteLength + encrypted.byteLength);
+    combined.set(iv, 0);
+    combined.set(new Uint8Array(encrypted), iv.byteLength);
+    return btoa(String.fromCharCode(...combined));
+  }
+
+  async function decryptToken(encryptedB64, password) {
+    const combined = new Uint8Array(atob(encryptedB64).split('').map((c) => c.charCodeAt(0)));
+    const iv = combined.slice(0, 12);
+    const data = combined.slice(12);
+    const key = await deriveKey(password);
+    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+    return new TextDecoder().decode(decrypted);
+  }
+
+  /* ---------- Gestion des utilisateurs ---------- */
+
+  // Rôles et droits
+  const ROLES = {
+    admin:      { label: 'Administrateur',         views: null },  // null = tout
+    pages:      { label: 'Modification des Pages', views: ['dashboard','pages','navigation','media'] },
+    teams:      { label: 'Saisies Équipes',        views: ['dashboard','teams','quickresults'] },
+    journalist: { label: 'Journaliste',            views: ['dashboard','news','albums','videos','media'] }
+  };
+
+  let currentUser = null; // { id, name, role }
+
+  function applyRoleRestrictions(role) {
+    const allowed = ROLES[role] ? ROLES[role].views : null;
+    if (!allowed) return; // admin : tout visible
+
+    document.querySelectorAll('.nav-btn[data-view]').forEach((btn) => {
+      const view = btn.dataset.view;
+      const li = btn.closest('li');
+      if (allowed.includes(view)) {
+        if (li) li.style.display = '';
+        btn.disabled = false;
+      } else {
+        if (li) li.style.display = 'none';
+      }
+    });
+
+    // Cache aussi la section token dans vue utilisateurs si non admin
+    const tokenCard = document.getElementById('changeTokenCard');
+    if (tokenCard) tokenCard.classList.toggle('hidden', role !== 'admin');
+  }
+
+  function showCurrentUser() {
+    if (!currentUser) return;
+    const roleLabel = ROLES[currentUser.role] ? ROLES[currentUser.role].label : currentUser.role;
+    const topbar = document.querySelector('.topbar-title');
+    if (topbar) topbar.innerHTML = `Espace Admin <span>${currentUser.name} · ${roleLabel}</span>`;
+  }
+
+  async function loadUsersView() {
+    const list = document.getElementById('usersList');
+    list.innerHTML = '<p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>';
+    try {
+      const data = await readFile(USERS_PATH);
+      renderUsersList(data.users || []);
+    } catch (err) {
+      list.innerHTML = '';
+      list.appendChild(buildAlert('alert-danger', 'fa-triangle-exclamation', 'Impossible de charger les utilisateurs', [err.message]));
+    }
+  }
+
+  function renderUsersList(users) {
+    const list = document.getElementById('usersList');
+    list.innerHTML = '';
+    if (users.length === 0) {
+      list.innerHTML = '<p class="empty-list-msg">Aucun utilisateur.</p>';
+      return;
+    }
+    users.forEach((u) => {
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      const roleLabel = ROLES[u.role] ? ROLES[u.role].label : u.role;
+      row.innerHTML = `
+        <div class="admin-list-thumb"><i class="fa-solid fa-user" style="color:var(--color-navy);"></i></div>
+        <div class="admin-list-info">
+          <strong>${u.name} <span style="font-weight:400; font-size:0.78rem; color:var(--color-text-muted);">(${u.id})</span></strong>
+          <span>${roleLabel}</span>
+        </div>
+        <div class="admin-list-actions">
+          <button type="button" class="edit-btn" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+          ${u.id !== 'admin' ? '<button type="button" class="delete-btn" title="Supprimer"><i class="fa-solid fa-trash"></i></button>' : ''}
+        </div>
+      `;
+      row.querySelector('.edit-btn').addEventListener('click', () => startEditUser(u));
+      if (u.id !== 'admin') row.querySelector('.delete-btn').addEventListener('click', () => deleteUser(u.id, u.name));
+      list.appendChild(row);
+    });
+  }
+
+  let editingUserId = null;
+
+  function startEditUser(u) {
+    editingUserId = u.id;
+    document.getElementById('userUsername').value = u.id;
+    document.getElementById('userUsername').disabled = true;
+    document.getElementById('userName').value = u.name;
+    document.getElementById('userRole').value = u.role;
+    document.getElementById('userPassword').value = '';
+    document.getElementById('userPasswordHint').textContent = '(laisse vide pour ne pas changer)';
+    document.getElementById('userFormTitle').textContent = 'Modifier l\'utilisateur';
+    document.getElementById('userSaveLabel').textContent = 'Enregistrer';
+    document.getElementById('userCancelBtn').classList.remove('hidden');
+    document.getElementById('userForm').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetUserForm() {
+    editingUserId = null;
+    document.getElementById('userForm').reset();
+    document.getElementById('userUsername').disabled = false;
+    document.getElementById('userPasswordHint').textContent = '(obligatoire)';
+    document.getElementById('userFormTitle').textContent = 'Ajouter un utilisateur';
+    document.getElementById('userSaveLabel').textContent = 'Ajouter';
+    document.getElementById('userCancelBtn').classList.add('hidden');
+  }
+
+  document.getElementById('userCancelBtn').addEventListener('click', resetUserForm);
+
+  document.getElementById('userForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('userSaveBtn');
+    const statusEl = document.getElementById('userStatus');
+    btn.disabled = true;
+    setStatus(statusEl, 'loading', 'Enregistrement…');
+
+    try {
+      if (!fileState[USERS_PATH]) await readFile(USERS_PATH);
+      const users = (fileState[USERS_PATH].json.users || []).slice();
+      const encryptedToken = fileState[USERS_PATH].json.encryptedToken || '';
+
+      const id = editingUserId || document.getElementById('userUsername').value.trim().toLowerCase();
+      const name = document.getElementById('userName').value.trim();
+      const role = document.getElementById('userRole').value;
+      const password = document.getElementById('userPassword').value;
+
+      if (!editingUserId && users.find((u) => u.id === id)) throw new Error(`L'identifiant "${id}" est déjà utilisé.`);
+      if (!editingUserId && !password) throw new Error('Le mot de passe est obligatoire pour un nouvel utilisateur.');
+
+      const passwordHash = password ? await sha256(password) : (users.find((u) => u.id === id) || {}).passwordHash;
+
+      const userEntry = { id, name, role, passwordHash };
+
+      let updatedUsers;
+      if (editingUserId) {
+        updatedUsers = users.map((u) => u.id === editingUserId ? userEntry : u);
+      } else {
+        updatedUsers = users.concat(userEntry);
+      }
+
+      const updated = { users: updatedUsers, encryptedToken };
+      const result = await GitHubAPI.saveJSON(cfg, USERS_PATH, updated, fileState[USERS_PATH].sha, `Admin : ${editingUserId ? 'modification' : 'ajout'} de l'utilisateur "${name}"`);
+      fileState[USERS_PATH] = { json: updated, sha: result.content.sha };
+
+      renderUsersList(updatedUsers);
+      resetUserForm();
+      setStatus(statusEl, 'success', 'Utilisateur enregistré !');
+    } catch (err) {
+      setStatus(statusEl, 'error', 'Erreur : ' + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  async function deleteUser(id, name) {
+    if (!(await showConfirmModal(`Supprimer l'utilisateur "${name}" ? Cette action est immédiate.`))) return;
+    try {
+      if (!fileState[USERS_PATH]) await readFile(USERS_PATH);
+      const updatedUsers = fileState[USERS_PATH].json.users.filter((u) => u.id !== id);
+      const updated = { users: updatedUsers, encryptedToken: fileState[USERS_PATH].json.encryptedToken || '' };
+      const result = await GitHubAPI.saveJSON(cfg, USERS_PATH, updated, fileState[USERS_PATH].sha, `Admin : suppression de l'utilisateur "${name}"`);
+      fileState[USERS_PATH] = { json: updated, sha: result.content.sha };
+      renderUsersList(updatedUsers);
+    } catch (err) {
+      alert('Erreur : ' + err.message);
+    }
+  }
+
+  // Mise à jour du token chiffré
+  document.getElementById('changeTokenForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById('changeTokenStatus');
+    const btn = document.getElementById('changeTokenBtn');
+    btn.disabled = true;
+    setStatus(statusEl, 'loading', 'Chiffrement en cours…');
+    try {
+      const newToken = document.getElementById('newToken').value.trim();
+      const adminPwd = document.getElementById('adminPasswordForToken').value;
+      if (!fileState[USERS_PATH]) await readFile(USERS_PATH);
+      const adminUser = (fileState[USERS_PATH].json.users || []).find((u) => u.id === 'admin');
+      if (!adminUser) throw new Error('Utilisateur admin introuvable.');
+      const pwdHash = await sha256(adminPwd);
+      if (pwdHash !== adminUser.passwordHash) throw new Error('Mot de passe admin incorrect.');
+      const encryptedToken = await encryptToken(newToken, adminPwd);
+      const updated = { users: fileState[USERS_PATH].json.users, encryptedToken };
+      const result = await GitHubAPI.saveJSON(cfg, USERS_PATH, updated, fileState[USERS_PATH].sha, 'Admin : mise à jour du token chiffré');
+      fileState[USERS_PATH] = { json: updated, sha: result.content.sha };
+      document.getElementById('changeTokenForm').reset();
+      setStatus(statusEl, 'success', 'Token mis à jour !');
+    } catch (err) {
+      setStatus(statusEl, 'error', 'Erreur : ' + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   /* ---------- Démarrage ---------- */
 
+  // Vérifie si le premier setup est nécessaire
+  checkFirstSetup();
+
+  // Si une session est mémorisée (token en localStorage/sessionStorage), reconnexion auto
   const stored = loadStoredConfig();
-  if (stored) {
-    document.getElementById('ghToken').value = stored.token || '';
-    attemptLogin(
-      { token: stored.token, owner: REPO_OWNER, repo: REPO_NAME, branch: REPO_BRANCH },
-      !!localStorage.getItem(STORAGE_KEY)
-    );
+  if (stored && stored.token) {
+    cfg = { token: stored.token, owner: REPO_OWNER, repo: REPO_NAME, branch: REPO_BRANCH };
+    // Récupère le profil utilisateur depuis les données stockées localement si dispo
+    const storedUser = localStorage.getItem(STORAGE_KEY + '_user') || sessionStorage.getItem(STORAGE_KEY + '_user');
+    if (storedUser) {
+      try { currentUser = JSON.parse(storedUser); } catch (e) { currentUser = { id: 'admin', name: 'Administrateur', role: 'admin' }; }
+    } else {
+      currentUser = { id: 'admin', name: 'Administrateur', role: 'admin' };
+    }
+    enterAdminApp();
   }
 })();

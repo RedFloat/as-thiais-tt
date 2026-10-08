@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "id": "admin",
+      "name": "Administrateur",
+      "role": "admin",
+      "passwordHash": ""
+    }
+  ],
+  "encryptedToken": ""
+}

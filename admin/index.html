@@ -24,24 +24,52 @@
 
       <div class="login-error hidden" id="loginError"></div>
 
+      <!-- Connexion normale : identifiant + mot de passe -->
       <form id="loginForm">
         <div class="form-group">
-          <label for="ghToken">Code d'accès administrateur</label>
-          <input type="password" id="ghToken" placeholder="Colle ton code d'accès ici" autocomplete="off" required>
-          <span class="form-hint">Ce code t'a été transmis par le webmaster du site.</span>
+          <label for="loginUsername">Identifiant</label>
+          <input type="text" id="loginUsername" placeholder="Ton identifiant" autocomplete="username" required>
         </div>
-
+        <div class="form-group">
+          <label for="loginPassword">Mot de passe</label>
+          <input type="password" id="loginPassword" placeholder="Ton mot de passe" autocomplete="current-password" required>
+        </div>
         <div class="form-group">
           <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; color:var(--color-text-muted); font-size:0.82rem;">
             <input type="checkbox" id="rememberMe" style="width:auto;">
             Se souvenir de moi sur cet appareil
           </label>
         </div>
-
         <button type="submit" class="btn btn-gold btn-block" id="loginSubmitBtn">
           <i class="fa-solid fa-right-to-bracket"></i> Se connecter
         </button>
       </form>
+
+      <!-- Premier démarrage : aucun token configuré, l'admin entre son token GitHub
+           pour l'initialiser. Ce bloc n'apparaît que si encryptedToken est vide. -->
+      <div class="hidden" id="firstSetupSection">
+        <hr style="margin:1.5rem 0; border-color:#e2e8f0;">
+        <p style="font-size:0.82rem; color:var(--color-text-muted); text-align:center; margin-bottom:1rem;">
+          <i class="fa-solid fa-circle-info"></i> Premier démarrage — configure l'accès administrateur
+        </p>
+        <form id="firstSetupForm">
+          <div class="form-group">
+            <label for="setupToken">Token GitHub</label>
+            <input type="password" id="setupToken" placeholder="ghp_..." autocomplete="off" required>
+          </div>
+          <div class="form-group">
+            <label for="setupPassword">Mot de passe admin (à retenir)</label>
+            <input type="password" id="setupPassword" placeholder="Choisis un mot de passe fort" required>
+          </div>
+          <div class="form-group">
+            <label for="setupPasswordConfirm">Confirme le mot de passe</label>
+            <input type="password" id="setupPasswordConfirm" placeholder="Répète le mot de passe" required>
+          </div>
+          <button type="submit" class="btn btn-gold btn-block" id="firstSetupBtn">
+            <i class="fa-solid fa-lock"></i> Initialiser l'accès
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -110,6 +138,9 @@
         </button></li>
         <li><button type="button" class="nav-btn" data-view="navigation">
           <i class="fa-solid fa-bars"></i> Ordre des Pages
+        </button></li>
+        <li><button type="button" class="nav-btn" data-view="users">
+          <i class="fa-solid fa-users"></i> Utilisateurs
         </button></li>
         <li><button type="button" class="nav-btn" data-view="media">
           <i class="fa-solid fa-photo-film"></i> Médiathèque
@@ -1281,6 +1312,81 @@
             <button type="button" class="btn btn-ghost" id="quickResultsBackBtn">Retour au tableau de bord</button>
           </div>
           <div class="status-msg" id="quickResultsStatus"></div>
+        </div>
+      </section>
+
+      <section class="admin-view" id="view-users">
+        <div class="view-header">
+          <h1>Utilisateurs</h1>
+          <p>Gère les accès à l'espace admin. Chaque utilisateur a son identifiant, son mot de passe et son rôle.</p>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-user-plus"></i> <span id="userFormTitle">Ajouter un utilisateur</span></h2>
+          <form id="userForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="userUsername">Identifiant</label>
+                <input type="text" id="userUsername" placeholder="ex : pierre.martin" required>
+              </div>
+              <div class="form-group">
+                <label for="userName">Nom affiché</label>
+                <input type="text" id="userName" placeholder="ex : Pierre Martin" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="userRole">Rôle</label>
+                <select id="userRole">
+                  <option value="admin">Administrateur (tous les droits)</option>
+                  <option value="pages">Modification des Pages</option>
+                  <option value="teams">Saisies Équipes</option>
+                  <option value="journalist">Journaliste</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="userPassword">Mot de passe <span id="userPasswordHint" style="font-weight:400; color:var(--color-text-muted);">(obligatoire)</span></label>
+                <input type="password" id="userPassword" placeholder="Laisse vide pour ne pas changer">
+              </div>
+            </div>
+            <div style="display:flex; gap:0.7rem; align-items:center;">
+              <button type="submit" class="btn btn-primary" id="userSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> <span id="userSaveLabel">Ajouter</span>
+              </button>
+              <button type="button" class="btn btn-ghost hidden" id="userCancelBtn">Annuler</button>
+            </div>
+            <div class="status-msg" id="userStatus"></div>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h2><i class="fa-solid fa-list"></i> Utilisateurs actuels</h2>
+          <div id="usersList">
+            <p style="color:var(--color-text-muted); font-size:0.88rem;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement…</p>
+          </div>
+        </div>
+
+        <div class="admin-card" id="changeTokenCard">
+          <h2><i class="fa-solid fa-key"></i> Token GitHub</h2>
+          <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:1rem;">
+            Mets à jour le token GitHub chiffré. Nécessite le mot de passe admin actuel pour déchiffrer et rechiffrer.
+          </p>
+          <form id="changeTokenForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="newToken">Nouveau token GitHub</label>
+                <input type="password" id="newToken" placeholder="ghp_..." required>
+              </div>
+              <div class="form-group">
+                <label for="adminPasswordForToken">Ton mot de passe admin</label>
+                <input type="password" id="adminPasswordForToken" placeholder="Pour confirmer" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="changeTokenBtn">
+              <i class="fa-solid fa-rotate"></i> Mettre à jour le token
+            </button>
+            <div class="status-msg" id="changeTokenStatus"></div>
+          </form>
         </div>
       </section>
 
