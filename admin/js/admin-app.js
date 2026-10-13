@@ -502,9 +502,9 @@
       const pwdHash = await sha256(password);
       if (pwdHash !== user.passwordHash) throw new Error('Identifiant ou mot de passe incorrect.');
 
-      // Déchiffre le token avec le mot de passe
-      if (!usersData.encryptedToken) throw new Error('Token GitHub non configuré. Contacte l\'administrateur.');
-      const token = await decryptToken(usersData.encryptedToken, password);
+      // Déchiffre le token chiffré spécifiquement pour cet utilisateur
+      if (!user.encryptedToken) throw new Error('Accès non configuré pour cet utilisateur. Demande à l\'administrateur de modifier ton compte.');
+      const token = await decryptToken(user.encryptedToken, password);
 
       const config = { token, owner: REPO_OWNER, repo: REPO_NAME, branch: REPO_BRANCH };
       await GitHubAPI.testConnection(config);
@@ -569,7 +569,7 @@
         existingSha = undefined; // fichier inexistant : première création
       }
 
-      const usersData = { users: [{ id: 'admin', name: 'Administrateur', role: 'admin', passwordHash: pwdHash }], encryptedToken };
+      const usersData = { users: [{ id: 'admin', name: 'Administrateur', role: 'admin', passwordHash: pwdHash, encryptedToken }], encryptedToken };
       await GitHubAPI.saveJSON(testCfg, USERS_PATH, usersData, existingSha, 'Admin : initialisation des utilisateurs');
 
       firstSetupSection.classList.add('hidden');
@@ -5907,7 +5907,12 @@ ${items}
 
       const passwordHash = password ? await sha256(password) : (users.find((u) => u.id === id) || {}).passwordHash;
 
-      const userEntry = { id, name, role, passwordHash };
+      // Chiffre le token courant avec le mot de passe du nouvel utilisateur
+      let userEncryptedToken = (users.find((u) => u.id === id) || {}).encryptedToken || '';
+      if (password && cfg && cfg.token) {
+        try { userEncryptedToken = await encryptToken(cfg.token, password); } catch (e) { console.warn('Chiffrement token:', e.message); }
+      }
+      const userEntry = { id, name, role, passwordHash, encryptedToken: userEncryptedToken };
 
       let updatedUsers;
       if (editingUserId) {
@@ -5960,7 +5965,13 @@ ${items}
       const pwdHash = await sha256(adminPwd);
       if (pwdHash !== adminUser.passwordHash) throw new Error('Mot de passe admin incorrect.');
       const encryptedToken = await encryptToken(newToken, adminPwd);
-      const updated = { users: fileState[USERS_PATH].json.users, encryptedToken };
+      // Met à jour le token admin, invalide ceux des autres (l'admin devra les re-sauvegarder)
+      const updatedUsers = fileState[USERS_PATH].json.users.map((u) =>
+        u.id === 'admin'
+          ? Object.assign({}, u, { encryptedToken })
+          : Object.assign({}, u, { encryptedToken: '' })
+      );
+      const updated = { users: updatedUsers, encryptedToken };
       const result = await GitHubAPI.saveJSON(cfg, USERS_PATH, updated, fileState[USERS_PATH].sha, 'Admin : mise à jour du token chiffré');
       fileState[USERS_PATH] = { json: updated, sha: result.content.sha };
       document.getElementById('changeTokenForm').reset();
