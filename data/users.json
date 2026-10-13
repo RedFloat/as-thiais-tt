@@ -1,4 +1,12 @@
 {
-  "users": [],
-  "encryptedToken": ""
+  "users": [
+    {
+      "id": "admin",
+      "name": "Administrateur",
+      "role": "admin",
+      "passwordHash": "1e572a4102491737e7041ae47a7698a026977ea96f0c406611a4dfc3b63cfbca",
+      "encryptedToken": "AwGX4BD6m/b2copXD4Snk+pgqYGbb7gc3kpFySwdjf8QmQBuVRs4SiJWgRMpB+01HsDzJ1gG0aY2mQqkAHI9ob6UXcAlFuOKzEAGx+zxPnzNNaCVa29r4nrXSMqujhWX9Ujt4Ul6nGzFnz5E/ihpghNE0RfWvQhi1w=="
+    }
+  ],
+  "encryptedToken": "AwGX4BD6m/b2copXD4Snk+pgqYGbb7gc3kpFySwdjf8QmQBuVRs4SiJWgRMpB+01HsDzJ1gG0aY2mQqkAHI9ob6UXcAlFuOKzEAGx+zxPnzNNaCVa29r4nrXSMqujhWX9Ujt4Ul6nGzFnz5E/ihpghNE0RfWvQhi1w=="
 }
