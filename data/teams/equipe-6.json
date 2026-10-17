@@ -32,9 +32,9 @@
       "date": "2026-10-16",
       "opponent": "VGA SAINT MAUR US 5",
       "home": true,
-      "status": "upcoming",
-      "result": null,
-      "score": null
+      "status": "played",
+      "result": "D",
+      "score": "12-2"
     },
     {
       "date": "2026-11-06",
