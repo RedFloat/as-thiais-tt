@@ -371,13 +371,21 @@
   }
 
   function pickLastAndNext(matches) {
-    const played = (matches || [])
-      .filter((m) => computeMatchStatus(m) === 'played')
+    const all = matches || [];
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    // "Dernier match" = le match passé le plus récent, qu'il ait un résultat ou pas.
+    // Si le plus récent n'a pas de résultat, on l'affiche quand même ("Résultat à venir")
+    // plutôt que de remonter au match d'avant — sinon l'affichage est trompeur.
+    const past = all
+      .filter((m) => m.date && m.date < todayStr)
       .sort((a, b) => (a.date < b.date ? 1 : -1));
-    const upcoming = (matches || [])
+
+    const upcoming = all
       .filter((m) => computeMatchStatus(m) === 'upcoming')
       .sort((a, b) => (a.date > b.date ? 1 : -1));
-    return { last: played[0] || null, next: upcoming[0] || null };
+
+    return { last: past[0] || null, next: upcoming[0] || null };
   }
 
   function computeForm(matches, count) {
@@ -408,7 +416,15 @@
       const { last, next } = pickLastAndNext(team.matches);
 
       let resultHtml;
-      if (last && last.result && RESULT_INFO[last.result]) {
+      if (!last) {
+        // Pas de match passé du tout
+        resultHtml = `
+          <div class="team-status team-status-none">
+            <span class="team-status-symbol">–</span> Saison à venir
+          </div>
+        `;
+      } else if (last.result && RESULT_INFO[last.result]) {
+        // Match passé avec résultat saisi
         const info = RESULT_INFO[last.result];
         const cleanScore = (last.score || '').replace(/^[VDN]\s*/i, '').trim();
         resultHtml = `
@@ -417,13 +433,16 @@
           </div>
           <span class="team-score">${cleanScore || '—'}</span>
           <span class="team-opponent">vs ${last.opponent || '?'}</span>
+          <span class="team-match-date">${formatDateFR(last.date)}</span>
         `;
       } else {
+        // Match passé SANS résultat encore saisi
         resultHtml = `
-          <div class="team-status team-status-none">
-            <span class="team-status-symbol">–</span> Aucun match
+          <div class="team-status team-status-pending">
+            <span class="team-status-symbol">…</span> Résultat à venir
           </div>
-          <span class="team-opponent">Saison à venir</span>
+          <span class="team-opponent">vs ${last.opponent || '?'}</span>
+          <span class="team-match-date">${formatDateFR(last.date)}</span>
         `;
       }
 
