@@ -4,14 +4,16 @@
       "id": "admin",
       "name": "Administrateur",
       "role": "admin",
-      "passwordHash": "1e572a4102491737e7041ae47a7698a026977ea96f0c406611a4dfc3b63cfbca"
+      "passwordHash": "1e572a4102491737e7041ae47a7698a026977ea96f0c406611a4dfc3b63cfbca",
+      "encryptedToken": "AwGX4BD6m/b2copXD4Snk+pgqYGbb7gc3kpFySwdjf8QmQBuVRs4SiJWgRMpB+01HsDzJ1gG0aY2mQqkAHI9ob6UXcAlFuOKzEAGx+zxPnzNNaCVa29r4nrXSMqujhWX9Ujt4Ul6nGzFnz5E/ihpghNE0RfWvQhi1w=="
     },
     {
       "id": "pim",
       "name": "Pierre Mathieu Germain",
-      "role": "teams",
-      "passwordHash": "f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9"
+      "role": "pages",
+      "passwordHash": "f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9",
+      "encryptedToken": "DgtknqHy3aqvZyZoGRIU04LonXSwA8wTg8UC47j1hvxzDCyxYpKIDaLKiBQE3llikmxHfSBakDgbW6wr4CLfIrC2MmPp1RFUed1HPJ6x89Ooj4nlwb5pMTb+MRCCMZNv3hBmqBRQzj7CByTjc6rTf8LvP2xksgcdfQ=="
     }
   ],
-  "encryptedToken": "VICFfGxpNgTHEOEKEndA88nWazBF1JIhr+zMEGoexeA1AiN8u1M2BroB5F2F0+1SS4IUytIC60c91n2EIlcAoBRcGl45TpfoqbdRK5JAoOS/wSBjwRsOwUziA6Anrf8Oc4tszO+sII19dZx5/4FFVNxD7HKfQiUPKg=="
+  "encryptedToken": "AwGX4BD6m/b2copXD4Snk+pgqYGbb7gc3kpFySwdjf8QmQBuVRs4SiJWgRMpB+01HsDzJ1gG0aY2mQqkAHI9ob6UXcAlFuOKzEAGx+zxPnzNNaCVa29r4nrXSMqujhWX9Ujt4Ul6nGzFnz5E/ihpghNE0RfWvQhi1w=="
 }
