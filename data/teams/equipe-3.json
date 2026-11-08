@@ -40,9 +40,9 @@
       "date": "2026-11-07",
       "opponent": "MENUCOURT 1",
       "home": true,
-      "status": "upcoming",
-      "result": null,
-      "score": null
+      "status": "played",
+      "result": "V",
+      "score": "11-3"
     },
     {
       "date": "2026-11-21",
